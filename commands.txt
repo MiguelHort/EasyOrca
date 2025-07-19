@@ -1,0 +1,2 @@
+Alterar Banco:
+npx prisma migrate dev --name add-cpf-to-cliente
