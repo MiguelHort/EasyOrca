@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useCallback } from "react";
 import { jsPDF } from "jspdf";
 import { supabase } from "@/lib/supabase";
