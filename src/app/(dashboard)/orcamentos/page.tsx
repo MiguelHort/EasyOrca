@@ -22,7 +22,8 @@ export default function HistoricoOrcamentosPage() {
   const [orcamentoSelecionado, setOrcamentoSelecionado] = useState<Orcamento | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const user: User = useUserInfo(); // Hook substitui o getInfoUser
+  // Hook para dados do usuário
+  const user: User = useUserInfo();
 
   const { generatePDF, isGeneratingPDF, lastPdfLink, setLastPdfLink } = usePDFGenerator();
   const { sendWhatsApp } = useWhatsApp();
@@ -32,7 +33,7 @@ export default function HistoricoOrcamentosPage() {
       setLoading(true);
       setError(null);
 
-      // Substitua isso pela chamada real de API:
+      // TODO: substituir pelo fetch real da sua API
       const mockOrcamentos: Orcamento[] = [
         {
           id: "001",
@@ -151,9 +152,7 @@ export default function HistoricoOrcamentosPage() {
         <div className="container mx-auto px-4 py-8">
           <Alert className="mb-6 border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-400/40">
             <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-            <AlertDescription className="text-red-800 dark:text-red-200">
-              {error}
-            </AlertDescription>
+            <AlertDescription className="text-red-800 dark:text-red-200">{error}</AlertDescription>
           </Alert>
           <div className="text-center">
             <Button onClick={handleRetry} className="mt-4">
@@ -170,12 +169,8 @@ export default function HistoricoOrcamentosPage() {
       <SiteHeader title="Orçamentos" />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Histórico de Orçamentos
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Visualize e gerencie seus orçamentos criados
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Histórico de Orçamentos</h1>
+          <p className="text-gray-600 dark:text-gray-400">Visualize e gerencie seus orçamentos criados</p>
         </div>
 
         {orcamentos.length === 0 ? (
@@ -183,9 +178,7 @@ export default function HistoricoOrcamentosPage() {
             <CardContent>
               <div className="text-gray-500 dark:text-gray-400 mb-4">
                 <AlertCircle className="h-12 w-12 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">
-                  Nenhum orçamento encontrado
-                </h3>
+                <h3 className="text-xl font-semibold mb-2">Nenhum orçamento encontrado</h3>
                 <p>Você ainda não possui orçamentos criados.</p>
               </div>
               <Button onClick={handleRetry} variant="outline">
@@ -196,11 +189,7 @@ export default function HistoricoOrcamentosPage() {
         ) : (
           <div className="grid gap-4">
             {orcamentos.map((orcamento) => (
-              <OrcamentoCard
-                key={orcamento.id}
-                orcamento={orcamento}
-                onViewDetails={handleViewDetails}
-              />
+              <OrcamentoCard key={orcamento.id} orcamento={orcamento} onViewDetails={handleViewDetails} />
             ))}
           </div>
         )}
@@ -216,10 +205,7 @@ export default function HistoricoOrcamentosPage() {
         lastPdfLink={lastPdfLink}
       />
 
-      <FloatingWidget
-        lastPdfLink={lastPdfLink}
-        onSendWhatsApp={handleSendWhatsApp}
-      />
+      <FloatingWidget lastPdfLink={lastPdfLink} onSendWhatsApp={handleSendWhatsApp} />
     </div>
   );
 }
