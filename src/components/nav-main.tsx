@@ -29,11 +29,11 @@ export function NavMain({
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
-            <Link className="w-full" href="/dashboard/orcamentos/novo">
+            <Link className="w-full" href="/orcamentos/novo">
               <SidebarMenuButton
                 tooltip="Novo Orçamento"
                 className={`min-w-8 duration-200 ease-linear ${
-                  pathname === "/dashboard/orcamentos/novo"
+                  pathname === "/orcamentos/novo"
                     ? "bg-primary text-primary-foreground hover:text-primary-foreground hover:bg-primary/90 dark:text-primary-foreground dark:hover:bg-primary/90"
                     : "bg-primary text-primary-foreground hover:bg-primary/90"
                 }`}

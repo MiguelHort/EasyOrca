@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { NotepadTextDashed, Lock, Mail, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { getUser } from "../../api/http/auth";
+import { getUser } from "@/lib/services/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -41,7 +41,7 @@ export default function LoginPage() {
         
         // Aguarda 5 segundos antes de redirecionar
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/home");
         }, 3000);
       }
     } catch {

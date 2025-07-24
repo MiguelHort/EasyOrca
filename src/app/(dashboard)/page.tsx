@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ClipboardList, FilePlus2, Users, Wrench } from "lucide-react";
-import { getInfoUser } from "@/api/http/infoUser";
+import { getInfoUser } from "@/lib/services/infoUser";
 
 import {
   Card,

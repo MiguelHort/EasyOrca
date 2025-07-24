@@ -23,10 +23,13 @@ import {
 } from "lucide-react";
 import { ThemePButton2 } from "@/components/theme-button-2";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function AutoOrcaLanding() {
   const [isVisible, setIsVisible] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [atTop, setAtTop] = useState(true);
 
   useEffect(() => {
     setIsVisible(true);
@@ -34,6 +37,15 @@ export default function AutoOrcaLanding() {
       setCurrentTestimonial((prev) => (prev + 1) % 3);
     }, 4000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setAtTop(window.scrollY === 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const testimonials = [
@@ -70,36 +82,73 @@ export default function AutoOrcaLanding() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <header
+        className={`fixed top-0 w-full z-50 backdrop-blur-md transition-colors duration-500 ${
+          atTop ? "bg-transparent" : "bg-background/80"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-16 py-4 flex justify-between items-center">
+          {/* Logo */}
           <div className="flex items-center space-x-2">
-            <NotepadTextDashed className="h-8 w-8 stroke-2 text-primary" />
-            <span className="text-xl font-bold text-blue-600">EasyOrça</span>
+            <NotepadTextDashed
+              className={`h-8 w-8 stroke-2 ${
+                atTop ? "text-white" : "text-primary"
+              }`}
+            />
+            <span
+              className={`text-xl font-bold ${
+                atTop ? "text-white" : "text-blue-600"
+              }`}
+            >
+              EasyOrça
+            </span>
           </div>
+
+          {/* Navegação */}
           <nav className="hidden md:flex space-x-8">
             <a
               href="#features"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className={`transition-colors ${
+                atTop
+                  ? "text-white hover:text-white/80"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               Recursos
             </a>
             <a
               href="#how-it-works"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className={`transition-colors ${
+                atTop
+                  ? "text-white hover:text-white/80"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               Como Funciona
             </a>
             <a
               href="#testimonials"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className={`transition-colors ${
+                atTop
+                  ? "text-white hover:text-white/80"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               Depoimentos
             </a>
           </nav>
+
+          {/* Botões */}
           <div className="flex items-center space-x-4">
             <ThemePButton2 />
             <Link href="/login">
-              <button className="text-muted-foreground hover:text-foreground transition-colors">
+              <button
+                className={`transition-colors ${
+                  atTop
+                    ? "text-white hover:text-white/80"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
                 Entrar
               </button>
             </Link>
@@ -113,60 +162,73 @@ export default function AutoOrcaLanding() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="flex flex-col-reverse md:flex-row items-center justify-between max-w-7xl mx-auto">
+      <section className="pt-32 pb-20 px-4 bg-blue-600 rounded-b-[120px] text-white overflow-hidden relative">
+        <div className="flex px-16 flex-col-reverse lg:flex-row items-center justify-between max-w-7xl mx-auto">
           {/* Texto à esquerda */}
-          <div className="max-w-xl text-center md:text-left">
-            <div className="inline-flex items-center space-x-2 bg-secondary rounded-full px-4 py-2 mb-6 border border-blue-600/20">
-              <Gift className="w-4 h-4 text-green-500" />
-              <span className="text-sm text-muted-foreground">
-                50% off - International Girlfriend Day!
-              </span>
-            </div>
-
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              <span className="text-muted-foreground">
-                Don't give a traditional gift.
-              </span>
+          <div className="max-w-2xl text-left lg:pr-16">
+            <h1 className="text-4xl md:text-3xl lg:text-6xl font-bold mb-8 leading-tight">
+              Faça orçamentos
               <br />
-              Give something{" "}
-              <span className="inline-flex items-center space-x-2">
-                <Gift className="w-6 h-6 text-primary" />{" "}
-                <span>that makes the</span>
-              </span>
+              em menos de
               <br />
-              <span className="text-primary">heart race.</span>
+              <span className="relative inline-block">
+                um{" "}
+                <span className="relative inline-block w-80 text-white font-bold z-10">
+                  <img
+                    src="\circulo.png"
+                    alt="círculo verde"
+                    className="absolute top-1 -left-4 w-60 object-containe"
+                    style={{ zIndex: 0 }}
+                  />
+                  <span className="relative z-10 text-white font-bold">
+                    minuto
+                  </span>
+                </span>
+              </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl">
-              Turn simple moments into thrilling surprises. Whether it’s a
-              birthday, wedding, or just because you remembered — create your
-              unique memory now and send it to someone you love.
+            <p
+              className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed max-w-lg"
+              style={{ fontFamily: "Comic Sans MS, cursive" }}
+            >
+              Uma boa entrega para o seu
+              <br />
+              cliente, começa aqui.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-              <button className="bg-primary text-primary-foreground px-6 py-3 rounded-xl text-base font-semibold hover:bg-primary/90 transition-all">
-                Create your memory
-              </button>
-              <span className="text-sm text-muted-foreground flex items-center">
-                💖 45,000+ memories eternalized
-              </span>
+            {/* Imagem da seta curva apontando para o botão */}
+            <div className="relative mb-">
+              <img
+                src="\seta.png"
+                alt="Seta curva apontando para o botão"
+                className="absolute -top-10 left-48 w-24 h-16 object-contain"
+                draggable={false}
+              />
+            </div>
+
+            <div className="flex justify-start">
+              <Button className="text-lg font-semibold px-8 py-4 bg-lime-400 text-white hover:bg-lime-400 transition-all shadow-lg transform hover:scale-105">
+                Conferir planos
+              </Button>
             </div>
           </div>
 
-          {/* Imagem à direita */}
-          <div className="mb-12 md:mb-0 md:ml-12">
-            <img
-              src="/e15c3cbb-0eeb-4290-bb94-643dfd4ff196.png"
-              alt="Love Story Demo"
-              className="w-[320px] md:w-[400px] rounded-2xl shadow-2xl"
-            />
+          {/* Mockups à direita */}
+          <div className="mb-12 lg:mb-0 relative flex items-center justify-center lg:justify-end">
+            <div className="relative">
+              <Image
+                src="/mockup.png"
+                alt="Mockup da aplicação EasyOrça"
+                width={500}
+                height={300}
+              />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-secondary/50">
+      <section id="features" className="py-20 px-16 bg-secondary/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
@@ -181,45 +243,45 @@ export default function AutoOrcaLanding() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: <Zap className="w-12 h-12 text-yellow-500" />,
+                icon: <Zap className="w-8 h-8 text-yellow-500" />,
                 title: "Velocidade Extrema",
                 description:
                   "Crie orçamentos completos em menos de 30 segundos. Sua produtividade nunca mais será a mesma.",
               },
               {
-                icon: <Award className="w-12 h-12 text-blue-500" />,
+                icon: <Award className="w-8 h-8 text-blue-500" />,
                 title: "Qualidade Profissional",
                 description:
                   "Templates premium que impressionam clientes e aumentam sua credibilidade no mercado.",
               },
               {
-                icon: <Shield className="w-12 h-12 text-green-500" />,
+                icon: <Shield className="w-8 h-8 text-green-500" />,
                 title: "Segurança Total",
                 description:
                   "Criptografia militar e backups automáticos. Seus dados e de seus clientes sempre protegidos.",
               },
               {
-                icon: <TrendingUp className="w-12 h-12 text-purple-500" />,
+                icon: <TrendingUp className="w-8 h-8 text-purple-500" />,
                 title: "Aumente suas Vendas",
                 description:
                   "Orçamentos profissionais geram 40% mais conversões. Transforme propostas em contratos.",
               },
               {
-                icon: <Clock className="w-12 h-12 text-cyan-500" />,
+                icon: <Clock className="w-8 h-8 text-cyan-500" />,
                 title: "Economia de Tempo",
                 description:
                   "Economize até 20 horas por semana automatizando a criação de orçamentos.",
               },
               {
-                icon: <Target className="w-12 h-12 text-red-500" />,
+                icon: <Target className="w-8 h-8 text-red-500" />,
                 title: "Foco no Negócio",
                 description:
                   "Menos tempo com burocracia, mais tempo para crescer seu negócio e atender clientes.",
               },
             ].map((feature, index) => (
               <div key={index} className="group relative">
-                <div className="bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
-                  <div className="w-16 h-16 rounded-xl bg-secondary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="h-70 bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     {feature.icon}
                   </div>
                   <h3 className="text-xl font-bold mb-4">{feature.title}</h3>
@@ -234,7 +296,7 @@ export default function AutoOrcaLanding() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 px-4">
+      <section id="how-it-works" className="py-20 px-16">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
@@ -247,7 +309,12 @@ export default function AutoOrcaLanding() {
 
           <div className="grid md:grid-cols-3 gap-12 relative">
             {/* Connecting lines */}
-            <div className="hidden md:block absolute top-20 left-1/2 w-full h-0.5 bg-blue-600/30 transform -translate-x-1/2 -translate-y-1/2"></div>
+            {/* Animated dotted arrow */}
+            <div className="hidden md:flex animated-dotted-arrow">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <span key={i}>•</span>
+              ))}
+            </div>
 
             {[
               {

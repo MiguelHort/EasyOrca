@@ -21,29 +21,29 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useTheme } from "next-themes"
-import { getInfoUser } from "@/api/http/infoUser"
+import { getInfoUser } from "@/lib/services/infoUser"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 
 const navItems = [
   {
     title: "Início",
-    url: "/dashboard",
+    url: "/home",
     icon: LayoutDashboard,
   },
   {
     title: "Histórico de Orçamentos",
-    url: "/dashboard/orcamentos",
+    url: "/orcamentos",
     icon: ListOrdered,
   },
   {
     title: "Clientes",
-    url: "/dashboard/clientes",
+    url: "/clientes",
     icon: Users2,
   },
   {
     title: "Serviços",
-    url: "/dashboard/servicos",
+    url: "/servicos",
     icon: Settings2,
   },
 ]

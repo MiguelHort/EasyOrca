@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { AlertCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
-import { getInfoUser } from "@/api/http/infoUser";
+import { getInfoUser } from "@/lib/services/infoUser";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";

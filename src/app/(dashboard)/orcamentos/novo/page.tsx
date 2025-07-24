@@ -75,7 +75,7 @@ export default function NovoOrcamentoPage() {
         return;
       }
 
-      router.push("/dashboard/orcamentos");
+      router.push("/orcamentos");
     } catch (err) {
       console.error(err);
       alert("Erro inesperado ao criar orçamento.");
