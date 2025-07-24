@@ -1,10 +1,8 @@
 "use client";
-export const dynamic = "force-dynamic";
 
 import { useEffect, useState, useCallback } from "react";
 import { AlertCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
-import { getInfoUser } from "@/lib/services/infoUser";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,42 +13,26 @@ import { FloatingWidget } from "@/components/floatingWidget";
 import { usePDFGenerator } from "@/hooks/usePDFGenerator";
 import { useWhatsApp } from "@/hooks/useWhatsApp";
 import { Orcamento, User } from "@/types/orcamento";
+import { useUserInfo } from "@/hooks/useUserInfo";
 
-/**
- * Compatível com o modo claro/escuro do Tailwind (`darkMode: 'class'`).
- *
- * Observação: certifique‑se de adicionar/remover a classe `dark` no elemento `<html>`
- * (ou utilizar algum provider) para alternar entre os temas.
- */
 export default function HistoricoOrcamentosPage() {
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [orcamentoSelecionado, setOrcamentoSelecionado] = useState<Orcamento | null>(null);
-  const [user, setUser] = useState<User>({ companyName: "", companyImage: "" });
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const user: User = useUserInfo(); // Hook substitui o getInfoUser
 
   const { generatePDF, isGeneratingPDF, lastPdfLink, setLastPdfLink } = usePDFGenerator();
   const { sendWhatsApp } = useWhatsApp();
-
-  const fetchUser = useCallback(async () => {
-    try {
-      const userInfo = await getInfoUser();
-      setUser({
-        companyName: userInfo?.companyName || "",
-        companyImage: userInfo?.companyImage || "",
-      });
-    } catch (err) {
-      console.error("Erro ao carregar usuário:", err);
-      setError("Erro ao carregar dados do usuário");
-    }
-  }, []);
 
   const fetchOrcamentos = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      // Substitua por sua API real
+
+      // Substitua isso pela chamada real de API:
       const mockOrcamentos: Orcamento[] = [
         {
           id: "001",
@@ -82,6 +64,7 @@ export default function HistoricoOrcamentosPage() {
           itens: [{ descricao: "Serviço X", quantidade: 3, valor: 600.0 }],
         },
       ];
+
       setOrcamentos(mockOrcamentos);
     } catch (err) {
       console.error("Erro ao carregar orçamentos:", err);
@@ -92,9 +75,8 @@ export default function HistoricoOrcamentosPage() {
   }, []);
 
   useEffect(() => {
-    fetchUser();
     fetchOrcamentos();
-  }, [fetchUser, fetchOrcamentos]);
+  }, [fetchOrcamentos]);
 
   const handleViewDetails = useCallback(
     (orcamento: Orcamento) => {
