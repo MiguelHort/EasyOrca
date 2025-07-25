@@ -34,8 +34,8 @@ export function NavMain({
                 tooltip="Novo Orçamento"
                 className={`min-w-8 duration-200 ease-linear ${
                   pathname === "/orcamentos/novo"
-                    ? "bg-primary text-primary-foreground hover:text-primary-foreground hover:bg-primary/90 dark:text-primary-foreground dark:hover:bg-primary/90"
-                    : "bg-primary text-primary-foreground hover:bg-primary/90"
+                    ? "bg-primary text-foreground hover:text-foreground hover:bg-primary/90 dark:text-foreground dark:hover:bg-primary/90"
+                    : "bg-primary text-primary-foreground hover:bg-primary/90 dark:text-foreground"
                 }`}
               >
                 <FilePlus2 />
@@ -55,7 +55,7 @@ export function NavMain({
                     tooltip={item.title}
                     className={`duration-200 ease-linear ${
                       isActive
-                        ? "bg-border dark:text-primary"
+                        ? "bg-border dark:text-foreground"
                         : "hover:bg-muted"
                     }`}
                   >

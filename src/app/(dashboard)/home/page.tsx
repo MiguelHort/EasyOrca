@@ -44,7 +44,7 @@ export default function DashboardPage() {
 
       <main className="min-h-screen bg-background">
         <div className="bg-primary">
-          <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-primary text-primary-foreground">
+          <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-primary text-white">
             <h1 className="text-3xl font-bold tracking-tight">
               Olá{userName ? `, ${userName}` : ""}! 👋
             </h1>
@@ -57,19 +57,19 @@ export default function DashboardPage() {
             <h2 className="text-xl font-semibold mb-4">Acesso Rápido</h2>
             <div className="flex flex-wrap gap-4">
               <Link href="/orcamentos">
-                <Button variant={"outline"} className="border-lime-400 cursor-pointer">
+                <Button variant={"outline"} className="border-lime-400 dark:border-lime-400 cursor-pointer">
                   <FilePlus2 className="h-5 w-5" />
                   Orçamentos
                 </Button>
               </Link>
               <Link href="/clientes">
-                <Button variant={"outline"} className="border-purple-600 cursor-pointer">
+                <Button variant={"outline"} className="border-purple-600 dark:border-purple-600 cursor-pointer">
                   <Users className="h-5 w-5" />
                   Clientes
                 </Button>
               </Link>
               <Link href="/servicos">
-                <Button variant={"outline"} className="border-red-600 cursor-pointer">
+                <Button variant={"outline"} className="border-red-600 dark:border-red-600 cursor-pointer">
                   <Wrench className="h-5 w-5" />
                   Serviços
                 </Button>
