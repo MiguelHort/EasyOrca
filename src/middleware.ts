@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-const SECRET_KEY = process.env.NEXT_PUBLIC_JWT_SECRET;
+const SECRET_KEY = process.env.JWT_SECRET;
 
 const publicRoutes = [
   { path: "/login", whenAuthenticated: "redirect" },
