@@ -20,6 +20,13 @@ import {
   ChevronRight,
   NotepadTextDashed,
   Gift,
+  Smartphone,
+  Send,
+  CreditCard,
+  FilePlus2,
+  Wrench,
+  ClipboardList,
+  UserCheck,
 } from "lucide-react";
 import { ThemePButton2 } from "@/components/theme-button-2";
 import Link from "next/link";
@@ -114,7 +121,7 @@ export default function AutoOrcaLanding() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Recursos
+              Nosso Diferencial
             </a>
             <a
               href="#how-it-works"
@@ -124,7 +131,7 @@ export default function AutoOrcaLanding() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Como Funciona
+                Direto ao Ponto
             </a>
             <a
               href="#testimonials"
@@ -153,8 +160,8 @@ export default function AutoOrcaLanding() {
               </button>
             </Link>
             <Link href="/register">
-              <button className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-all transform hover:scale-105">
-                Começar Grátis
+              <button className="bg-primary-foreground text-foreground font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition-all transform hover:scale-105">
+                Cadastrar-se
               </button>
             </Link>
           </div>
@@ -162,66 +169,68 @@ export default function AutoOrcaLanding() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 bg-blue-600 rounded-b-[120px] text-white overflow-hidden relative">
-        <div className="flex px-16 flex-col-reverse lg:flex-row items-center justify-between max-w-7xl mx-auto">
-          {/* Texto à esquerda */}
-          <div className="max-w-2xl text-left lg:pr-16">
-            <h1 className="text-4xl md:text-3xl lg:text-6xl font-bold mb-8 leading-tight">
-              Faça orçamentos
-              <br />
-              em menos de
-              <br />
-              <span className="relative inline-block">
-                um{" "}
-                <span className="relative inline-block w-80 text-white font-bold z-10">
-                  <img
-                    src="\circulo.png"
-                    alt="círculo verde"
-                    className="absolute top-1 -left-4 w-60 object-containe"
-                    style={{ zIndex: 0 }}
-                  />
-                  <span className="relative z-10 text-white font-bold">
-                    minuto
+      <section className="bg-secondary/50">
+        <div className="pt-32 pb-20 px-4 bg-blue-600 rounded-b-[120px] text-white overflow-hidden relative">
+          <div className="flex px-16 flex-col-reverse lg:flex-row items-center justify-between max-w-7xl mx-auto">
+            {/* Texto à esquerda */}
+            <div className="max-w-2xl text-left lg:pr-16">
+              <h1 className="text-4xl md:text-3xl lg:text-6xl font-bold mb-8 leading-tight">
+                Faça orçamentos
+                <br />
+                em menos de
+                <br />
+                <span className="relative inline-block">
+                  um{" "}
+                  <span className="relative inline-block w-80 text-white font-bold z-10">
+                    <img
+                      src="\circulo.png"
+                      alt="círculo verde"
+                      className="absolute top-1 -left-4 w-60 object-containe"
+                      style={{ zIndex: 0 }}
+                    />
+                    <span className="relative z-10 text-white font-bold">
+                      minuto
+                    </span>
                   </span>
                 </span>
-              </span>
-            </h1>
+              </h1>
 
-            <p
-              className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed max-w-lg"
-              style={{ fontFamily: "Comic Sans MS, cursive" }}
-            >
-              Uma boa entrega para o seu
-              <br />
-              cliente, começa aqui.
-            </p>
+              <p
+                className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed max-w-lg"
+                style={{ fontFamily: "Comic Sans MS, cursive" }}
+              >
+                Uma boa entrega para o seu
+                <br />
+                cliente, começa aqui.
+              </p>
 
-            {/* Imagem da seta curva apontando para o botão */}
-            <div className="relative mb-">
-              <img
-                src="\seta.png"
-                alt="Seta curva apontando para o botão"
-                className="absolute -top-10 left-48 w-24 h-16 object-contain"
-                draggable={false}
-              />
+              {/* Imagem da seta curva apontando para o botão */}
+              <div className="relative mb-">
+                <img
+                  src="\seta.png"
+                  alt="Seta curva apontando para o botão"
+                  className="absolute -top-10 left-48 w-24 h-16 object-contain"
+                  draggable={false}
+                />
+              </div>
+
+              <div className="flex justify-start">
+                <Button className="text-lg font-semibold px-8 py-4 bg-lime-400 text-white hover:bg-lime-400 transition-all shadow-lg transform hover:scale-105">
+                  Conferir planos
+                </Button>
+              </div>
             </div>
 
-            <div className="flex justify-start">
-              <Button className="text-lg font-semibold px-8 py-4 bg-lime-400 text-white hover:bg-lime-400 transition-all shadow-lg transform hover:scale-105">
-                Conferir planos
-              </Button>
-            </div>
-          </div>
-
-          {/* Mockups à direita */}
-          <div className="mb-12 lg:mb-0 relative flex items-center justify-center lg:justify-end">
-            <div className="relative">
-              <Image
-                src="/mockup.png"
-                alt="Mockup da aplicação EasyOrça"
-                width={500}
-                height={300}
-              />
+            {/* Mockups à direita */}
+            <div className="mb-12 lg:mb-0 relative flex items-center justify-center lg:justify-end">
+              <div className="relative">
+                <Image
+                  src="/mockup.png"
+                  alt="Mockup da aplicação EasyOrça"
+                  width={500}
+                  height={300}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -232,7 +241,7 @@ export default function AutoOrcaLanding() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Por que escolher o AutoOrça?
+              Por que escolher o EasyOrça?
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Desenvolvido especificamente para profissionais que valorizam
@@ -242,42 +251,42 @@ export default function AutoOrcaLanding() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              {
-                icon: <Zap className="w-8 h-8 text-yellow-500" />,
-                title: "Velocidade Extrema",
-                description:
-                  "Crie orçamentos completos em menos de 30 segundos. Sua produtividade nunca mais será a mesma.",
-              },
-              {
-                icon: <Award className="w-8 h-8 text-blue-500" />,
-                title: "Qualidade Profissional",
-                description:
-                  "Templates premium que impressionam clientes e aumentam sua credibilidade no mercado.",
-              },
-              {
-                icon: <Shield className="w-8 h-8 text-green-500" />,
-                title: "Segurança Total",
-                description:
-                  "Criptografia militar e backups automáticos. Seus dados e de seus clientes sempre protegidos.",
-              },
-              {
-                icon: <TrendingUp className="w-8 h-8 text-purple-500" />,
-                title: "Aumente suas Vendas",
-                description:
-                  "Orçamentos profissionais geram 40% mais conversões. Transforme propostas em contratos.",
-              },
-              {
-                icon: <Clock className="w-8 h-8 text-cyan-500" />,
-                title: "Economia de Tempo",
-                description:
-                  "Economize até 20 horas por semana automatizando a criação de orçamentos.",
-              },
-              {
-                icon: <Target className="w-8 h-8 text-red-500" />,
-                title: "Foco no Negócio",
-                description:
-                  "Menos tempo com burocracia, mais tempo para crescer seu negócio e atender clientes.",
-              },
+                {
+                  icon: <Zap className="w-8 h-8 text-yellow-500" />,
+                  title: "Orçamentos em 30 Segundos",
+                  description:
+                    "Ganhe tempo com a criação de orçamentos automatizados e profissionais em poucos cliques.",
+                },
+                {
+                  icon: <Smartphone className="w-8 h-8 text-blue-500" />,
+                  title: "100% Mobile",
+                  description:
+                    "Use em qualquer celular, tablet ou computador. Ideal para quem está sempre em movimento.",
+                },
+                {
+                  icon: <Send className="w-8 h-8 text-green-500" />,
+                  title: "Envio por WhatsApp",
+                  description:
+                    "Compartilhe orçamentos diretamente com seus clientes pelo WhatsApp ou por link.",
+                },
+                {
+                  icon: <FileText className="w-8 h-8 text-purple-500" />,
+                  title: "PDF Profissional",
+                  description:
+                    "Orçamentos com aparência profissional, prontos para serem enviados e impressionar seus clientes.",
+                },
+                {
+                  icon: <CreditCard className="w-8 h-8 text-cyan-500" />,
+                  title: "Aceita Pix e Cartão",
+                  description:
+                    "Facilite o pagamento com Pix ou cartão via integração com plataformas de pagamento.",
+                },
+                {
+                  icon: <UserCheck className="w-8 h-8 text-red-500" />,
+                  title: "Feito para Autônomos",
+                  description:
+                    "Fácil de usar, sem burocracia. Foco no que realmente importa: vender e atender bem.",
+                },
             ].map((feature, index) => (
               <div key={index} className="group relative">
                 <div className="h-70 bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
@@ -438,7 +447,7 @@ export default function AutoOrcaLanding() {
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-8 text-primary-foreground/80">
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5" />
-              <span>Grátis para sempre</span>
+              <span>Grátis para nunca </span>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5" />
@@ -461,7 +470,7 @@ export default function AutoOrcaLanding() {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="text-xl font-bold text-primary">AutoOrça</span>
+                <span className="text-xl font-bold text-primary">EasyOrça</span>
               </div>
               <p className="text-muted-foreground">
                 A ferramenta mais rápida e profissional para criar orçamentos.

@@ -1,16 +1,24 @@
 // src/hooks/useUserInfo.ts
 "use client";
+
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 
 export function useUserInfo() {
-  const [user, setUser] = useState({ companyName: "", companyImage: "" });
+  const [user, setUser] = useState<null | {
+    id: string;
+    name: string;
+    email: string;
+    companyName: string;
+    companyImage: string;
+  }>(null);
 
   useEffect(() => {
     async function fetchUser() {
-      const { data } = await supabase.from("users").select("*").single();
-      if (data) setUser(data);
+      const res = await fetch("/api/auth/me");
+      const json = await res.json();
+      setUser(json.user);
     }
+
     fetchUser();
   }, []);
 
