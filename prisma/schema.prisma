@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,73 +8,63 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(uuid())
+  id           String      @id @default(uuid())
   name         String
-  email        String     @unique
+  email        String      @unique
   passwordHash String
   phone        String?
-  createdAt    DateTime   @default(now())
-  profileImage String?    @default("default.jpg")
-  userName     String?    @unique
-  companyName  String?  
-  companyImage String?    @default("default.jpg")
-
+  createdAt    DateTime    @default(now())
+  profileImage String?     @default("default.jpg")
+  companyName  String?
+  userName     String?     @unique
+  companyImage String?     @default("default.jpg")
   clientes     Cliente[]
-  servicos     Servico[]
   orcamentos   Orcamento[]
+  servicos     Servico[]
 }
 
 model Cliente {
-  id         String     @id @default(uuid())
+  id         String      @id @default(uuid())
   nome       String
   email      String?
   telefone   String?
-  createdAt  DateTime   @default(now())
-
+  createdAt  DateTime    @default(now())
   userId     String
-  user       User       @relation(fields: [userId], references: [id])
-
+  user       User        @relation(fields: [userId], references: [id])
   orcamentos Orcamento[]
 }
 
 model Servico {
-  id         String     @id @default(uuid())
-  nome       String
-  preco      Decimal
-  createdAt  DateTime   @default(now())
-
-  userId     String
-  user       User       @relation(fields: [userId], references: [id])
-
+  id                String             @id @default(uuid())
+  nome              String
+  preco             Decimal
+  createdAt         DateTime           @default(now())
+  userId            String
   orcamentoServicos OrcamentoServico[]
+  user              User               @relation(fields: [userId], references: [id])
 
-  @@unique([nome, userId]) // evita serviços duplicados por usuário
+  @@unique([nome, userId])
 }
 
 model Orcamento {
-  id         String     @id @default(uuid())
+  id         String             @id @default(uuid())
   descricao  String?
   valorTotal Decimal
-  status     String     @default("enviado")
-  createdAt  DateTime   @default(now())
-
+  status     String             @default("enviado")
+  createdAt  DateTime           @default(now())
   userId     String
   clienteId  String
-
-  user       User       @relation(fields: [userId], references: [id])
-  cliente    Cliente    @relation(fields: [clienteId], references: [id])
-
+  cliente    Cliente            @relation(fields: [clienteId], references: [id])
+  user       User               @relation(fields: [userId], references: [id])
   itens      OrcamentoServico[]
 }
 
 model OrcamentoServico {
-  id             String   @id @default(uuid())
-  precoUnitario  Decimal
-  quantidade     Int      @default(1)
-
-  orcamentoId    String
-  servicoId      String
-
-  orcamento      Orcamento @relation(fields: [orcamentoId], references: [id])
-  servico        Servico   @relation(fields: [servicoId], references: [id])
+  id            String    @id @default(uuid())
+  precoUnitario Decimal
+  quantidade    Int       @default(1)
+  orcamentoId   String
+  servicoId     String
+  orcamento     Orcamento @relation(fields: [orcamentoId], references: [id])
+  servico       Servico   @relation(fields: [servicoId], references: [id])
 }
