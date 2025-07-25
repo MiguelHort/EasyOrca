@@ -46,116 +46,131 @@ export default function RegisterPage() {
   }
 
   return (
+    // <div className="min-h-screen flex items-center justify-center bg-sidebar-border p-4">
+    //   <div className="w-full max-w-md space-y-8">
+    //     <div className="text-center">
+    //       <div className="flex justify-center mb-2">
+    //         <NotepadTextDashed className="h-12 w-12 stroke-2 text-blue-600" />
+    //       </div>
+    //       <h1 className="text-3xl font-bold tracking-tight text-sz-1">
+    //         EasyOrça
+    //       </h1>
+    //       <p className="mt-2 text-muted-foreground">
+    //         Orçamentos prontos em segundos. Profissionalismo em cada clique.
+    //       </p>
+    //     </div>
+
+    //     <Card className="py-8 px-6">
+    //       <CardHeader>
+    //         <CardTitle>Cadastro</CardTitle>
+    //         <CardDescription>
+    //           Crie sua conta para acessar a plataforma
+    //         </CardDescription>
+    //       </CardHeader>
+    //       <CardContent>
+    //         <form onSubmit={handleSubmit(handleRegister)}>
+    //           <div className="grid gap-4">
+    //             {/* Nome */}
+    //             <div className="flex items-center border-2 rounded-md pl-4">
+    //               <User className="h-4 w-4 stroke-zinc-600" />
+    //               <Input
+    //                 id="name"
+    //                 type="text"
+    //                 placeholder="Nome"
+    //                 className="border-none"
+    //                 {...register("name", { required: "Nome é obrigatório" })}
+    //               />
+    //             </div>
+    //             {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+
+    //             {/* Email */}
+    //             <div className="flex items-center border-2 rounded-md pl-4">
+    //               <Mail className="h-4 w-4 stroke-zinc-600" />
+    //               <Input
+    //                 id="email"
+    //                 type="email"
+    //                 placeholder="Email"
+    //                 className="border-none"
+    //                 {...register("email", { required: "Email é obrigatório" })}
+    //               />
+    //             </div>
+    //             {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
+
+    //             {/* Senha */}
+    //             <div className="flex items-center border-2 rounded-md pl-4">
+    //               <Lock className="h-4 w-4 stroke-zinc-600" />
+    //               <Input
+    //                 id="password"
+    //                 type="password"
+    //                 placeholder="Senha"
+    //                 className="border-none"
+    //                 {...register("password", { required: "Senha é obrigatória" })}
+    //               />
+    //             </div>
+    //             {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
+
+    //             {/* Username */}
+    //             <div className="flex items-center border-2 rounded-md pl-4">
+    //               <User className="h-4 w-4 stroke-zinc-600" />
+    //               <Input
+    //                 id="userName"
+    //                 type="text"
+    //                 placeholder="Nome de usuário (opcional)"
+    //                 className="border-none"
+    //                 {...register("userName")}
+    //               />
+    //             </div>
+
+    //             {/* Telefone */}
+    //             <div className="flex items-center border-2 rounded-md pl-4">
+    //               <Phone className="h-4 w-4 stroke-zinc-600" />
+    //               <Input
+    //                 id="phone"
+    //                 type="tel"
+    //                 placeholder="Telefone (opcional)"
+    //                 className="border-none"
+    //                 {...register("phone")}
+    //               />
+    //             </div>
+
+    //             {/* Nome da empresa */}
+    //             <div className="flex items-center border-2 rounded-md pl-4">
+    //               <Building2 className="h-4 w-4 stroke-zinc-600" />
+    //               <Input
+    //                 id="companyName"
+    //                 type="text"
+    //                 placeholder="Nome da empresa (opcional)"
+    //                 className="border-none"
+    //                 {...register("companyName")}
+    //               />
+    //             </div>
+
+    //             <Button
+    //               type="submit"
+    //               className="w-full cursor-pointer"
+    //             >
+    //               Cadastrar
+    //             </Button>
+    //           </div>
+    //         </form>
+    //       </CardContent>
+    //     </Card>
+    //   </div>
+    // </div>
     <div className="min-h-screen flex items-center justify-center bg-sidebar-border p-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <div className="flex justify-center mb-2">
-            <NotepadTextDashed className="h-12 w-12 stroke-2 text-blue-600" />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-sz-1">
-            EasyOrça
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Orçamentos prontos em segundos. Profissionalismo em cada clique.
+      <Card className="py-8 px-6 max-w-md w-full text-center">
+        <CardHeader>
+          <CardTitle>Atenção</CardTitle>
+          <CardDescription>
+            Para realizar o cadastro, entre em contato com o desenvolvedor.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground mb-4">
+            Caso precise de acesso, envie um e-mail para <span className="font-semibold">miguel.hort@gmail.com</span>
           </p>
-        </div>
-
-        <Card className="py-8 px-6">
-          <CardHeader>
-            <CardTitle>Cadastro</CardTitle>
-            <CardDescription>
-              Crie sua conta para acessar a plataforma
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(handleRegister)}>
-              <div className="grid gap-4">
-                {/* Nome */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <User className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Nome"
-                    className="border-none"
-                    {...register("name", { required: "Nome é obrigatório" })}
-                  />
-                </div>
-                {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
-
-                {/* Email */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <Mail className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Email"
-                    className="border-none"
-                    {...register("email", { required: "Email é obrigatório" })}
-                  />
-                </div>
-                {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
-
-                {/* Senha */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <Lock className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Senha"
-                    className="border-none"
-                    {...register("password", { required: "Senha é obrigatória" })}
-                  />
-                </div>
-                {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
-
-                {/* Username */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <User className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="userName"
-                    type="text"
-                    placeholder="Nome de usuário (opcional)"
-                    className="border-none"
-                    {...register("userName")}
-                  />
-                </div>
-
-                {/* Telefone */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <Phone className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="Telefone (opcional)"
-                    className="border-none"
-                    {...register("phone")}
-                  />
-                </div>
-
-                {/* Nome da empresa */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <Building2 className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="companyName"
-                    type="text"
-                    placeholder="Nome da empresa (opcional)"
-                    className="border-none"
-                    {...register("companyName")}
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full cursor-pointer"
-                >
-                  Cadastrar
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
