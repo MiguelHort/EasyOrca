@@ -31,6 +31,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import HeaderLandingPage from "./HeaderLandingPage";
+import Link from "next/link";
 
 export default function AutoOrcaLanding() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -102,9 +103,11 @@ export default function AutoOrcaLanding() {
               </div>
 
               <div className="flex justify-start">
-                <Button className="text-sm sm:text-base md:text-lg font-semibold px-6 sm:px-8 py-3 sm:py-4 bg-lime-400 text-white hover:bg-lime-400 transition-all shadow-lg transform hover:scale-105">
-                  Conferir planos
-                </Button>
+                <Link href="/register">
+                  <Button className="h-12 text-sm sm:text-base md:text-lg font-semibold px-6 sm:px-8 py-3 sm:py-4 bg-lime-400 text-white hover:bg-lime-400 transition-all shadow-lg transform hover:scale-105">
+                    Começar agora
+                  </Button>
+                </Link>
               </div>
             </div>
 
@@ -123,13 +126,13 @@ export default function AutoOrcaLanding() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-16 bg-secondary/50">
+      <section id="features" className="py-20 p-6 md:px-16 bg-secondary/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
               Por que escolher o EasyOrça?
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Desenvolvido especificamente para profissionais que valorizam
               tempo e qualidade
             </p>
@@ -175,7 +178,7 @@ export default function AutoOrcaLanding() {
               },
             ].map((feature, index) => (
               <div key={index} className="group relative">
-                <div className="h-70 bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                <div className="md:h-70 bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                   <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     {feature.icon}
                   </div>
@@ -194,10 +197,10 @@ export default function AutoOrcaLanding() {
       <section id="how-it-works" className="py-20 px-16">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
               Como funciona?
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Três passos simples para revolucionar seus orçamentos
             </p>
           </div>
@@ -205,7 +208,7 @@ export default function AutoOrcaLanding() {
           <div className="grid md:grid-cols-3 gap-12 relative">
             {/* Connecting lines */}
             {/* Animated dotted arrow */}
-            <div className="hidden md:flex animated-dotted-arrow">
+            <div className="hidden md:flex animated-dotted-arrow" >
               {Array.from({ length: 10 }).map((_, i) => (
                 <span key={i}>•</span>
               ))}
@@ -274,10 +277,10 @@ export default function AutoOrcaLanding() {
       <section id="testimonials" className="py-20 px-4 bg-secondary/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
               Nós somos suspeitos para dizer
             </h2>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-lg text-muted-foreground">
               Então confira alguns depoimentos de clientes que já usaram e aprovaram nosso sistema!
             </p>
           </div>
@@ -332,10 +335,10 @@ export default function AutoOrcaLanding() {
       {/* CTA Section */}
       <section className="py-20 px-4 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">
             Pronto para transformar seu negócio?
           </h2>
-          <p className="text-xl mb-8 text-primary-foreground/80">
+          <p className="text-lg mb-8 text-primary-foreground/80">
             Junte-se a milhares de profissionais que já revolucionaram seus
             orçamentos
           </p>
@@ -352,15 +355,15 @@ export default function AutoOrcaLanding() {
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-8 text-primary-foreground/80">
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5" />
-              <span>Grátis para nunca </span>
+              <span>Fácil de usar</span>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5" />
-              <span>Sem cartão de crédito</span>
+              <span>Valor acessível</span>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5" />
-              <span>Suporte 24/7</span>
+              <span>Suporte de qualidade</span>
             </div>
           </div>
         </div>

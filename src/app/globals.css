@@ -127,7 +127,6 @@
   top: 5rem;
   left: 10%;
   width: 80%;
-  display: flex;
   justify-content: space-between;
   pointer-events: none;
   z-index: 0;
