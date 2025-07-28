@@ -26,7 +26,7 @@ export default function HeaderLandingPage() {
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <Image
-            src={atTop ? "/logo2.png" : "/logo2-1.png"}
+            src={atTop ? "/logoHeader.png" : "/logoHeader2.png"}
             alt="Logo"
             width={120}
             height={120}
