@@ -84,7 +84,7 @@ export default function AutoOrcaLanding() {
 
               <p
                 className="text-base sm:text-lg md:text-xl text-white/90 mb-6 md:mb-8 leading-relaxed max-w-lg"
-                style={{ fontFamily: "Comic Sans MS, cursive" }}
+                style={{ fontFamily: "Comic Sans Custom" }}
               >
                 Uma boa entrega para o seu
                 <br />
