@@ -1,16 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { User, Mail, Phone, Plus, ChevronRight } from "lucide-react";
+import { Plus } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import {
   Dialog,
   DialogTrigger,
@@ -25,12 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface Cliente {
-  id: string;
-  nome: string;
-  email?: string;
-  telefone?: string;
-}
+import CardClient, { Cliente } from "./CardClient";
 
 export default function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -172,31 +160,7 @@ export default function ClientesPage() {
           ) : (
             <div className="grid gap-4">
               {clientes.map((cliente) => (
-                <Card key={cliente.id} className="hover:bg-muted transition">
-                  <CardContent className="py-4 px-5 flex items-center justify-between">
-                    <div className="flex items-start gap-4">
-                      <div className="p-2 bg-muted rounded-full">
-                        <User className="w-5 h-5 text-muted-foreground" />
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="font-medium">{cliente.nome}</h3>
-                        {cliente.telefone && (
-                          <p className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Phone className="w-4 h-4" />
-                            {cliente.telefone}
-                          </p>
-                        )}
-                        {cliente.email && (
-                          <p className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Mail className="w-4 h-4" />
-                            {cliente.email}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                  </CardContent>
-                </Card>
+                <CardClient key={cliente.id} cliente={cliente} />
               ))}
             </div>
           )}

@@ -3,29 +3,15 @@
 import React, { useState, useEffect } from "react";
 import {
   CheckCircle,
-  Timer,
   FileText,
   Users,
-  ShieldCheck,
-  ArrowRight,
   Star,
   Play,
   Zap,
-  Target,
-  Award,
-  TrendingUp,
-  Clock,
-  Shield,
-  Sparkles,
   ChevronRight,
-  NotepadTextDashed,
-  Gift,
   Smartphone,
   Send,
   CreditCard,
-  FilePlus2,
-  Wrench,
-  ClipboardList,
   UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -62,12 +48,11 @@ export default function AutoOrcaLanding() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      
       <HeaderLandingPage />
 
       {/* Hero Section */}
       <section className="bg-secondary/50">
-        <div className="pt-32 pb-20 bg-blue-600 rounded-b-[80px] sm:rounded-b-[100px] sm:px-6 lg:rounded-b-[120px] text-white overflow-hidden relative">
+        <div className="pt-32 pb-20 bg-blue-600 rounded-b-[60px] sm:rounded-b-[80px] sm:px-6 lg:rounded-b-[100px] text-white overflow-hidden relative">
           <div className="max-w-7xl mx-auto px-4 flex flex-col-reverse lg:flex-row items-center justify-between gap-8">
             {/* Texto à esquerda */}
             <div className="flex flex-col lg:w-1/2 text-left">
@@ -104,7 +89,7 @@ export default function AutoOrcaLanding() {
 
               <div className="flex justify-start">
                 <Link href="/register">
-                  <Button className="h-12 text-sm sm:text-base md:text-lg font-semibold px-6 sm:px-8 py-3 sm:py-4 bg-lime-400 text-white hover:bg-lime-400 transition-all shadow-lg transform hover:scale-105">
+                  <Button className="h-12 text-sm sm:text-base md:text-lg font-semibold px-6 sm:px-8 py-3 sm:py-4 bg-lime-400 text-white hover:bg-lime-400 transition-all shadow-lg transform hover:scale-103">
                     Começar agora
                   </Button>
                 </Link>
@@ -178,7 +163,7 @@ export default function AutoOrcaLanding() {
               },
             ].map((feature, index) => (
               <div key={index} className="group relative">
-                <div className="md:h-70 bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                <div className="md:h-70 bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition-all duration-300 transform hover:scale-103">
                   <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     {feature.icon}
                   </div>
@@ -208,7 +193,7 @@ export default function AutoOrcaLanding() {
           <div className="grid md:grid-cols-3 gap-12 relative">
             {/* Connecting lines */}
             {/* Animated dotted arrow */}
-            <div className="hidden md:flex animated-dotted-arrow" >
+            <div className="hidden md:flex animated-dotted-arrow">
               {Array.from({ length: 10 }).map((_, i) => (
                 <span key={i}>•</span>
               ))}
@@ -216,57 +201,58 @@ export default function AutoOrcaLanding() {
 
             {[
               {
-              step: "01",
-              title: "Cadastre-se Grátis",
-              description: (
-                <>
-                Você cadastra seu serviço/produto
-                <br />
-                <span className="text-sm text-muted-foreground">
-                  (Nome, descrição, preço)
-                </span>
-                </>
-              ),
-              icon: <Users className="w-8 h-8" />,
+                step: "01",
+                title: "Cadastre-se Grátis",
+                description: (
+                  <>
+                    Você cadastra seu serviço/produto
+                    <br />
+                    <span className="text-sm text-muted-foreground">
+                      (Nome, descrição, preço)
+                    </span>
+                  </>
+                ),
+                icon: <Users className="w-8 h-8" />,
               },
               {
-              step: "02",
-              title: "Configure seus Serviços",
-              description: (
-                <>
-                Coloca os dados do seu cliente
-                <br />
-                <span className="text-sm text-muted-foreground">
-                  (Nome, telefone, email)
-                </span>
-                </>
-              ),
-              icon: <FileText className="w-8 h-8" />,
+                step: "02",
+                title: "Configure seus Serviços",
+                description: (
+                  <>
+                    Coloca os dados do seu cliente
+                    <br />
+                    <span className="text-sm text-muted-foreground">
+                      (Nome, telefone, email)
+                    </span>
+                  </>
+                ),
+                icon: <FileText className="w-8 h-8" />,
               },
               {
-              step: "03",
-              title: "Gere Orçamentos",
-              description: (
-                <>
-                Gera o orçamento personalizado com as informações que seu cliente precisa
-                <br />
-                para você fazer negócio!
-                </>
-              ),
-              icon: <CheckCircle className="w-8 h-8" />,
+                step: "03",
+                title: "Gere Orçamentos",
+                description: (
+                  <>
+                    Gera o orçamento personalizado com as informações que seu
+                    cliente precisa
+                    <br />
+                    para você fazer negócio!
+                  </>
+                ),
+                icon: <CheckCircle className="w-8 h-8" />,
               },
             ].map((step, index) => (
               <div key={index} className="text-center relative">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 relative z-10">
-                {step.icon}
-              </div>
-              <div className="text-6xl font-bold mb-4 text-primary/20">
-                {step.step}
-              </div>
-              <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {step.description}
-              </p>
+                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 relative z-10">
+                  {step.icon}
+                </div>
+                <div className="text-6xl font-bold mb-4 text-primary/20">
+                  {step.step}
+                </div>
+                <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {step.description}
+                </p>
               </div>
             ))}
           </div>
@@ -281,7 +267,8 @@ export default function AutoOrcaLanding() {
               Nós somos suspeitos para dizer
             </h2>
             <p className="text-lg text-muted-foreground">
-              Então confira alguns depoimentos de clientes que já usaram e aprovaram nosso sistema!
+              Então confira alguns depoimentos de clientes que já usaram e
+              aprovaram nosso sistema!
             </p>
           </div>
 
@@ -344,7 +331,7 @@ export default function AutoOrcaLanding() {
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <button className="group bg-background text-foreground px-8 py-4 rounded-xl text-lg font-semibold hover:bg-muted transition-all transform hover:scale-105 shadow-xl">
+            <button className="group bg-background text-foreground px-8 py-4 rounded-xl text-lg font-semibold hover:bg-muted transition-all transform hover:scale-103 shadow-xl">
               <span className="flex items-center justify-center space-x-2">
                 <span>Começar Grátis Agora</span>
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -375,10 +362,14 @@ export default function AutoOrcaLanding() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-primary-foreground" />
+                <div className="text-xl font-bold text-primary">
+                  <Image
+                    src="/logoHeader2.png"
+                    alt="Logo"
+                    width={120}
+                    height={120}
+                  />
                 </div>
-                <span className="text-xl font-bold text-primary">EasyOrça</span>
               </div>
               <p className="text-muted-foreground">
                 A ferramenta mais rápida e profissional para criar orçamentos.
@@ -477,7 +468,7 @@ export default function AutoOrcaLanding() {
           </div>
 
           <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2025 AutoOrça. Todos os direitos reservados.</p>
+            <p>&copy; 2025 EasyOrça. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>

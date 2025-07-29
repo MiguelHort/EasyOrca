@@ -3,6 +3,7 @@ import { User } from "lucide-react";
 import Link from "next/link";
 import { ThemePButton2 } from "@/components/theme-button-2";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 export default function HeaderLandingPage() {
   const [atTop, setAtTop] = useState(true);
@@ -83,9 +84,9 @@ export default function HeaderLandingPage() {
             <User className={`w-5 h-5 md:hidden ${atTop ? "stroke-white" : "stroke-foreground"}`} />
           </Link>
           <Link href="/register">
-            <button className="bg-primary-foreground text-foreground font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition-all transform hover:scale-105">
+            <Button variant="secondary" className="hover:opacity-90 transition-all transform hover:scale-103">
               Cadastrar-se
-            </button>
+            </Button>
           </Link>
         </div>
       </div>
