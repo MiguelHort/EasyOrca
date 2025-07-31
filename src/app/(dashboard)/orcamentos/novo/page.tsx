@@ -168,8 +168,8 @@ export default function NovoOrcamentoPage() {
     <>
       <SiteHeader title="Novo Orçamento" />
 
-      <main className="p-6 max-w-xl">
-        <Card>
+      <main className="p-6 max-w-2xl">
+        <Card className="border-none shadow-none">
           <CardHeader>
             <CardTitle>Novo Orçamento</CardTitle>
             <CardDescription>

@@ -55,7 +55,7 @@ export default function OrcamentosPage() {
           </Link>
         </div>
 
-        <ScrollArea className="h-[50vh] pr-2">
+        <ScrollArea className="pr-2">
           {loading ? (
             <div className="grid gap-4">
               {[...Array(3)].map((_, i) => (
