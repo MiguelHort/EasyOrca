@@ -1,42 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
-
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
 import CardOrcamento, { Orcamento } from "./CardOrcamento";
 import Link from "next/link";
 
 export default function OrcamentosPage() {
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
   const [erroMsg, setErroMsg] = useState<string | null>(null);
-
-  // Campos do dialog "Novo Orçamento"
-  const [cliente, setCliente] = useState("");
-  const [valor, setValor] = useState<string>("");
-  const [data, setData] = useState<string>("");
-  const [status, setStatus] = useState<string>("rascunho");
-
-  const valorNumber = useMemo(() => {
-    const v = Number(String(valor).replace(/\./g, "").replace(",", ".").trim());
-    return Number.isFinite(v) ? v : 0;
-  }, [valor]);
 
   useEffect(() => {
     fetchOrcamentos();
@@ -58,46 +34,6 @@ export default function OrcamentosPage() {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!cliente.trim()) {
-      alert("Cliente é obrigatório");
-      return;
-    }
-
-    try {
-      const res = await fetch("/api/orcamentos", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cliente: cliente.trim(),
-          valor: valorNumber,
-          data: data || new Date().toISOString().slice(0, 10),
-          status: status || "rascunho",
-        }),
-      });
-
-      if (!res.ok) {
-        const erro = await res.json().catch(() => ({}));
-        alert(erro?.error || "Erro ao criar orçamento");
-        return;
-      }
-
-      // Reset
-      setCliente("");
-      setValor("");
-      setData("");
-      setStatus("rascunho");
-      setOpen(false);
-      fetchOrcamentos();
-    } catch (err) {
-      console.error("Erro ao criar orçamento:", err);
-      alert("Erro ao criar orçamento");
-    }
-  }
-
   return (
     <>
       <SiteHeader title="Orçamentos" />
@@ -110,7 +46,6 @@ export default function OrcamentosPage() {
           </p>
         </section>
 
-        {/* Botão de adicionar orçamento via Dialog (opcional) */}
         <div className="mb-6 flex justify-end">
           <Link href="/orcamentos/novo">
             <Button>

@@ -1,20 +1,17 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { FileText, User, Calendar, DollarSign, ChevronRight } from "lucide-react";
+import { FileText, Calendar, DollarSign, ChevronRight } from "lucide-react";
 
 export interface Orcamento {
   id: string;
   cliente: string;
   valor: number;
-  data: string;   // ISO date ou string legível
+  data: string; // ISO
   status: "rascunho" | "enviado" | "aprovado" | "cancelado" | string;
 }
 
-type Props = {
-  orcamento: Orcamento;
-  onClick?: () => void;
-};
+type Props = { orcamento: Orcamento; onClick?: () => void };
 
 function formatCurrencyBRL(v: number) {
   try {
@@ -49,7 +46,7 @@ export default function CardOrcamento({ orcamento, onClick }: Props) {
   const { cliente, valor, data, status } = orcamento;
 
   return (
-    <Card className="hover:bg-muted transition" onClick={onClick}>
+    <Card className="hover:bg-muted/50 transition" onClick={onClick}>
       <CardContent className="py-4 px-5 flex items-center justify-between">
         <div className="flex items-start gap-4">
           <div className="p-2 bg-muted rounded-full">
@@ -60,22 +57,17 @@ export default function CardOrcamento({ orcamento, onClick }: Props) {
             <h3 className="font-medium">{cliente}</h3>
 
             <p className="text-sm text-muted-foreground flex items-center gap-1">
-              <User className="w-4 h-4" />
-              Cliente: {cliente}
-            </p>
-
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
               <DollarSign className="w-4 h-4" />
-              Valor: {formatCurrencyBRL(valor)}
+              {formatCurrencyBRL(valor)}
             </p>
 
             <p className="text-sm text-muted-foreground flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              Data: {formatDateBR(data)}
+              {formatDateBR(data)}
             </p>
 
             <p className={`text-sm font-semibold ${statusClass(status)}`}>
-              Status: {status}
+              {status}
             </p>
           </div>
         </div>

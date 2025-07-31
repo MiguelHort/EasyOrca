@@ -170,4 +170,22 @@
   font-style: normal;
 }
 
+/* --- PRINT --- */
+@page {
+  size: A4;
+  margin: 16mm;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  /* Garanta cores/fundos no PDF */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+
 
