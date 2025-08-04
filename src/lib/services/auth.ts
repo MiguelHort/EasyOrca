@@ -9,6 +9,8 @@ type UserCadastro = {
   name: string;
   email: string;
   password: string;
+  phone?: string;
+  userName?: string;
 };
 
 type AuthResponse = {

@@ -47,7 +47,7 @@ export default function CardOrcamento({ orcamento, onClick }: Props) {
 
   return (
     <Card className="hover:bg-muted/50 transition" onClick={onClick}>
-      <CardContent className="py-4 px-5 flex items-center justify-between">
+      <CardContent className="px-5 flex items-center justify-between">
         <div className="flex items-start gap-4">
           <div className="p-2 bg-muted rounded-full">
             <FileText className="w-5 h-5 text-muted-foreground" />

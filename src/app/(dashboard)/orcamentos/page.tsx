@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import CardOrcamento, { Orcamento } from "./CardOrcamento";
+import CardOrcamento, { Orcamento } from "@/components/CardOrcamento";
 import Link from "next/link";
 
 export default function OrcamentosPage() {

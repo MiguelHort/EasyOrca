@@ -16,6 +16,7 @@ import { getUser } from "@/lib/services/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
+import Image from "next/image";
 
 type Inputs = {
   email: string;
@@ -25,7 +26,8 @@ type Inputs = {
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [atTop, setAtTop] = useState(true);
+
   const {
     register,
     handleSubmit,
@@ -38,7 +40,7 @@ export default function LoginPage() {
       if (response) {
         setIsLoading(true);
         toast.success("Login realizado com sucesso!");
-        
+
         // Aguarda 5 segundos antes de redirecionar
         setTimeout(() => {
           router.push("/home");
@@ -80,14 +82,17 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-sidebar-border p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="flex justify-center mb-2">
-            <NotepadTextDashed className="h-12 w-12 stroke-2 text-blue-600" />
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/logoHeader2.png"
+              alt="Logo"
+              width={160}
+              height={160}
+            />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-sz-1">
-            EasyOrça
-          </h1>
           <p className="mt-2 text-muted-foreground">
-            Orçamentos prontos em segundos. Profissionalismo em cada clique.
+            Orçamentos prontos em segundos. <br />
+            Profissionalismo em cada clique.
           </p>
         </div>
 
@@ -124,15 +129,21 @@ export default function LoginPage() {
                       {...register("passwordHash")}
                     />
                   </div>
-                  {errors.passwordHash && <p className="text-red-500 text-xs"></p>}
+                  {errors.passwordHash && (
+                    <p className="text-red-500 text-xs"></p>
+                  )}
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full cursor-pointer"
-                >
+                <Button type="submit" className="w-full cursor-pointer">
                   Entrar
                 </Button>
+
+                <p className="text-sm text-muted-foreground text-center">
+                  Não tem uma conta?{" "}
+                  <a href="/register" className="text-blue-600 hover:underline">
+                    Cadastre-se
+                  </a>
+                </p>
               </div>
             </form>
           </CardContent>

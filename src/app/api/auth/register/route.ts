@@ -39,8 +39,9 @@ export async function POST(req: NextRequest) {
         id: crypto.randomUUID(),
         name,
         email,
-        phone: "99999-9999", // Placeholder, pode ser removido se não for necessário
+        phone: body.phone || "", // Placeholder, pode ser removido se não for necessário
         passwordHash: hashedPassword,
+        userName: body.userName || "", // Permite que o campo seja opcional
       },
     });
 
@@ -49,6 +50,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
+    console.error("Erro ao cadastrar usuário:", error); // <-- Adicione isso
     return NextResponse.json(
       { message: "Erro interno ao cadastrar o usuário", error: (error as Error).message },
       { status: 500 }

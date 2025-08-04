@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ClipboardList, FilePlus2, Users, Wrench } from "lucide-react";
+import {
+  ClipboardList,
+  FilePlus2,
+  Users,
+  Wrench,
+  CheckCircle,
+  Crown,
+} from "lucide-react";
 import { getInfoUser } from "@/lib/services/infoUser";
 
 import {
@@ -15,12 +22,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SiteHeader } from "@/components/site-header";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import CardOrcamento, { Orcamento } from "@/components/CardOrcamento";
 
 export default function DashboardPage() {
   const [userName, setUserName] = useState("");
   const [orcamentoCount, setOrcamentoCount] = useState<number | null>(null);
   const [clientesCount, setClientesCount] = useState<number | null>(null);
   const [servicosCount, setServicosCount] = useState<number | null>(null);
+  const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [erroMsg, setErroMsg] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchUser() {
@@ -38,17 +50,39 @@ export default function DashboardPage() {
     fetchUser();
   }, []);
 
+  useEffect(() => {
+    fetchOrcamentos();
+  }, []);
+
+  async function fetchOrcamentos() {
+    try {
+      setLoading(true);
+      setErroMsg(null);
+      const res = await fetch("/api/orcamentos", { credentials: "include" });
+      if (!res.ok) throw new Error(`Erro ${res.status}`);
+      const data = await res.json();
+      setOrcamentos(data);
+    } catch (err: any) {
+      console.error("Erro ao carregar orçamentos:", err);
+      setErroMsg(err?.message || "Erro ao carregar orçamentos");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <>
       <SiteHeader title="Dashboard" />
 
       <main className="min-h-screen bg-background">
         <div className="bg-primary">
-          <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-r from-primary to-blue-400 text-white">
+          <header className="mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r from-primary to-blue-400 dark:to-blue-800 text-white">
             <h1 className="text-3xl font-bold tracking-tight">
               Olá{userName ? `, ${userName}` : ""}! 👋
             </h1>
-            <p className="mt-1">Aqui está um resumo da sua conta.</p>
+            <p className="mt-1">
+              Mais um dia para fechar bons negócios com confiança!
+            </p>
           </header>
         </div>
 
@@ -57,19 +91,28 @@ export default function DashboardPage() {
             <h2 className="text-xl font-semibold mb-4">Acesso Rápido</h2>
             <div className="flex flex-wrap gap-4">
               <Link href="/orcamentos">
-                <Button variant={"outline"} className="border-lime-400 border-2 hover:bg-lime-200 dark:border-lime-400 cursor-pointer">
+                <Button
+                  variant={"outline"}
+                  className="border-primary border-2 dark:border-primary cursor-pointer"
+                >
                   <FilePlus2 className="h-5 w-5" />
                   Orçamentos
                 </Button>
               </Link>
               <Link href="/clientes">
-                <Button variant={"outline"} className="border-purple-400 border-2 hover:bg-purple-200 dark:border-purple-400 cursor-pointer">
+                <Button
+                  variant={"outline"}
+                  className="border-primary border-2 dark:border-primary cursor-pointer"
+                >
                   <Users className="h-5 w-5" />
                   Clientes
                 </Button>
               </Link>
               <Link href="/servicos">
-                <Button variant={"outline"} className="border-red-400 border-2 hover:bg-red-200 dark:border-red-400 cursor-pointer">
+                <Button
+                  variant={"outline"}
+                  className="border-primary border-2 dark:border-primary cursor-pointer"
+                >
                   <Wrench className="h-5 w-5" />
                   Serviços
                 </Button>
@@ -79,43 +122,109 @@ export default function DashboardPage() {
 
           <section>
             <h2 className="text-xl font-semibold mb-4">Estatísticas</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-4 gap-6">
               <InfoCard
                 icon={<FilePlus2 className="text-primary h-6 w-6" />}
                 title="Orçamentos criados"
                 value={orcamentoCount}
-                description="Total de orçamentos que você criou."
+                description="Este mês"
               />
               <InfoCard
-                icon={<Users className="h-6 w-6 text-purple-600" />}
+                icon={<Users className="h-6 w-6 text-primary" />}
                 title="Clientes cadastrados"
                 value={clientesCount}
-                description="Total de clientes que você cadastrou."
+                description="Total cadastrado"
               />
               <InfoCard
-                icon={<Wrench className="h-6 w-6 text-red-600" />}
-                title="Serviços disponíveis"
+                icon={<Wrench className="h-6 w-6 text-primary" />}
+                title="Taxa de Conversão"
                 value={servicosCount}
-                description="Total de serviços que você cadastrou."
+                description="Orçamentos aceitos"
+              />
+              <InfoCard
+                icon={<Wrench className="h-6 w-6 text-primary" />}
+                title="Valor Total"
+                value={servicosCount}
+                description="Em orçamentos"
               />
             </div>
           </section>
 
-          <Card className="mt-10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ClipboardList className="h-6 w-6 text-blue-500" />
-                Detalhes da Conta
-              </CardTitle>
-              <CardDescription>
-                Resumo geral das informações que você possui no sistema.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-muted-foreground text-sm">
-              Mantenha seus dados sempre atualizados para um melhor desempenho
-              da plataforma.
-            </CardContent>
-          </Card>
+          <section className="flex flex-col md:flex-row mt-10 gap-10">
+            {/* Card da esquerda: Orçamentos */}
+            <Card className="border-border flex-1">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FilePlus2 className="h-6 w-6 text-primary" />
+                  Seus Orçamentos
+                </CardTitle>
+                <CardDescription>
+                  Veja e gerencie todos os orçamentos criados.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-muted-foreground text-sm flex flex-col gap-4">
+                <ScrollArea className="pr-2">
+                  {loading ? (
+                    <div className="grid gap-4">
+                      {[...Array(3)].map((_, i) => (
+                        <Skeleton key={i} className="h-20 rounded-xl" />
+                      ))}
+                    </div>
+                  ) : erroMsg ? (
+                    <p className="text-sm text-red-600">{erroMsg}</p>
+                  ) : orcamentos.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">
+                      Nenhum orçamento encontrado.
+                    </p>
+                  ) : (
+                    <div className="grid gap-4">
+                      {orcamentos.map((o) => (
+                        <CardOrcamento key={o.id} orcamento={o} />
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+                <Link href="/orcamentos">
+                  <Button variant="default" className="w-full">
+                    Ver Orçamentos
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Card da direita: Plano Premium */}
+            <Card className="flex-1 rounded-xl border border-blue-600 bg-blue-50/50 dark:bg-blue-950 p-6 shadow-sm">
+              <CardHeader className="p-0 mb-4">
+                <CardTitle className="flex items-center gap-2 text-blue-600 text-xl font-semibold">
+                  <Crown className="h-5 w-5 text-blue-600" />
+                  Upgrade para PRO
+                </CardTitle>
+                <CardDescription className="text-sm text-gray-500">
+                  Desbloqueie recursos avançados para seu negócio
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="p-0">
+                <ul className="space-y-2 text-gray-500 text-sm mb-6">
+                  {[
+                    "Orçamentos ilimitados",
+                    "Templates premium",
+                    "Integração com Pix",
+                    "Relatórios avançados",
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-blue-600" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <Button className="w-full bg-primary text-white text-sm shadow-md">
+                  Fazer parte
+                </Button>
+              </CardContent>
+            </Card>
+          </section>
         </div>
       </main>
     </>

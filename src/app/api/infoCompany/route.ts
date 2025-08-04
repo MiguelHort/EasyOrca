@@ -21,33 +21,31 @@ export async function GET(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        profileImage: true,
-        userName: true,
-        phone: true,
+      include: {
+        company: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
       },
     });
 
-    if (!user) {
+    if (!user || !user.company) {
       return NextResponse.json(
-        { error: "Usuário não encontrado" },
+        { error: "Empresa não encontrada para este usuário" },
         { status: 404 }
       );
     }
 
     return NextResponse.json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      profileImage: user.profileImage,
-      userName: user.userName,
-      phone: user.phone,
+      id: user.company.id,
+      name: user.company.name,
+      image: user.company.image,
     });
   } catch (error) {
-    console.error("Erro em /api/infoUser:", error);
+    console.error("Erro ao buscar empresa:", error);
     return NextResponse.json(
       { error: "Erro interno do servidor" },
       { status: 500 }

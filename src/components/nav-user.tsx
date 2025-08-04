@@ -9,6 +9,8 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react"
 
+import { BriefcaseBusiness } from "lucide-react";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -35,9 +37,14 @@ export function NavUser({
     email: string
     avatar: string
     userName: string
+    nameCompany: string
   }
 }) {
   const { isMobile } = useSidebar()
+
+  function formatCompanyName(nameCompany: string) {
+    return nameCompany.replace(/\s+/g, '').toLowerCase();
+  }
 
   async function handleLogout() {
     try {
@@ -105,10 +112,16 @@ export function NavUser({
 
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <Link href={`/dashboard/${user.userName}`}>
+              <Link href={`/${user.userName}/perfilUsuario`}>
                 <DropdownMenuItem>
                   <IconUserCircle />
                   Perfil
+                </DropdownMenuItem>
+              </Link>
+              <Link href={`/${user.userName}/perfilEmpresa`}>
+                <DropdownMenuItem>
+                  <BriefcaseBusiness />
+                  Empresa
                 </DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>

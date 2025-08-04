@@ -56,6 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     email: "",
     avatar: "",
     userName: "",
+    nameCompany: "",
   })
 
   useEffect(() => {
@@ -67,6 +68,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           email: userInfo?.email || "",
           avatar: userInfo?.profileImage || "",
           userName: userInfo?.userName || "",
+          nameCompany: userInfo?.company?.name || "",
         })
       } catch (err) {
         console.error("Erro ao carregar usuário:", err)
@@ -75,6 +77,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     fetchUser()
   }, [])
+
+  console.log("User data:", user);
 
   return (
     <Sidebar collapsible="icon" {...props}>

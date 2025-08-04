@@ -3,8 +3,6 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
-
-// Use um segredo do lado do servidor (NÃO usar NEXT_PUBLIC_)
 const secretKey = process.env.JWT_SECRET || "dev_fallback_inseguro";
 
 export async function POST(req: NextRequest) {
@@ -16,18 +14,26 @@ export async function POST(req: NextRequest) {
   try {
     const payload = jwt.verify(token, secretKey) as { id: string };
 
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+      select: { companyId: true },
+    });
+
+    if (!user?.companyId) {
+      return NextResponse.json({ error: "Usuário sem empresa vinculada" }, { status: 403 });
+    }
+
     const body = await req.json().catch(() => ({}));
     const {
       clienteId,
       descricao = "",
-      valorTotal,          // number|string esperado
-      servicoIds = [],     // string[] opcional (IDs dos serviços)
-      // futuramente: itens: { servicoId, quantidade }[]
+      valorTotal,
+      servicoIds = [],
     } = body || {};
 
-    // ---- Validação básica
     const valorNum =
       typeof valorTotal === "string" ? Number(valorTotal) : Number(valorTotal);
+
     if (!clienteId || !Number.isFinite(valorNum)) {
       return NextResponse.json(
         { error: "Dados obrigatórios faltando: clienteId e valorTotal" },
@@ -35,25 +41,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ---- Verifica cliente pertence ao usuário
+    // Verifica se cliente pertence à empresa
     const cliente = await prisma.cliente.findFirst({
-      where: { id: clienteId, userId: payload.id },
+      where: {
+        id: clienteId,
+        companyId: user.companyId,
+      },
       select: { id: true },
     });
+
     if (!cliente) {
       return NextResponse.json(
-        { error: "Cliente não encontrado" },
+        { error: "Cliente não encontrado para esta empresa" },
         { status: 404 }
       );
     }
 
-    // ---- Normaliza/valida serviços (se enviados)
-    let itensParaCriar:
-      | { orcamentoId: string; servicoId: string; precoUnitario: Prisma.Decimal; quantidade: number }[]
-      | [] = [];
+    // Prepara os serviços (se houver)
+    let itensParaCriar: {
+      orcamentoId: string;
+      servicoId: string;
+      precoUnitario: Prisma.Decimal;
+      quantidade: number;
+    }[] = [];
 
     if (Array.isArray(servicoIds) && servicoIds.length > 0) {
-      // dedupe + sanitize
       const ids = Array.from(
         new Set(
           servicoIds
@@ -63,39 +75,36 @@ export async function POST(req: NextRequest) {
         )
       );
 
-      if (ids.length > 0) {
-        // Garante que serviços existem e pertencem ao usuário
-        const encontrados = await prisma.servico.findMany({
-          where: { id: { in: ids }, userId: payload.id },
-          select: { id: true, preco: true },
-        });
+      const encontrados = await prisma.servico.findMany({
+        where: {
+          id: { in: ids },
+          companyId: user.companyId,
+        },
+        select: { id: true, preco: true },
+      });
 
-        if (encontrados.length !== ids.length) {
-          return NextResponse.json(
-            { error: "Um ou mais serviços informados não foram encontrados." },
-            { status: 400 }
-          );
-        }
-
-        // Monta itens com precoUnitario (snapshot do preço no momento do orçamento)
-        itensParaCriar = encontrados.map((s) => ({
-          orcamentoId: "", // será preenchido após criar o orçamento
-          servicoId: s.id,
-          precoUnitario: s.preco, // já é Prisma.Decimal
-          quantidade: 1,          // padrão; ajuste se for receber do frontend
-        }));
+      if (encontrados.length !== ids.length) {
+        return NextResponse.json(
+          { error: "Um ou mais serviços não pertencem à empresa" },
+          { status: 400 }
+        );
       }
+
+      itensParaCriar = encontrados.map((s) => ({
+        orcamentoId: "", // preenchido após criar
+        servicoId: s.id,
+        precoUnitario: s.preco,
+        quantidade: 1,
+      }));
     }
 
-    // ---- Transação: cria orçamento e itens
+    // Criação via transação
     const result = await prisma.$transaction(async (tx) => {
-      const criado = await tx.orcamento.create({
+      const orcamento = await tx.orcamento.create({
         data: {
           userId: payload.id,
           clienteId,
           descricao,
-          // Valor total: mantemos o informado pela UI; se quiser calcular pelo(s) serviço(s),
-          // sobrescreva aqui com a soma de (precoUnitario * quantidade).
           valorTotal: new Prisma.Decimal(valorNum),
         },
       });
@@ -104,17 +113,13 @@ export async function POST(req: NextRequest) {
         await tx.orcamentoServico.createMany({
           data: itensParaCriar.map((it) => ({
             ...it,
-            orcamentoId: criado.id,
+            orcamentoId: orcamento.id,
           })),
-          // skipDuplicates não é essencial aqui pois deduplicamos na entrada;
-          // se adicionar @@unique([orcamentoId, servicoId]) no schema, pode manter:
-          // skipDuplicates: true,
         });
       }
 
-      // Retorna o orçamento com itens e dados úteis
-      const completo = await tx.orcamento.findUnique({
-        where: { id: criado.id },
+      return await tx.orcamento.findUnique({
+        where: { id: orcamento.id },
         include: {
           cliente: { select: { id: true, nome: true } },
           itens: {
@@ -124,8 +129,6 @@ export async function POST(req: NextRequest) {
           },
         },
       });
-
-      return completo!;
     });
 
     return NextResponse.json(result, { status: 201 });
@@ -136,6 +139,7 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
+
     console.error("[POST /api/orcamentos/novo] Erro:", err);
     return NextResponse.json({ error: "Erro ao criar orçamento" }, { status: 500 });
   }
