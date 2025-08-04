@@ -6,42 +6,53 @@ import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
 const secretKey = process.env.NEXT_PUBLIC_JWT_SECRET || 'testeSIH';
 
-// GET: lista os serviços do usuário autenticado
+// Função auxiliar para obter a companyId do usuário autenticado
+async function getCompanyIdFromToken(token: string): Promise<string | null> {
+  try {
+    const payload = jwt.verify(token, secretKey) as { id: string };
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+      select: { companyId: true },
+    });
+    return user?.companyId ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// GET: lista os serviços da empresa do usuário autenticado
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
   if (!token)
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  try {
-    const payload = jwt.verify(token, secretKey) as { userId: string };
+  const companyId = await getCompanyIdFromToken(token);
+  if (!companyId)
+    return NextResponse.json({ error: 'Usuário sem empresa associada' }, { status: 403 });
 
+  try {
     const servicos = await prisma.servico.findMany({
-      where: { userId: payload.userId },
+      where: { companyId },
       orderBy: { nome: 'asc' },
     });
 
     return NextResponse.json(servicos);
   } catch (err) {
-    return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
+    return NextResponse.json({ error: 'Erro ao buscar serviços' }, { status: 500 });
   }
 }
 
-// POST: adiciona um novo serviço para o usuário
+// POST: adiciona um novo serviço para a empresa do usuário
 export async function POST(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
   if (!token)
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
+  const companyId = await getCompanyIdFromToken(token);
+  if (!companyId)
+    return NextResponse.json({ error: 'Usuário sem empresa associada' }, { status: 403 });
+
   try {
-    const payload = jwt.verify(token, secretKey) as { id?: string };
-
-    if (!payload.id) {
-      return NextResponse.json(
-        { error: 'Token inválido: sem id' },
-        { status: 401 }
-      );
-    }
-
     const body = await req.json();
     const { nome, preco } = body;
 
@@ -56,7 +67,7 @@ export async function POST(req: NextRequest) {
       data: {
         nome,
         preco,
-        userId: payload.id,
+        companyId,
       },
     });
 
@@ -64,13 +75,12 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error(err);
 
-    // Verifica se é erro de serviço duplicado
     if (
       err.code === 'P2002' &&
-      err.meta?.target?.includes('nome_userId')
+      err.meta?.target?.includes('nome_companyId')
     ) {
       return NextResponse.json(
-        { error: 'Já existe um serviço com esse nome' },
+        { error: 'Já existe um serviço com esse nome para essa empresa' },
         { status: 400 }
       );
     }
