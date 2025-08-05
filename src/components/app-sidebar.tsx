@@ -7,6 +7,7 @@ import {
   ListOrdered,
   Users2,
   Settings2,
+  Sparkles,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -44,6 +45,13 @@ const navItems = [
     title: "Serviços",
     url: "/servicos",
     icon: Settings2,
+  },
+  {
+    title: "Upgrade",
+    url: "/upgrade",
+    icon: Sparkles,
+    iconStyle: "text-primary",
+    style: "text-primary font-semibold",
   },
 ];
 

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
     "@next/bundle-analyzer": "^15.4.3",
     "@prisma/client": "^6.11.1",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -43,11 +44,12 @@
     "puppeteer": "^24.15.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.60.0",
+    "react-hook-form": "^7.62.0",
     "sonner": "^2.0.6",
     "swr": "^2.3.4",
     "tabler": "^1.0.0",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

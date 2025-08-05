@@ -20,6 +20,8 @@ export function NavMain({
     title: string
     url: string
     icon?: React.ElementType
+    style?: string
+    iconStyle?: string
   }[]
 }) {
   const pathname = usePathname()
@@ -59,8 +61,8 @@ export function NavMain({
                         : "hover:bg-muted"
                     }`}
                   >
-                    {item.icon && <item.icon />}
-                    <span>{item.title}</span>
+                    {item.icon && <item.icon className={`${item.iconStyle}`} />}
+                    <span className={`${item.style}`}>{item.title}</span>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
