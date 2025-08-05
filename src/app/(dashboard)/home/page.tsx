@@ -9,7 +9,7 @@ import {
   CheckCircle,
   Crown,
 } from "lucide-react";
-import { getInfoUser } from "@/lib/services/infoUser";
+import { useUser } from '@/hooks/useUser'
 
 import {
   Card,
@@ -26,29 +26,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import CardOrcamento, { Orcamento } from "@/components/CardOrcamento";
 
 export default function DashboardPage() {
-  const [userName, setUserName] = useState("");
-  const [orcamentoCount, setOrcamentoCount] = useState<number | null>(null);
-  const [clientesCount, setClientesCount] = useState<number | null>(null);
-  const [servicosCount, setServicosCount] = useState<number | null>(null);
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
   const [loading, setLoading] = useState(true);
   const [erroMsg, setErroMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const user = await getInfoUser();
-        setUserName(user?.name || "");
-        setOrcamentoCount(user?.orcamentoCount ?? 0);
-        setClientesCount(user?.clienteCount ?? 0);
-        setServicosCount(user?.servicoCount ?? 0);
-      } catch (err) {
-        console.error("Erro ao carregar usuário:", err);
-      }
-    }
-
-    fetchUser();
-  }, []);
+  const { user, isLoading, isError, errorMessage } = useUser();
 
   useEffect(() => {
     fetchOrcamentos();
@@ -78,7 +60,7 @@ export default function DashboardPage() {
         <div className="bg-primary">
           <header className="mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r from-primary to-blue-400 dark:to-blue-800 text-white">
             <h1 className="text-3xl font-bold tracking-tight">
-              Olá{userName ? `, ${userName}` : ""}! 👋
+              Olá{user?.name ? `, ${user?.name}` : ""}! 👋
             </h1>
             <p className="mt-1">
               Mais um dia para fechar bons negócios com confiança!
@@ -126,25 +108,25 @@ export default function DashboardPage() {
               <InfoCard
                 icon={<FilePlus2 className="text-primary h-6 w-6" />}
                 title="Orçamentos criados"
-                value={orcamentoCount}
+                value={0}
                 description="Este mês"
               />
               <InfoCard
                 icon={<Users className="h-6 w-6 text-primary" />}
                 title="Clientes cadastrados"
-                value={clientesCount}
+                value={0}
                 description="Total cadastrado"
               />
               <InfoCard
                 icon={<Wrench className="h-6 w-6 text-primary" />}
                 title="Taxa de Conversão"
-                value={servicosCount}
+                value={0}
                 description="Orçamentos aceitos"
               />
               <InfoCard
                 icon={<Wrench className="h-6 w-6 text-primary" />}
                 title="Valor Total"
-                value={servicosCount}
+                value={0}
                 description="Em orçamentos"
               />
             </div>

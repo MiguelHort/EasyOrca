@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
 import Image from "next/image";
+import { mutate } from "swr";
 
 type Inputs = {
   email: string;
@@ -36,12 +37,16 @@ export default function LoginPage() {
 
   async function handleLogin(data: Inputs) {
     try {
-      const response = await getUser(data);
+      const response = await getUser(data); // faz login e recebe cookies HttpOnly
+
       if (response) {
         setIsLoading(true);
         toast.success("Login realizado com sucesso!");
 
-        // Aguarda 5 segundos antes de redirecionar
+        // ✅ Atualiza o cache do SWR para /api/infoUser
+        await mutate("/api/infoUser");
+
+        // Redireciona para /home após 3s
         setTimeout(() => {
           router.push("/home");
         }, 3000);
@@ -83,12 +88,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <Image
-              src="/logoHeader2.png"
-              alt="Logo"
-              width={160}
-              height={160}
-            />
+            <Image src="/logoHeader2.png" alt="Logo" width={160} height={160} />
           </div>
           <p className="mt-2 text-muted-foreground">
             Orçamentos prontos em segundos. <br />

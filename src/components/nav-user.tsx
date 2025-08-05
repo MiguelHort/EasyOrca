@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import React from "react"
+import React from "react";
 import {
   IconCreditCard,
   IconDotsVertical,
   IconLogout,
   IconNotification,
   IconUserCircle,
-} from "@tabler/icons-react"
+} from "@tabler/icons-react";
 
 import { BriefcaseBusiness } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,48 +20,53 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import { mutate } from "swr";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email: string
-    avatar: string
-    userName: string
-    nameCompany: string
-  }
+    name: string;
+    email: string;
+    avatar: string;
+    userName: string;
+    nameCompany: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
 
   function formatCompanyName(nameCompany: string) {
-    return nameCompany.replace(/\s+/g, '').toLowerCase();
+    return nameCompany.replace(/\s+/g, "").toLowerCase();
   }
 
   async function handleLogout() {
     try {
       const res = await fetch("/api/auth/logout", {
         method: "POST",
-      })
+        credentials: "include", // garante que o cookie HttpOnly seja enviado
+      });
+
       if (res.ok) {
-        window.location.href = "/login"
+        // ✅ Limpa o cache de dados do usuário
+        await mutate("/api/infoUser", null, { revalidate: false });
+
+        // Redireciona para login
+        window.location.href = "/login";
       } else {
-        console.error("Erro ao fazer logout")
+        console.error("Erro ao fazer logout");
       }
     } catch (error) {
-      console.error("Erro ao fazer logout:", error)
+      console.error("Erro ao fazer logout:", error);
     }
   }
-
-  console.log("User data:", user);
 
   return (
     <SidebarMenu>
@@ -126,7 +131,10 @@ export function NavUser({
               </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-500 hover:bg-red-200 dark:text-red-200 dark:hover:bg-red-900">
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="cursor-pointer text-red-500 hover:bg-red-200 dark:text-red-200 dark:hover:bg-red-900"
+            >
               <IconLogout className=" text-red-500 hover:bg-red-200" />
               Sair
             </DropdownMenuItem>
@@ -134,5 +142,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

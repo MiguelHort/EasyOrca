@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   LayoutDashboard,
   NotepadTextDashed,
   ListOrdered,
   Users2,
   Settings2,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -19,11 +19,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { useTheme } from "next-themes"
-import { getInfoUser } from "@/lib/services/infoUser"
-import { useEffect, useState } from "react"
-import Link from "next/link"
+} from "@/components/ui/sidebar";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useUser } from "@/hooks/useUser";
 
 const navItems = [
   {
@@ -46,39 +45,19 @@ const navItems = [
     url: "/servicos",
     icon: Settings2,
   },
-]
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { resolvedTheme } = useTheme()
 
-  const [user, setUser] = useState({
-    name: "",
-    email: "",
-    avatar: "",
-    userName: "",
-    nameCompany: "",
-  })
+  const { user, isLoading, isError, errorMessage } = useUser();
 
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const userInfo = await getInfoUser()
-        setUser({
-          name: userInfo?.name || "",
-          email: userInfo?.email || "",
-          avatar: userInfo?.profileImage || "",
-          userName: userInfo?.userName || "",
-          nameCompany: userInfo?.company?.name || "",
-        })
-      } catch (err) {
-        console.error("Erro ao carregar usuário:", err)
-      }
-    }
-
-    fetchUser()
-  }, [])
-
-  console.log("User data:", user);
+  const userPlaceholder = {
+    name: user?.name,
+    email: user?.email,
+    avatar: user?.profileImage,
+    userName: user?.userName,
+    nameCompany: user?.company?.name,
+  };
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -103,8 +82,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser user={userPlaceholder} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
