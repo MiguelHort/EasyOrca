@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,12 +19,15 @@ const formSchema = z.object({
   userName: z.string().optional(),
   email: z.string().email("Email inválido"),
   phone: z.string().optional(),
+  profileImage: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 export default function MinhaContaPage() {
   const { user, isLoading, isError, errorMessage } = useUser();
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     register,
@@ -44,9 +47,21 @@ export default function MinhaContaPage() {
         userName: user.userName || "",
         email: user.email,
         phone: user.phone || "",
+        profileImage: user.profileImage || "",
       });
     }
   }, [user, reset]);
+
+  // Carrega imagem quando usuário estiver disponível
+  useEffect(() => {
+    const fetchUrl = async () => {
+      const res = await fetch(`/api/user/profileImage?nome=${user.profileImage}`);
+      const data = await res.json();
+      if (data.url) setImgUrl(`${data.url}&t=${Date.now()}`); // evita cache
+    };
+
+    if (user?.profileImage) fetchUrl();
+  }, [user?.profileImage]);
 
   async function onSubmit(data: FormData) {
     try {
@@ -69,6 +84,37 @@ export default function MinhaContaPage() {
     }
   }
 
+  // 🔼 Upload da imagem para API
+  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("userId", user.id);
+
+    const res = await fetch("/api/user/profileImage", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      alert(result.error || "Erro ao atualizar imagem");
+      return;
+    }
+
+    // Atualiza imagem na tela
+    const fetchUrl = async () => {
+      const res = await fetch(`/api/user/profileImage?nome=${result.fileName}`);
+      const data = await res.json();
+      if (data.url) setImgUrl(`${data.url}&t=${Date.now()}`); // cache busting
+    };
+
+    await fetchUrl();
+  }
+
   if (isError) return <p>Erro: {errorMessage}</p>;
 
   if (isLoading || !user) {
@@ -89,72 +135,64 @@ export default function MinhaContaPage() {
       <main className="p-6 max-w-3xl mx-auto">
         <Card className="w-full max-w-3xl mx-auto">
           <CardContent className="p-6 space-y-6">
-            <div className="flex items-center gap-10 bg-muted rounded-lg p-4">
-              <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-10 bg-muted rounded-lg p-4">
+              <div className="flex gap-4 items-center">
                 <Avatar className="h-14 w-14">
                   <AvatarImage
-                    src={`/api/user/profileImage?file=${user.profileImage}`}
+                    src={imgUrl || `/api/user/profileImage?file=${user.profileImage}`}
                     alt={user.name}
                   />
                   <AvatarFallback>{user.name[0]}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-lg font-bold">{user.name}</p>
-                  <p className="text-sm text-gray-500 font-normal">
+                  <p className="text-sm sm:text-lg font-bold">{user.name}</p>
+                  <p className="text-xs text-gray-500 font-normal">
                     {user.userName}
                   </p>
                 </div>
               </div>
-              <Button>Alterar Foto</Button>
+
+              <Button
+                className="flex w-full sm:w-auto"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Alterar Foto
+              </Button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nome</Label>
-                <Input
-                  id="name"
-                  {...register("name")}
-                  disabled={isSubmitting}
-                />
+                <Input id="name" {...register("name")} disabled={isSubmitting} />
                 {errors.name && (
-                  <p className="text-sm text-destructive">
-                    {errors.name.message}
-                  </p>
+                  <p className="text-sm text-destructive">{errors.name.message}</p>
                 )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="userName">Nome de usuário</Label>
-                <Input
-                  id="userName"
-                  {...register("userName")}
-                  disabled={isSubmitting}
-                />
+                <Input id="userName" {...register("userName")} disabled={isSubmitting} />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...register("email")}
-                  disabled={isSubmitting}
-                />
+                <Input id="email" type="email" {...register("email")} disabled={isSubmitting} />
                 {errors.email && (
-                  <p className="text-sm text-destructive">
-                    {errors.email.message}
-                  </p>
+                  <p className="text-sm text-destructive">{errors.email.message}</p>
                 )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="phone">Telefone</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  {...register("phone")}
-                  disabled={isSubmitting}
-                />
+                <Input id="phone" type="tel" {...register("phone")} disabled={isSubmitting} />
               </div>
 
               {isSubmitSuccessful && (

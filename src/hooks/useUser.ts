@@ -2,7 +2,7 @@
 import useSWR from 'swr'
 
 export function useUser() {
-  const { data, error, isLoading } = useSWR('/api/infoUser')
+  const { data, error, isLoading } = useSWR('/api/user')
 
   return {
     user: data,

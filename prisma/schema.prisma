@@ -9,62 +9,64 @@ datasource db {
 
 // Tabela de Usuário (funcionário)
 model User {
-  id           String    @id @default(uuid())
-  name         String
-  email        String    @unique
-  passwordHash String
-  phone        String?
-  userName     String?   @unique
-  profileImage String?   @default("default.jpg")
-  createdAt    DateTime  @default(now())
+  id               String   @id @default(uuid())
+  name             String
+  email            String   @unique
+  passwordHash     String
+  phone            String?
+  userName         String?  @unique
+  profileImage     String?  @default("default.jpg")
+  isPremium        Boolean  @default(false)
+  stripeCustomerId String?
+  createdAt        DateTime @default(now())
 
   // Relacionamento: Um usuário pertence a uma empresa
-  companyId    String?   // Tornar opcional para permitir usuários sem empresa
+  companyId String? // Tornar opcional para permitir usuários sem empresa
   // Relacionamento: Um usuário pertence a uma empresa, mas pode ser nulo
-  company      Company?  @relation(fields: [companyId], references: [id])
+  company   Company? @relation(fields: [companyId], references: [id])
 
   // Relacionamento: Um usuário cria muitos orçamentos
-  orcamentos   Orcamento[]
+  orcamentos Orcamento[]
 }
 
 // NOVA TABELA: Empresa
 model Company {
-  id        String    @id @default(uuid())
-  name      String    // Anteriormente companyName
-  image     String?   @default("default.jpg") // Anteriormente companyImage
-  createdAt DateTime  @default(now())
+  id        String   @id @default(uuid())
+  name      String // Anteriormente companyName
+  image     String?  @default("default.jpg") // Anteriormente companyImage
+  createdAt DateTime @default(now())
 
   // Relacionamento: Uma empresa tem muitos usuários (funcionários)
-  users     User[]
+  users    User[]
   // Relacionamento: Uma empresa tem muitos clientes
-  clientes  Cliente[]
+  clientes Cliente[]
   // Relacionamento: Uma empresa oferece muitos serviços
-  servicos  Servico[]
+  servicos Servico[]
 }
 
 model Cliente {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   nome      String
   email     String?
   telefone  String?
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   // Relacionamento: Um cliente pertence a uma empresa
   companyId String
-  company   Company   @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
 
   orcamentos Orcamento[]
 }
 
 model Servico {
-  id          String   @id @default(uuid())
-  nome        String
-  preco       Decimal
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  nome      String
+  preco     Decimal
+  createdAt DateTime @default(now())
 
   // Relacionamento: Um serviço pertence a uma empresa
-  companyId   String
-  company     Company  @relation(fields: [companyId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 
   orcamentoServicos OrcamentoServico[]
 
@@ -80,14 +82,14 @@ model Orcamento {
   createdAt  DateTime @default(now())
 
   // Relacionamento: O orçamento ainda é criado por um usuário específico
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
   // Relacionamento: O orçamento é para um cliente
-  clienteId  String
-  cliente    Cliente  @relation(fields: [clienteId], references: [id])
+  clienteId String
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
 
-  itens      OrcamentoServico[]
+  itens OrcamentoServico[]
 }
 
 model OrcamentoServico {

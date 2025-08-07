@@ -9,7 +9,7 @@ import {
   CheckCircle,
   Crown,
 } from "lucide-react";
-import { useUser } from '@/hooks/useUser'
+import { useUser } from "@/hooks/useUser";
 
 import {
   Card,
@@ -18,12 +18,20 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SiteHeader } from "@/components/site-header";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CardOrcamento, { Orcamento } from "@/components/CardOrcamento";
+import { ShowPremiumDialog } from "@/components/ShowPremiumDialog";
 
 export default function DashboardPage() {
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
@@ -200,15 +208,19 @@ export default function DashboardPage() {
                     </li>
                   ))}
                 </ul>
-
-                <Button className="w-full bg-primary text-white text-sm shadow-md">
-                  Fazer parte
-                </Button>
+                <Link href="/upgrade">
+                  <Button className="w-full bg-primary text-white text-sm shadow-md">
+                    Fazer parte
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </section>
         </div>
       </main>
+
+      <ShowPremiumDialog />
+      
     </>
   );
 }

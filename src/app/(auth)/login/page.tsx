@@ -48,6 +48,7 @@ export default function LoginPage() {
 
         // Redireciona para /home após 3s
         setTimeout(() => {
+          localStorage.setItem("showPremiumDialog", "true");
           router.push("/home");
         }, 3000);
       }

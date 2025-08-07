@@ -1,35 +1,104 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import path from "path";
-import fs from "fs";
+import { supabase } from "@/lib/supabase";
+import { PrismaClient } from "@prisma/client";
+import { randomUUID } from "crypto";
 
-const JWT_SECRET = process.env.JWT_SECRET || "testeSIH";
+const prisma = new PrismaClient();
+
+const BUCKET = "assets";
+const BASE_PATH = "imgs/profileImage";
 
 export async function GET(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
-  const filename = req.nextUrl.searchParams.get("file");
+  const { searchParams } = new URL(req.url);
+  const nome = searchParams.get("nome");
 
-  if (!token || !filename) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  console.log("Nome do arquivo:", nome);
+
+  if (!nome) {
+    return NextResponse.json({ error: "Parâmetro 'nome' é obrigatório." }, { status: 400 });
   }
 
+  const filePath = `${BASE_PATH}/${nome}`;
+
+  const { data, error } = await supabase
+    .storage
+    .from(BUCKET)
+    .createSignedUrl(filePath, 60); // URL válida por 60 segundos
+
+  if (error || !data?.signedUrl) {
+    return NextResponse.json({ error: error?.message || "Erro ao gerar URL." }, { status: 500 });
+  }
+
+  return NextResponse.json({ url: data.signedUrl });
+}
+
+export async function POST(req: NextRequest) {
   try {
-    jwt.verify(token, JWT_SECRET);
+    const formData = await req.formData();
+    const file = formData.get("file") as File | null;
+    const userId = formData.get("userId") as string | null;
 
-    const filePath = path.join(process.cwd(), "src", "assets", "imgs", "profileImages", filename);
-
-    if (!fs.existsSync(filePath)) {
-      return NextResponse.json({ error: "Imagem não encontrada" }, { status: 404 });
+    if (!file || !userId) {
+      return NextResponse.json(
+        { error: "Arquivo (file) e ID do usuário (userId) são obrigatórios." },
+        { status: 400 }
+      );
     }
 
-    const fileBuffer = fs.readFileSync(filePath);
-    return new NextResponse(fileBuffer, {
-      headers: {
-        "Content-Type": "image/jpeg",
-        "Cache-Control": "no-store",
+    // 2. Buscar o usuário para obter o nome da imagem antiga (se houver)
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { profileImage: true },
+    });
+
+    const oldImageName = user?.profileImage;
+
+    // 3. Gerar um nome de arquivo único para evitar sobreposições
+    const fileExtension = file.name.split(".").pop();
+    const newUniqueFileName = `${randomUUID()}.${fileExtension}`;
+    const filePath = `${BASE_PATH}/${newUniqueFileName}`;
+
+    // 4. Fazer upload do novo arquivo para o Supabase
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false, // Usar 'false' pois o nome é sempre único
+        contentType: file.type,
+      });
+
+    if (uploadError) {
+      console.error("Erro ao fazer upload para o Supabase:", uploadError.message);
+      return NextResponse.json(
+        { error: "Erro ao fazer upload do arquivo." },
+        { status: 500 }
+      );
+    }
+
+    // 5. Atualizar o nome da imagem no banco de dados com Prisma ✨
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        profileImage: newUniqueFileName,
       },
     });
+
+    // 6. (Opcional) Remover a imagem antiga do Supabase Storage 🗑️
+    if (oldImageName) {
+      const oldImagePath = `${BASE_PATH}/${oldImageName}`;
+      await supabase.storage.from(BUCKET).remove([oldImagePath]);
+    }
+
+    return NextResponse.json({
+      message: "Imagem de perfil atualizada com sucesso.",
+      fileName: newUniqueFileName,
+    });
+
   } catch (error) {
-    return NextResponse.json({ error: "Token inválido" }, { status: 401 });
+    console.error("Erro no processo de upload:", error);
+    return NextResponse.json(
+      { error: "Ocorreu um erro interno no servidor." },
+      { status: 500 }
+    );
   }
 }
