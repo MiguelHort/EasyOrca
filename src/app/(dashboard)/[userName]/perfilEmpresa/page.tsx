@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState, ChangeEvent, useRef } from "react";
 
 import { useCompany } from "@/hooks/useCompany";
 
@@ -14,6 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import Image from "next/image";
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -24,6 +27,8 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function EmpresaPage() {
   const { company, isLoading, isError } = useCompany();
+  const [imgUrl, setImgUrl] = useState("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     register,
@@ -43,6 +48,17 @@ export default function EmpresaPage() {
       });
     }
   }, [company, reset]);
+
+    // Carrega imagem quando usuário estiver disponível
+  useEffect(() => {
+    const fetchUrl = async () => {
+      const res = await fetch(`/api/company/companyImage?nome=${company.image}`);
+      const data = await res.json();
+      if (data.url) setImgUrl(`${data.url}&t=${Date.now()}`); // evita cache
+    };
+
+    if (company?.image) fetchUrl();
+  }, [company?.image]);
 
   async function onSubmit(data: FormData) {
     try {
@@ -64,6 +80,37 @@ export default function EmpresaPage() {
       alert(err.message || "Erro ao salvar");
     }
   }
+
+  // 🔼 Upload da imagem para API
+    async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+      const file = event.target.files?.[0];
+      if (!file || !company?.id) return;
+  
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("companyId", company.id);
+
+      const res = await fetch("/api/company/companyImage", {
+        method: "POST",
+        body: formData,
+      });
+  
+      const result = await res.json();
+  
+      if (!res.ok) {
+        alert(result.error || "Erro ao atualizar imagem");
+        return;
+      }
+  
+      // Atualiza imagem na tela
+      const fetchUrl = async () => {
+        const res = await fetch(`/api/user/profileImage?nome=${result.fileName}`);
+        const data = await res.json();
+        if (data.url) setImgUrl(`${data.url}&t=${Date.now()}`); // cache busting
+      };
+  
+      await fetchUrl();
+    }
 
   if (isError) {
     return <p className="text-destructive p-6">Erro ao carregar dados da empresa.</p>;
@@ -88,21 +135,37 @@ export default function EmpresaPage() {
       <main className="p-6 max-w-3xl mx-auto space-y-6">
         <Card>
           <CardContent className="p-6 flex gap-4 items-center">
-            {company.image ? (
-              <img
-                src={`/api/company/companyImage?file=${company.image}`}
-                alt="Logo da empresa"
-                className="w-24 h-20 rounded-lg object-cover"
-              />
-            ) : (
-              <div className="w-24 h-20 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-sm">
-                Sem logo
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-10 bg-muted rounded-lg p-4">
+              <div className="flex gap-4 items-center">
+                <div>
+                  <img
+                    src={imgUrl || `/api/company/companyImage?file=${company.image}`}
+                    alt={company.name}
+                    className="w-26 h-18 rounded-lg object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="text-sm sm:text-lg font-bold">{company.name}</p>
+                  <p className="text-xs text-gray-500 font-normal">
+                    {company.userName}
+                  </p>
+                </div>
               </div>
-            )}
 
-            <div>
-              <h3 className="text-lg font-medium">{company.name}</h3>
-              <Badge className="mt-2">Empresa Ativa</Badge>
+              <Button
+                className="flex w-full sm:w-auto"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Alterar Foto
+              </Button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
             </div>
           </CardContent>
         </Card>

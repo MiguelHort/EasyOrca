@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 
@@ -18,65 +21,85 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import CardClient, { Cliente } from "./CardClient";
+import CardClient from "./CardClient";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+
+const formSchema = z.object({
+  nome: z.string().min(1, "Nome é obrigatório"),
+  email: z.string().email("Email inválido").optional().or(z.literal("")),
+  telefone: z
+    .string()
+    .min(11, "Telefone deve ter pelo menos 11 caracteres")
+    .optional()
+    .or(z.literal("")),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export default function ClientesPage() {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [telefone, setTelefone] = useState("");
+  const [clientes, setClientes] = useState<
+    {
+      id: string;
+      nome: string;
+      email: string | null;
+      telefone: string | null;
+    }[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    mode: "onChange",
+    defaultValues: {
+      nome: "",
+      email: "",
+      telefone: "",
+    },
+  });
+
   useEffect(() => {
+    async function fetchClientes() {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/clientes");
+        if (!res.ok) throw new Error("Erro ao buscar clientes");
+        const data = await res.json();
+        setClientes(data);
+      } catch {
+        alert("Erro ao carregar clientes");
+      } finally {
+        setLoading(false);
+      }
+    }
     fetchClientes();
   }, []);
 
-  async function fetchClientes() {
-    try {
-      setLoading(true);
-      const res = await fetch("/api/clientes", {
-        credentials: "include",
-      });
-      const data = await res.json();
-      setClientes(data);
-    } catch (err) {
-      console.error("Erro ao buscar clientes:", err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!nome.trim()) {
-      alert("Nome é obrigatório");
-      return;
-    }
-
+  async function onSubmit(data: FormData) {
     try {
       const res = await fetch("/api/clientes", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome, email, telefone }),
+        credentials: "include",
+        body: JSON.stringify(data),
       });
 
       if (!res.ok) {
-        const erro = await res.json();
-        alert(erro.error || "Erro ao adicionar cliente");
-        return;
+        const json = await res.json();
+        throw new Error(json.message || "Erro ao adicionar cliente.");
       }
 
-      setNome("");
-      setEmail("");
-      setTelefone("");
+      const novoCliente = await res.json();
+      setClientes((old) => [...old, novoCliente]);
+      reset();
       setOpen(false);
-      fetchClientes();
-    } catch (err) {
-      console.error("Erro ao criar cliente:", err);
-      alert("Erro ao criar cliente");
+    } catch (err: any) {
+      alert(err.message || "Erro ao salvar");
     }
   }
 
@@ -92,7 +115,6 @@ export default function ClientesPage() {
           </p>
         </section>
 
-        {/* Botão de adicionar cliente via Dialog */}
         <div className="mb-6 flex justify-end">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -103,68 +125,109 @@ export default function ClientesPage() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Adicionar Cliente</DialogTitle>
+                <DialogTitle>Novo Cliente</DialogTitle>
                 <DialogDescription>
                   Preencha os campos para registrar um novo cliente.
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="grid gap-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="nome">Nome</Label>
                   <Input
                     id="nome"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
+                    {...register("nome")}
                     placeholder="Ex: João da Silva"
+                    aria-invalid={!!errors.nome}
                     required
                   />
+                  {errors.nome && (
+                    <p className="text-red-600 text-sm">
+                      {errors.nome.message}
+                    </p>
+                  )}
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    {...register("email")}
                     type="email"
                     placeholder="joao@email.com"
+                    aria-invalid={!!errors.email}
                   />
+                  {errors.email && (
+                    <p className="text-red-600 text-sm">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="telefone">Telefone</Label>
                   <Input
                     id="telefone"
-                    value={telefone}
-                    onChange={(e) => setTelefone(e.target.value)}
+                    {...register("telefone")}
                     placeholder="(11) 91234-5678"
+                    aria-invalid={!!errors.telefone}
                   />
+                  {errors.telefone && (
+                    <p className="text-red-600 text-sm">
+                      {errors.telefone.message}
+                    </p>
+                  )}
                 </div>
-                <Button type="submit" className="w-full">
-                  Salvar Cliente
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Salvando..." : "Salvar Cliente"}
                 </Button>
               </form>
             </DialogContent>
           </Dialog>
         </div>
 
-        <ScrollArea className="h-[50vh] pr-2">
-          {loading ? (
-            <div className="grid gap-4">
-              {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-20 rounded-xl" />
-              ))}
-            </div>
-          ) : clientes.length === 0 ? (
+        <Card className="">
+          <CardHeader className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Lista de Clientes</h2>
             <p className="text-muted-foreground text-sm">
-              Nenhum cliente cadastrado.
+              {clientes.length} clientes cadastrados
             </p>
-          ) : (
-            <div className="grid gap-4">
-              {clientes.map((cliente) => (
-                <CardClient key={cliente.id} cliente={cliente} />
-              ))}
-            </div>
-          )}
-        </ScrollArea>
+          </CardHeader>
+          <CardContent className="p-4">
+            <ScrollArea className="h-[50vh] pr-2">
+              {loading ? (
+                <div className="grid gap-4">
+                  {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="h-20 rounded-xl" />
+                  ))}
+                </div>
+              ) : clientes.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  Nenhum cliente cadastrado.
+                </p>
+              ) : (
+                <div className="grid gap-4">
+                  {clientes.map((cliente) => (
+                    <CardClient
+                      key={cliente.id}
+                      cliente={cliente}
+                      onUpdate={(clienteAtualizado) => {
+                        setClientes((old) =>
+                          old.map((c) =>
+                            c.id === clienteAtualizado.id
+                              ? clienteAtualizado
+                              : c
+                          )
+                        );
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
       </main>
     </>
   );

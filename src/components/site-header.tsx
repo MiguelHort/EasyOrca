@@ -20,12 +20,12 @@ export function SiteHeader({ title }: TitleProps) {
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
             <a
-              href="https://github.com/MiguelHort"
+              href="https://www.instagram.com/easyorca"
               rel="noopener noreferrer"
               target="_blank"
               className="dark:text-foreground"
             >
-              GitHub
+              Instagram
             </a>
           </Button>
           <ThemePButton2 />

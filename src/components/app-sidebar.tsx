@@ -24,6 +24,7 @@ import {
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useUser } from "@/hooks/useUser";
+import { Logo } from "@/assets/icons/Logo";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, isLoading, isError, errorMessage } = useUser();
@@ -82,7 +83,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link className="text-sm font-medium" href="/">
-                <NotepadTextDashed className="text-blue-600" />
+                <Logo />
                 <span className="text-blue-600 text-xl">EasyOrça</span>
               </Link>
             </SidebarMenuButton>

@@ -51,7 +51,7 @@ export function NavMain({
           {items.map((item) => {
             const isActive = pathname === item.url
             return (
-              <SidebarMenuItem key={item.title}>
+              <SidebarMenuItem key={item.title} className="cursor-pointer">
                 <Link href={item.url} className="w-full">
                   <SidebarMenuButton
                     tooltip={item.title}
