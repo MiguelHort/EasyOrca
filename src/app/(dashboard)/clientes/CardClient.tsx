@@ -79,7 +79,7 @@ export default function CardClient({ cliente, onUpdate }: CardClientProps) {
         >
           <div className="flex items-start gap-4">
             <div className="p-2 bg-muted rounded-full">
-              <User className="w-5 h-5 text-muted-foreground" />
+              <User className="w-5 h-5 text-primary" />
             </div>
             <div className="space-y-1">
               <h3 className="font-medium">{cliente.nome}</h3>
