@@ -85,6 +85,7 @@ export async function GET(req: NextRequest) {
         profileImage: true,
         userName: true,
         phone: true,
+        isPremium: true,
       },
     });
 
@@ -102,6 +103,7 @@ export async function GET(req: NextRequest) {
       profileImage: user.profileImage,
       userName: user.userName,
       phone: user.phone,
+      isPremium: user.isPremium,
     });
   } catch (error) {
     console.error("Erro em /api/infoUser:", error);

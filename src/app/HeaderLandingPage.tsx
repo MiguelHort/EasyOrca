@@ -73,7 +73,7 @@ export default function HeaderLandingPage() {
           <ThemePButton2 />
           <Link href="/login" className="flex items-center gap-3">
             <button
-              className={`transition-colors hidden md:flex ${
+              className={`transition-colors hidden md:flex cursor-pointer ${
                 atTop
                   ? "text-white hover:text-white/80"
                   : "text-muted-foreground hover:text-foreground"

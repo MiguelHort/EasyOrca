@@ -4,8 +4,17 @@ import { CheckCircle, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SiteHeader } from "@/components/site-header";
+import { useUser } from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
 
 export default function AssinarPlanoPage() {
+  const { user } = useUser();
+  const router = useRouter();
+
+  if (user?.isPremium) {
+    router.push("/home");
+  }
+
   const handleSubscribe = async () => {
     // Aqui você pode chamar sua API de assinatura (ex: Stripe, PagSeguro, etc.)
     alert("Assinatura iniciada!");

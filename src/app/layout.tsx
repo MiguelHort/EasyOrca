@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: "EasyOrça",
   description: "Gerado por EasyOrça",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
   },
 };
 

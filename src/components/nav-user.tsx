@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { useEffect, useState } from "react";
 import {
   IconCreditCard,
   IconDotsVertical,
@@ -42,10 +42,21 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
 
   function formatCompanyName(nameCompany: string) {
     return nameCompany.replace(/\s+/g, "").toLowerCase();
   }
+
+    useEffect(() => {
+      const fetchUrl = async () => {
+        const res = await fetch(`/api/user/profileImage?nome=${user.avatar}`);
+        const data = await res.json();
+        if (data.url) setImgUrl(`${data.url}&t=${Date.now()}`); // evita cache
+      };
+
+      if (user?.avatar) fetchUrl();
+    }, [user?.avatar]);
 
   async function handleLogout() {
     try {
@@ -79,7 +90,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage
-                  src={`/api/user/profileImage?file=${user.avatar}`}
+                  src={imgUrl || `/api/user/profileImage?file=${user.avatar}`}
                   alt={user.name}
                 />
               </Avatar>
@@ -102,7 +113,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
-                    src={`/api/user/profileImage?file=${user.avatar}`}
+                    src={imgUrl || `/api/user/profileImage?file=${user.avatar}`}
                     alt={user.name}
                   />
                 </Avatar>

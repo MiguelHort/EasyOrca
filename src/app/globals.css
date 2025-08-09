@@ -166,8 +166,14 @@
 @font-face {
   font-family: "Comic Sans Custom";
   src: url("/fonts/ComicSansMS.TTF") format("truetype");
-  font-weight: normal;
-  font-style: normal;
+}
+@font-face {
+  font-family: "Dreaming Out Loud";
+  src: url("/fonts/dreaming-outloud-regular-pro.otf") format("opentype");
+}
+@font-face {
+  font-family: "Hammersmith One";
+  src: url("/fonts/hammersmithone-regular.ttf") format("truetype");
 }
 
 /* --- PRINT --- */

@@ -10,7 +10,14 @@ import {
 } from "@/components/ui/card";
 
 import { Input } from "@/components/ui/input";
-import { NotepadTextDashed, Lock, Mail, Loader2 } from "lucide-react";
+import {
+  NotepadTextDashed,
+  Lock,
+  Mail,
+  Loader2,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { getUser } from "@/lib/services/auth";
 import { useRouter } from "next/navigation";
@@ -18,6 +25,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import Image from "next/image";
 import { mutate } from "swr";
+import Link from "next/link";
 
 type Inputs = {
   email: string;
@@ -27,7 +35,7 @@ type Inputs = {
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [atTop, setAtTop] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -88,9 +96,9 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-sidebar-border p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="flex justify-center mb-4">
+          <Link className="flex justify-center mb-4" href="/">
             <Image src="/logoHeader2.png" alt="Logo" width={160} height={160} />
-          </div>
+          </Link>
           <p className="mt-2 text-muted-foreground">
             Orçamentos prontos em segundos. <br />
             Profissionalismo em cada clique.
@@ -108,6 +116,7 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit(handleLogin)}>
               <div className="grid gap-4">
                 <div className="flex flex-col gap-1">
+                  {/* Campo Email */}
                   <div className="flex items-center border-2 rounded-md pl-4">
                     <Mail className="h-4 w-4 stroke-zinc-600" />
                     <Input
@@ -120,15 +129,27 @@ export default function LoginPage() {
                   </div>
                   {errors.email && <p className="text-red-500 text-xs"></p>}
 
-                  <div className="flex items-center border-2 rounded-md pl-4">
+                  {/* Campo Senha com botão de ver senha */}
+                  <div className="flex items-center border-2 rounded-md pl-4 pr-2">
                     <Lock className="h-4 w-4 stroke-zinc-600" />
                     <Input
                       id="senha"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="Senha"
-                      className="border-none"
+                      className="border-none flex-1"
                       {...register("passwordHash")}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
                   </div>
                   {errors.passwordHash && (
                     <p className="text-red-500 text-xs"></p>

@@ -13,6 +13,11 @@ import {
   Send,
   CreditCard,
   UserCheck,
+  Clock,
+  BarChart3,
+  Briefcase,
+  MessageCircle,
+  Globe,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -55,8 +60,11 @@ export default function AutoOrcaLanding() {
         <div className="pt-32 pb-20 bg-blue-600 rounded-b-[60px] sm:rounded-b-[80px] sm:px-6 lg:rounded-b-[100px] text-white overflow-hidden relative">
           <div className="max-w-7xl mx-auto px-4 flex flex-col-reverse lg:flex-row items-center justify-between gap-8">
             {/* Texto à esquerda */}
-            <div className="flex flex-col lg:w-1/2 text-left">
-              <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 md:mb-8 leading-tight">
+            <div className="flex flex-col pl-4 lg:w-1/2 text-left">
+              <h1
+                className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 md:mb-8 leading-tight"
+                style={{ fontFamily: "Hammersmith One" }}
+              >
                 Faça orçamentos
                 <br />
                 em menos de
@@ -70,7 +78,7 @@ export default function AutoOrcaLanding() {
 
               <p
                 className="text-base sm:text-lg md:text-xl text-white/90 mb-6 md:mb-8 leading-relaxed max-w-lg"
-                style={{ fontFamily: "Comic Sans Custom" }}
+                style={{ fontFamily: "Dreaming Out Loud" }}
               >
                 Uma boa entrega para o seu
                 <br />
@@ -82,14 +90,14 @@ export default function AutoOrcaLanding() {
                 <img
                   src="/seta.png"
                   alt="Seta curva apontando para o botão"
-                  className="absolute -top-10 left-36 sm:left-44 md:left-48 w-16 sm:w-20 md:w-24 h-14 object-contain"
+                  className="absolute -top-10 left-36 sm:left-44 md:left-48 w-24 sm:w-20 md:w-24 h-22 object-contain"
                   draggable={false}
                 />
               </div>
 
               <div className="flex justify-start">
                 <Link href="/register">
-                  <Button className="h-12 text-sm sm:text-base md:text-lg font-semibold px-6 sm:px-8 py-3 sm:py-4 bg-lime-400 text-white hover:bg-lime-400 transition-all shadow-lg transform hover:scale-103">
+                  <Button className="h-12 text-sm sm:text-base md:text-lg font-semibold px-6 sm:px-8 py-3 sm:py-4 bg-lime-400 text-white hover:bg-lime-400 transition-all shadow-2xl transform hover:scale-103">
                     Começar agora
                   </Button>
                 </Link>
@@ -99,11 +107,11 @@ export default function AutoOrcaLanding() {
             {/* Mockup à direita */}
             <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
               <Image
-                src="/mockup.png"
+                src="/mockup1.png"
                 alt="Mockup da aplicação EasyOrça"
                 width={500}
                 height={300}
-                className="w-full max-w-[380px] sm:max-w-[460px] lg:max-w-[500px]"
+                className="flex items-end w-full max-w-[380px] sm:max-w-[500px] lg:max-w-[500px]"
               />
             </div>
           </div>
@@ -126,40 +134,40 @@ export default function AutoOrcaLanding() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: <Zap className="w-8 h-8 text-yellow-500" />,
-                title: "Orçamentos em 30 Segundos",
+                icon: <Zap className="w-8 h-8 text-yellow-500" />, // Relaciona-se bem com rapidez e praticidade
+                title: "Praticidade",
                 description:
-                  "Ganhe tempo com a criação de orçamentos automatizados e profissionais em poucos cliques.",
+                  "Cadastre seus serviços e somente personalize o orçamento para cada cliente em poucos passos!",
               },
               {
-                icon: <Smartphone className="w-8 h-8 text-blue-500" />,
-                title: "100% Mobile",
+                icon: <BarChart3 className="w-8 h-8 text-blue-500" />, // Controle → gráfico/gestão
+                title: "Controle",
                 description:
-                  "Use em qualquer celular, tablet ou computador. Ideal para quem está sempre em movimento.",
+                  "Gestão completa da quantidade de orçamentos feitos, aceitos, recusados, clientes atendidos e serviços prestados/produtos vendidos.",
               },
               {
-                icon: <Send className="w-8 h-8 text-green-500" />,
-                title: "Envio por WhatsApp",
+                icon: <Briefcase className="w-8 h-8 text-green-500" />, // Profissionalismo → trabalho/negócios
+                title: "Profissionalismo",
                 description:
-                  "Compartilhe orçamentos diretamente com seus clientes pelo WhatsApp ou por link.",
+                  "Envie orçamentos completos e com valores claros, transmitindo mais profissionalismo ao seu cliente.",
               },
               {
-                icon: <FileText className="w-8 h-8 text-purple-500" />,
-                title: "PDF Profissional",
+                icon: <MessageCircle className="w-8 h-8 text-purple-500" />, // Direto no WhatsApp → conversa/mensagem
+                title: "Direto no Whatsapp",
                 description:
-                  "Orçamentos com aparência profissional, prontos para serem enviados e impressionar seus clientes.",
+                  "Com um botão, você encaminha o orçamento direto para o Whatsapp do seu cliente, sem precisar fazer download do arquivo.",
               },
               {
-                icon: <CreditCard className="w-8 h-8 text-cyan-500" />,
-                title: "Aceita Pix e Cartão",
+                icon: <Globe className="w-8 h-8 text-cyan-500" />, // Acessível de qualquer lugar → mundo/internet
+                title: "Acessível de qualquer lugar",
                 description:
-                  "Facilite o pagamento com Pix ou cartão via integração com plataformas de pagamento.",
+                  "Gera o orçamento personalizado com as informações que seu cliente precisa para você fazer negócio!",
               },
               {
-                icon: <UserCheck className="w-8 h-8 text-red-500" />,
-                title: "Feito para Autônomos",
+                icon: <UserCheck className="w-8 h-8 text-red-500" />, // Feito para quem faz acontecer → pessoa determinada
+                title: "Feito para quem faz acontecer",
                 description:
-                  "Fácil de usar, sem burocracia. Foco no que realmente importa: vender e atender bem.",
+                  "Um sistema pensado para a rotina do empreendedor: intuitivo, fácil de usar e que se encaixa no seu dia a dia.",
               },
             ].map((feature, index) => (
               <div key={index} className="group relative">
@@ -243,7 +251,7 @@ export default function AutoOrcaLanding() {
               },
             ].map((step, index) => (
               <div key={index} className="text-center relative">
-                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 relative z-10">
+                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-12 relative z-10">
                   {step.icon}
                 </div>
                 <div className="text-6xl font-bold mb-4 text-primary/20">

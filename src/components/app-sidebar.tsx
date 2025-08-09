@@ -25,38 +25,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useUser } from "@/hooks/useUser";
 
-const navItems = [
-  {
-    title: "Início",
-    url: "/home",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Histórico de Orçamentos",
-    url: "/orcamentos",
-    icon: ListOrdered,
-  },
-  {
-    title: "Clientes",
-    url: "/clientes",
-    icon: Users2,
-  },
-  {
-    title: "Serviços",
-    url: "/servicos",
-    icon: Settings2,
-  },
-  {
-    title: "Upgrade",
-    url: "/upgrade",
-    icon: Sparkles,
-    iconStyle: "text-primary",
-    style: "text-primary font-semibold",
-  },
-];
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-
   const { user, isLoading, isError, errorMessage } = useUser();
 
   const userPlaceholder = {
@@ -65,7 +34,43 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     avatar: user?.profileImage,
     userName: user?.userName,
     nameCompany: user?.company?.name,
+    isPremium: user?.isPremium || false,
   };
+
+  const navItems = [
+    {
+      title: "Início",
+      url: "/home",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Histórico de Orçamentos",
+      url: "/orcamentos",
+      icon: ListOrdered,
+    },
+    {
+      title: "Clientes",
+      url: "/clientes",
+      icon: Users2,
+    },
+    {
+      title: "Serviços",
+      url: "/servicos",
+      icon: Settings2,
+    },
+    // Só adiciona o Upgrade se o usuário NÃO for premium
+    ...(!userPlaceholder.isPremium
+      ? [
+          {
+            title: "Upgrade",
+            url: "/upgrade",
+            icon: Sparkles,
+            iconStyle: "text-primary",
+            style: "text-primary font-semibold",
+          },
+        ]
+      : []),
+  ];
 
   return (
     <Sidebar collapsible="icon" {...props}>

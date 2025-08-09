@@ -8,6 +8,8 @@ import {
   Wrench,
   CheckCircle,
   Crown,
+  TrendingUp,
+  DollarSign,
 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 
@@ -65,14 +67,34 @@ export default function DashboardPage() {
       <SiteHeader title="Dashboard" />
 
       <main className="min-h-screen bg-background">
-        <div className="bg-primary">
-          <header className="mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r from-primary to-blue-400 dark:to-blue-800 text-white">
-            <h1 className="text-3xl font-bold tracking-tight">
-              Olá{user?.name ? `, ${user?.name}` : ""}! 👋
-            </h1>
-            <p className="mt-1">
-              Mais um dia para fechar bons negócios com confiança!
-            </p>
+        <div>
+          <header className="flex justify-between mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r from-primary to-blue-400 dark:to-blue-800 text-white">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                Olá{user?.name ? `, ${user?.name}` : ""}! 👋
+              </h1>
+              <p className="mt-1">
+                Mais um dia para fechar bons negócios com confiança!
+              </p>
+            </div>
+            {user?.isPremium ? (
+            <div className="flex items-center gap-4">
+              <div className="flex text-xs font-semibold border-1 border-gray-200 rounded-2xl py-1 px-3">
+                <Crown className="h-4 w-4 mr-2" />
+                Plano PRO
+              </div>
+            </div>
+            ) : (
+            <div className="flex items-center gap-4">    
+              <div className="text-xs font-semibold border-1 border-gray-200 rounded-2xl py-0.5 px-2 bg-blue-400">
+                Plano Grátis
+              </div>
+              <Button className="flex items-center bg-background text-primary">
+                <Crown className="h-4 w-4 mr-2" />
+                Upgrade para PRO
+              </Button>
+            </div>
+            )}
           </header>
         </div>
 
@@ -116,26 +138,34 @@ export default function DashboardPage() {
               <InfoCard
                 icon={<FilePlus2 className="text-primary h-6 w-6" />}
                 title="Orçamentos criados"
-                value={0}
+                value={24}
                 description="Este mês"
+                percentage={12}
+                valueType="number"
               />
               <InfoCard
                 icon={<Users className="h-6 w-6 text-primary" />}
                 title="Clientes cadastrados"
-                value={0}
+                value={48}
                 description="Total cadastrado"
+                percentage={5}
+                valueType="number"
               />
               <InfoCard
-                icon={<Wrench className="h-6 w-6 text-primary" />}
+                icon={<TrendingUp className="h-6 w-6 text-primary" />}
                 title="Taxa de Conversão"
-                value={0}
+                value={86}
                 description="Orçamentos aceitos"
+                percentage={15}
+                valueType="percent"
               />
               <InfoCard
-                icon={<Wrench className="h-6 w-6 text-primary" />}
+                icon={<DollarSign className="h-6 w-6 text-primary" />}
                 title="Valor Total"
-                value={0}
+                value={16040}
                 description="Em orçamentos"
+                percentage={23}
+                valueType="currency"
               />
             </div>
           </section>
@@ -220,7 +250,6 @@ export default function DashboardPage() {
       </main>
 
       <ShowPremiumDialog />
-      
     </>
   );
 }
@@ -230,19 +259,47 @@ type InfoCardProps = {
   title: string;
   value: number | null;
   description: string;
+  percentage: number | null;
+  valueType?: "percent" | "currency" | "number"; // novo
 };
 
-function InfoCard({ icon, title, value, description }: InfoCardProps) {
+function InfoCard({
+  icon,
+  title,
+  value,
+  description,
+  percentage,
+  valueType = "number", // padrão
+}: InfoCardProps) {
+  // Formata valor dependendo do tipo
+  const formattedValue =
+    valueType === "currency"
+      ? value?.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        })
+      : valueType === "percent"
+      ? `${value}%`
+      : value;
+
   return (
     <Card className="border-border">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold text-foreground">{value}</p>
+            <p className="text-2xl font-bold text-foreground">
+              {formattedValue}
+            </p>
             <p className="text-sm text-muted-foreground">{description}</p>
           </div>
           <div className="bg-primary/10 p-3 rounded-lg">{icon}</div>
+        </div>
+        <div className="mt-4">
+          <p className="text-muted-foreground">
+            <span className="text-green-600 font-semibold ">{percentage}%</span>{" "}
+            vs mês anterior
+          </p>
         </div>
       </CardContent>
     </Card>

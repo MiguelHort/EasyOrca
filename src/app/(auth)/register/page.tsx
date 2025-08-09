@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createUser } from "@/lib/services/auth";
 import Image from "next/image";
+import Link from "next/link";
 
 type Inputs = {
   name: string;
@@ -60,9 +61,9 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-sidebar-border p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="flex justify-center mb-4">
+          <Link className="flex justify-center mb-4" href="/">
             <Image src="/logoHeader2.png" alt="Logo" width={160} height={160} />
-          </div>
+          </Link>
           <p className="mt-2 text-muted-foreground">
             Orçamentos prontos em segundos. <br />
             Profissionalismo em cada clique.
