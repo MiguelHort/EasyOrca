@@ -11,9 +11,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { ClipboardList, Users, Crown, CheckCircle, Trophy } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
 
 export function ShowPremiumDialog() {
   const [showPremiumDialog, setshowPremiumDialog] = useState(false);
+  const [toggle, setToggle] = useState(false);
 
   useEffect(() => {
     const promoSeen = localStorage.getItem("showPremiumDialog");
@@ -22,6 +25,13 @@ export function ShowPremiumDialog() {
       setshowPremiumDialog(true);
     }
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setToggle((prev) => !prev);
+    }, 7000); // 6s de animação + 1s de pausa
+    return () => clearTimeout(timer);
+  }, [toggle]);
 
   function handleClosePromo() {
     localStorage.setItem("showPremiumDialog", "false");
@@ -35,11 +45,11 @@ export function ShowPremiumDialog() {
           showPremiumDialog ? "" : "hidden"
         }`}
       >
-        <div className="rounded-xl p-0 m-4 overflow-hidden bg-white dark:bg-muted shadow-xl max-w-3xl w-full">
-          <div className="grid grid-cols-1 md:grid-cols-2">
+        <div className="rounded-xl p-0 m-4 overflow-hidden bg-background dark:bg-muted shadow-xl max-w-3xl w-full">
+          <div className="relative grid grid-cols-1 md:grid-cols-2">
             {/* Lado Esquerdo - Texto */}
             <div className="p-8 flex flex-col justify-between relative">
-                <button
+              <button
                 onClick={handleClosePromo}
                 className="absolute top-2 right-4 text-white hover:text-zinc-800 dark:hover:text-white text-xl z-10 sm:hidden"
                 aria-label="Fechar"
@@ -48,16 +58,16 @@ export function ShowPremiumDialog() {
               </button>
               <div>
                 <div className="space-y-1">
-                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
+                  <h2 className="text-2xl font-bold text-zinc-900">
                     Assine o AutoOrça Premium
                   </h2>
-                  <p className="text-base text-zinc-600 dark:text-zinc-300">
+                  <p className="text-base text-zinc-600">
                     Eleve seu negócio ao próximo nível. Desbloqueie todos os
                     recursos avançados do AutoOrça com um plano exclusivo.
                   </p>
                 </div>
 
-                <div className="mt-6 space-y-4 text-sm text-zinc-700 dark:text-zinc-300">
+                <div className="mt-6 max-w-100 space-y-4 text-sm md:max-w-80 text-zinc-700">
                   <div className="flex items-start gap-3">
                     <ClipboardList className="w-5 h-5 text-primary mt-0.5" />
                     <span>
@@ -102,7 +112,7 @@ export function ShowPremiumDialog() {
             </div>
 
             {/* Lado Direito - Imagem e fundo */}
-            <div className="relative bg-gradient-to-br from-cyan-600 via-sky-500 to-blue-600">
+            <div className="relative bg-gradient-to-br from-cyan-600 via-sky-400 to-blue-700 rounded-l-2xl">
               <button
                 onClick={handleClosePromo}
                 className="absolute top-2 right-4 text-white hover:text-zinc-800 dark:hover:text-white text-xl z-10"
@@ -110,7 +120,33 @@ export function ShowPremiumDialog() {
               >
                 ×
               </button>
-              <Trophy className="absolute bottom-0 right-0 w-full h-full object-cover opacity-20" />
+            </div>
+            <div className="absolute top-6 left-50 inset-0 translate-x-6 w-190 h-120 hidden md:block">
+              <Image
+                src="/mockupVideo2.png"
+                alt="Imagem 1"
+                fill
+                className="object-contain"
+              />
+
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: `url(${
+                    toggle ? "/mockupVideo1.png" : "/mockupVideo2.png"
+                  })`,
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center",
+                }}
+                initial={{ clipPath: "inset(0% 0% 0% 100%)" }}
+                animate={{
+                  clipPath: toggle
+                    ? "inset(0% 0% 0% 0%)"
+                    : "inset(0% 0% 0% 100%)",
+                }}
+                transition={{ duration: 6, ease: [0.45, 0.05, 0.55, 0.95] }}
+              />
             </div>
           </div>
         </div>
