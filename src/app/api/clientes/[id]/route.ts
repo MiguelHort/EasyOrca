@@ -7,7 +7,7 @@ const secretKey = process.env.NEXT_PUBLIC_JWT_SECRET || "testeSIH";
 
 export async function PATCH(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   const token = req.cookies.get("token")?.value;
   if (!token) {
@@ -26,7 +26,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Usuário sem empresa vinculada" }, { status: 403 });
     }
 
-    const { id } = context.params;
+    const { id } = params;
     const body = await req.json();
     const { nome, email, telefone } = body;
 
