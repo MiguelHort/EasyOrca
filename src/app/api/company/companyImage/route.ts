@@ -3,14 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { PrismaClient } from "@prisma/client";
 import { randomUUID } from "crypto";
 
-// Prisma Singleton para evitar múltiplas conexões no dev
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["query", "error"] : ["error"],
-  });
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+const prisma = new PrismaClient();
 
 const BUCKET = "assets";
 const BASE_PATH = "imgs/companyImage";
