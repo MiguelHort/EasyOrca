@@ -9,7 +9,16 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ClipboardList, Users, Crown, CheckCircle, Trophy } from "lucide-react";
+import {
+  ClipboardList,
+  Users,
+  Crown,
+  CheckCircle,
+  Trophy,
+  CircleDollarSign,
+  ChartNoAxesCombined,
+  LayoutTemplate,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -45,69 +54,76 @@ export function ShowPremiumDialog() {
           showPremiumDialog ? "" : "hidden"
         }`}
       >
-        <div className="rounded-xl p-0 m-4 overflow-hidden bg-background dark:bg-muted shadow-xl max-w-3xl w-full">
+        <div className="rounded-xl p-0 m-4 overflow-hidden bg-background dark:bg-muted shadow-xl max-w-3xl text-primary">
           <div className="relative grid grid-cols-1 md:grid-cols-2">
             {/* Lado Esquerdo - Texto */}
             <div className="p-8 flex flex-col justify-between relative">
               <button
                 onClick={handleClosePromo}
-                className="absolute top-2 right-4 text-white hover:text-zinc-800 dark:hover:text-white text-xl z-10 sm:hidden"
+                className="absolute top-2 right-4 text-black hover:text-zinc-800 dark:hover:text-white text-xl z-10 sm:hidden"
                 aria-label="Fechar"
               >
                 ×
               </button>
               <div>
                 <div className="space-y-1">
-                  <h2 className="text-2xl font-bold text-zinc-900">
-                    Assine o AutoOrça Premium
+                  <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-primary leading-snug">
+                    A demanda cresceu? <br /> Então esse é o próximo nível!
                   </h2>
-                  <p className="text-base text-zinc-600">
-                    Eleve seu negócio ao próximo nível. Desbloqueie todos os
-                    recursos avançados do AutoOrça com um plano exclusivo.
+                  <p className="text-sm sm:text-base md:text-lg leading-relaxed">
+                    O mesmo sistema que você já usa no dia-a-dia, só que{" "}
+                    <span className="font-semibold text-primary">
+                      mais completo.
+                    </span>
                   </p>
                 </div>
 
-                <div className="mt-6 max-w-100 space-y-4 text-sm md:max-w-80 text-zinc-700">
+                <div className="mt-6 max-w-full sm:max-w-[400px] md:max-w-[320px] space-y-4 text-xs sm:text-sm">
                   <div className="flex items-start gap-3">
-                    <ClipboardList className="w-5 h-5 text-primary mt-0.5" />
+                    <CircleDollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                     <span>
-                      <strong>Orçamentos ilimitados</strong> com modelos PDF
-                      profissionais
+                      <strong className="text-primary">
+                        Orçamentos ilimitados
+                      </strong>{" "}
+                      e{" "}
+                      <strong className="text-primary">personalizações</strong>{" "}
+                      para acompanhar o crescimento do seu trabalho.
                     </span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Users className="w-5 h-5 text-primary mt-0.5" />
+                    <ChartNoAxesCombined className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                     <span>
-                      Cadastro e histórico completo de{" "}
-                      <strong>clientes e veículos</strong>
+                      <strong className="text-primary">Dashboard</strong> para
+                      você visualizar{" "}
+                      <strong className="text-primary">
+                        informações do seu negócio
+                      </strong>{" "}
+                      que passam batido na{" "}
+                      <strong className="text-primary">
+                        correria do dia-a-dia
+                      </strong>
+                      .
                     </span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Crown className="w-5 h-5 text-primary mt-0.5" />
+                    <LayoutTemplate className="w-6 h-6 sm:w-8 sm:h-8 text-primary mt-0.5" />
                     <span>
-                      <strong>Suporte prioritário</strong> e atualizações
-                      antecipadas
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5" />
-                    <span>
-                      Acesso a todos os <strong>recursos premium</strong> sem
-                      limites
+                      <strong className="text-primary">
+                        Mais opções de templates
+                      </strong>{" "}
+                      para você escolher qual se enquadra melhor para cada
+                      serviço.
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8 space-y-3">
+              <div className="mt-4 space-y-3">
                 <Link href="/upgrade">
                   <Button className="w-full text-base bg-primary text-white hover:bg-primary/90 transition">
                     Assinar por R$49,90/mês
                   </Button>
                 </Link>
-                <p className="mt-2 text-xs text-center text-zinc-500 dark:text-zinc-400">
-                  Cancele quando quiser. Teste grátis por 7 dias.
-                </p>
               </div>
             </div>
 
@@ -115,7 +131,7 @@ export function ShowPremiumDialog() {
             <div className="relative bg-gradient-to-br from-cyan-600 via-sky-400 to-blue-700 rounded-l-2xl">
               <button
                 onClick={handleClosePromo}
-                className="absolute top-2 right-4 text-white hover:text-zinc-800 dark:hover:text-white text-xl z-10"
+                className="absolute top-2 right-4 text-white hover:text-zinc-800 text-xl z-10"
                 aria-label="Fechar"
               >
                 ×
@@ -123,7 +139,7 @@ export function ShowPremiumDialog() {
             </div>
             <div className="absolute top-6 left-50 inset-0 translate-x-6 w-190 h-120 hidden md:block">
               <Image
-                src="/mockupVideo2.png"
+                src="/mockupVideo3.png"
                 alt="Imagem 1"
                 fill
                 className="object-contain"

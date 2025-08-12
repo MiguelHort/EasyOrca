@@ -277,6 +277,8 @@ function InfoCard({
       ? value?.toLocaleString("pt-BR", {
           style: "currency",
           currency: "BRL",
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
         })
       : valueType === "percent"
       ? `${value}%`
@@ -288,7 +290,7 @@ function InfoCard({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold text-foreground">
+            <p className="text-2xl md:text-xl font-bold text-foreground">
               {formattedValue}
             </p>
             <p className="text-sm text-muted-foreground">{description}</p>

@@ -7,7 +7,7 @@ const secretKey = process.env.NEXT_PUBLIC_JWT_SECRET || "testeSIH";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> } // <-- aqui
 ) {
   const token = req.cookies.get("token")?.value;
   if (!token) {
@@ -26,7 +26,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Usuário sem empresa vinculada" }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params; // <-- e aqui
     const body = await req.json();
     const { nome, email, telefone } = body;
 
@@ -34,10 +34,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Nome é obrigatório" }, { status: 400 });
     }
 
-    // Verifica se cliente existe e pertence à mesma empresa
-    const clienteExistente = await prisma.cliente.findUnique({
-      where: { id },
-    });
+    const clienteExistente = await prisma.cliente.findUnique({ where: { id } });
 
     if (!clienteExistente || clienteExistente.companyId !== user.companyId) {
       return NextResponse.json({ error: "Cliente não encontrado ou sem permissão" }, { status: 404 });
@@ -45,11 +42,7 @@ export async function PATCH(
 
     const clienteAtualizado = await prisma.cliente.update({
       where: { id },
-      data: {
-        nome,
-        email,
-        telefone,
-      },
+      data: { nome, email, telefone },
     });
 
     return NextResponse.json(clienteAtualizado);

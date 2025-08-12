@@ -1,22 +1,39 @@
 "use client";
 
-import { CheckCircle, Crown } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileText, LayoutDashboard, Layers } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { useUser } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function AssinarPlanoPage() {
   const { user } = useUser();
   const router = useRouter();
+
+  // Lista de imagens únicas
+  const slides = [
+    "/mockupVideo1-1.png",
+    "/mockupVideo2-1.png",
+  ];
+
+  const [index, setIndex] = useState(0);
+
+  // Troca automática
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % slides.length);
+    }, 4000); // troca a cada 4s
+    return () => clearInterval(interval);
+  }, [slides.length]);
 
   if (user?.isPremium) {
     router.push("/home");
   }
 
   const handleSubscribe = async () => {
-    // Aqui você pode chamar sua API de assinatura (ex: Stripe, PagSeguro, etc.)
     alert("Assinatura iniciada!");
   };
 
@@ -24,41 +41,79 @@ export default function AssinarPlanoPage() {
     <>
       <SiteHeader title="Assinar Plano Premium" />
 
-      <main className="p-6">
-        <Card className="max-w-2xl mx-auto border-blue-600 bg-blue-50/50 dark:bg-blue-950 p-6">
-          <CardHeader className="flex flex-col items-center gap-2 text-center">
-            <Crown className="h-10 w-10 text-yellow-500" />
-            <CardTitle className="text-2xl font-bold">Plano Premium</CardTitle>
-            <p className="text-muted-foreground text-sm">
-              Acesse todos os recursos sem limitações.
+      <main className="px-6 md:px-16 py-10 bg-white">
+        <div className="grid md:grid-cols-2 gap-10 items-center">
+          {/* Texto à esquerda */}
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-blue-600">
+              Orçamentos <span className="text-lime-400">ilimitados</span>,
+              <br />
+              com mais templates e personalizações
+            </h1>
+            <p className="mt-4 text-gray-700 text-base md:text-lg">
+              Se você precisa de{" "}
+              <strong>mais do que a nossa versão gratuita</strong> oferece, é
+              aqui que você irá para o <strong>próximo nível!</strong>
             </p>
-          </CardHeader>
 
-          <CardContent className="space-y-6">
-            <div className="text-center">
-              <p className="text-4xl font-bold">R$ 49,90</p>
-              <p className="text-sm text-muted-foreground">por mês</p>
+            {/* Lista de benefícios */}
+            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-4">
+              <div className="flex items-start gap-3">
+                <FileText className="h-10 w-10 text-blue-500 mt-1" />
+                <p className="text-sm text-gray-800">
+                  <strong>Orçamentos ilimitados</strong> e personalizações para
+                  acompanhar o crescimento do seu trabalho.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <LayoutDashboard className="h-10 w-10 text-blue-500 mt-1" />
+                <p className="text-sm text-gray-800">
+                  <strong>Dashboard</strong> para você visualizar informações do
+                  seu negócio que passam batido na correria do dia-a-dia.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <Layers className="h-10 w-10 text-blue-500 mt-1" />
+                <p className="text-sm text-gray-800">
+                  <strong>Mais opções de templates</strong> para você escolher
+                  qual se enquadra melhor para cada serviço.
+                </p>
+              </div>
+
+              <Button
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                size="lg"
+                onClick={handleSubscribe}
+              >
+                Assinar Agora
+              </Button>
             </div>
+          </div>
 
-            <ul className="space-y-3">
-              {[
-                "Criação ilimitada de orçamentos",
-                "PDFs personalizados com logo",
-                "Acesso antecipado a novidades",
-                "Suporte prioritário",
-              ].map((benefit) => (
-                <li key={benefit} className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  {benefit}
-                </li>
-              ))}
-            </ul>
-
-            <Button className="w-full" size="lg" onClick={handleSubscribe}>
-              Assinar agora
-            </Button>
-          </CardContent>
-        </Card>
+          {/* Carrossel de uma imagem por vez */}
+          <div className="relative flex justify-center items-center">
+            <div className="relative w-full max-w-md h-[400px] overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={slides[index]}
+                    alt={`Slide ${index + 1}`}
+                    width={500}
+                    height={400}
+                    className="object-contain"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
       </main>
     </>
   );
