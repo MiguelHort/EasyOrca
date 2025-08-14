@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Wrench, BadgeDollarSign, Edit2, Trash2, MoreVertical } from "lucide-react";
+
 import {
   Dialog,
   DialogContent,
@@ -25,7 +24,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Edit2, Trash2, User, MoreVertical } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -34,91 +35,67 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-export type Cliente = {
-  id: string;
-  nome: string;
-  email: string | null;
-  telefone: string | null;
-};
+const currency = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
-export type CardClienteProps = {
-  cliente: Cliente;
-  onUpdate?: (atualizado: Cliente) => void;
+type CardServiceProps = {
+  servico: { id: string; nome: string; preco: number };
+  onUpdate?: (s: { id: string; nome: string; preco: number }) => void;
   onDelete?: (id: string) => void;
 };
 
-const CardCliente: React.FC<CardClienteProps> = ({ cliente, onUpdate, onDelete }) => {
+export default function CardService({ servico, onUpdate, onDelete }: CardServiceProps) {
   const [open, setOpen] = useState(false);
-
-  const [nome, setNome] = useState(cliente.nome ?? "");
-  const [email, setEmail] = useState(cliente.email ?? "");
-  const [telefone, setTelefone] = useState(cliente.telefone ?? "");
-
-  const [saving, setSaving] = useState(false);
+  const [nome, setNome] = useState(servico.nome);
+  const [preco, setPreco] = useState(String(servico.preco).replace(".", ","));
+  const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    setNome(cliente.nome ?? "");
-    setEmail(cliente.email ?? "");
-    setTelefone(cliente.telefone ?? "");
-  }, [cliente]);
+    setNome(servico.nome);
+    setPreco(String(servico.preco).replace(".", ","));
+  }, [servico]);
 
   async function handleSave() {
-    setSaving(true);
+    setLoading(true);
     try {
-      const payload = {
-        nome: (nome || "").trim(),
-        email: (email || "").trim() || null,
-        telefone: (telefone || "").trim() || null,
-      };
+      const precoNumber = Number(preco.replace(",", "."));
+      if (Number.isNaN(precoNumber)) throw new Error("Preço inválido");
 
-      if (!payload.nome) throw new Error("O nome é obrigatório.");
-
-      const res = await fetch(`/api/clientes/${cliente.id}`, {
+      const res = await fetch(`/api/servicos/${servico.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ nome, preco: precoNumber }),
       });
-
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
-        throw new Error(j.error || "Erro ao atualizar cliente");
+        throw new Error(j.error || "Erro ao atualizar serviço");
       }
-
-      const updated = (await res.json()) as Partial<Cliente>;
-
-      const novo: Cliente = {
-        id: updated.id ?? cliente.id,
-        nome: updated.nome ?? payload.nome!,
-        email: updated.email ?? payload.email ?? null,
-        telefone: updated.telefone ?? payload.telefone ?? null,
-      };
-
-      onUpdate?.(novo);
+      const atualizado = await res.json();
+      onUpdate?.({ ...atualizado, preco: Number(atualizado.preco) });
       setOpen(false);
     } catch (e: any) {
-      alert(e.message || "Erro ao salvar cliente");
+      alert(e.message || "Erro ao salvar serviço");
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   }
 
   async function handleConfirmDelete() {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/clientes/${cliente.id}`, {
+      const res = await fetch(`/api/servicos/${servico.id}`, {
         method: "DELETE",
         credentials: "include",
       });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
-        throw new Error(j.error || "Erro ao excluir cliente");
+        throw new Error(j.error || "Erro ao excluir serviço");
       }
-      onDelete?.(cliente.id);
+      onDelete?.(servico.id);
       setOpen(false);
     } catch (e: any) {
-      alert(e.message || "Erro ao excluir cliente");
+      alert(e.message || "Erro ao excluir serviço");
     } finally {
       setDeleting(false);
     }
@@ -126,23 +103,20 @@ const CardCliente: React.FC<CardClienteProps> = ({ cliente, onUpdate, onDelete }
 
   return (
     <>
-      <Card className="hover:bg-muted transition">
+      <Card className="hover:bg-muted transition flex">
         <CardContent
-          className="flex w-full justify-between items-center cursor-pointer py-4"
+          className="flex justify-between items-center"
           onClick={() => setOpen(true)}
         >
           <div className="flex items-start gap-4">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
-              <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <Wrench className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-
             <div className="space-y-1">
-              <h3 className="font-medium">{cliente.nome}</h3>
-              <p className="text-sm text-muted-foreground">
-                {cliente.email || "sem e-mail"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {cliente.telefone || "sem telefone"}
+              <h3 className="font-medium">{servico.nome}</h3>
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <BadgeDollarSign className="w-4 h-4" />
+                {currency.format(servico.preco)}
               </p>
             </div>
           </div>
@@ -202,9 +176,9 @@ const CardCliente: React.FC<CardClienteProps> = ({ cliente, onUpdate, onDelete }
 
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Excluir cliente?</AlertDialogTitle>
+                  <AlertDialogTitle>Excluir serviço?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Esta ação não pode ser desfeita. O cliente será removido.
+                    Esta ação não pode ser desfeita. O serviço será removido.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -222,36 +196,22 @@ const CardCliente: React.FC<CardClienteProps> = ({ cliente, onUpdate, onDelete }
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Editar Cliente</DialogTitle>
-            <DialogDescription>Atualize os dados do cliente e salve.</DialogDescription>
+            <DialogTitle>Editar Serviço</DialogTitle>
+            <DialogDescription>Altere as informações do serviço e salve.</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             <div className="grid gap-1">
-              <Label htmlFor="nome">Nome*</Label>
-              <Input
-                id="nome"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-              />
+              <Label htmlFor="nome">Nome</Label>
+              <Input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} />
             </div>
-
             <div className="grid gap-1">
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="preco">Preço</Label>
               <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            <div className="grid gap-1">
-              <Label htmlFor="telefone">Telefone</Label>
-              <Input
-                id="telefone"
-                value={telefone}
-                onChange={(e) => setTelefone(e.target.value)}
+                id="preco"
+                value={preco}
+                onChange={(e) => setPreco(e.target.value)}
+                inputMode="decimal"
               />
             </div>
           </div>
@@ -260,14 +220,12 @@ const CardCliente: React.FC<CardClienteProps> = ({ cliente, onUpdate, onDelete }
             <DialogClose asChild>
               <Button variant="outline">Cancelar</Button>
             </DialogClose>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? "Salvando..." : "Salvar"}
+            <Button onClick={handleSave} disabled={loading}>
+              {loading ? "Salvando..." : "Salvar"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
   );
-};
-
-export default CardCliente;
+}

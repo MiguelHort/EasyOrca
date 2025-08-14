@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-
 import {
   Dialog,
   DialogTrigger,
@@ -30,6 +29,8 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X } from "lucide-react";
 
+const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+
 interface Cliente {
   id: string;
   nome: string;
@@ -38,7 +39,17 @@ interface Cliente {
 interface Servico {
   id: string;
   nome: string;
-  // preco?: number; // descomente se sua API retornar preço
+  preco: number; // agora assumimos preco vindo da API
+}
+
+function parseMoeda(valor: string): number | null {
+  if (!valor) return null;
+  // aceita "1.234,56" (pt-BR) ou "1234.56" (en-US)
+  const v = valor.trim();
+  // caso pt-BR: remove . dos milhares e troca , por .
+  const br = v.replace(/\./g, "").replace(",", ".");
+  const n = Number(br);
+  return Number.isFinite(n) ? n : null;
 }
 
 export default function NovoOrcamentoPage() {
@@ -58,7 +69,9 @@ export default function NovoOrcamentoPage() {
 
   // --- Campos do orçamento ---
   const [descricao, setDescricao] = useState("");
-  const [valorTotal, setValorTotal] = useState("");
+  const [valorTotal, setValorTotal] = useState(""); // campo editável
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
   // Busca clientes
   useEffect(() => {
@@ -66,10 +79,11 @@ export default function NovoOrcamentoPage() {
       try {
         const res = await fetch("/api/clientes", { credentials: "include" });
         if (!res.ok) throw new Error("Erro ao buscar clientes");
-        const data = await res.json();
-        const lista: Cliente[] = Array.isArray(data) ? data : [];
-        setClientes(lista);
-        if (lista.length > 0) setClienteId(lista[0].id);
+        const data = (await res.json()) as Cliente[];
+        setClientes(Array.isArray(data) ? data : []);
+        if (Array.isArray(data) && data.length > 0) {
+          setClienteId(data[0].id);
+        }
       } catch (err) {
         console.error(err);
         setClientes([]);
@@ -87,8 +101,14 @@ export default function NovoOrcamentoPage() {
       try {
         const res = await fetch("/api/servicos", { credentials: "include" });
         if (!res.ok) throw new Error("Erro ao buscar serviços");
-        const data = await res.json();
-        setServicos(Array.isArray(data) ? data : []);
+        const data = (await res.json()) as Partial<Servico>[];
+        // garante preco numérico (0 quando ausente)
+        const normalizados: Servico[] = (Array.isArray(data) ? data : []).map((s) => ({
+          id: String(s.id),
+          nome: String(s.nome),
+          preco: Number(s.preco ?? 0),
+        }));
+        setServicos(normalizados);
       } catch (err) {
         console.error(err);
         setServicos([]);
@@ -99,47 +119,66 @@ export default function NovoOrcamentoPage() {
     fetchServicos();
   }, []);
 
-  // Filtro de serviços (memoizado)
+  // Filtro de serviços
   const servicosFiltrados = useMemo(() => {
     const termo = buscaServicos.trim().toLowerCase();
     if (!termo) return servicos;
     return servicos.filter((s) => s.nome.toLowerCase().includes(termo));
   }, [buscaServicos, servicos]);
 
-  // Helpers para seleção
+  // Subtotal calculado dos serviços selecionados
+  const subtotalServicos = useMemo(() => {
+    const map = new Map(servicos.map((s) => [s.id, s.preco]));
+    return servicoIds.reduce((acc, id) => acc + (map.get(id) ?? 0), 0);
+  }, [servicoIds, servicos]);
+
+  // Sugestão de total: se usuário não digitar nada, mostramos o subtotal
+  const sugestaoTotal = useMemo(() => {
+    const n = parseMoeda(valorTotal);
+    return n == null ? subtotalServicos : n;
+  }, [valorTotal, subtotalServicos]);
+
+  // Helpers de seleção
   function toggleServico(id: string) {
     setServicoIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   }
-
   function removerServico(id: string) {
     setServicoIds((prev) => prev.filter((x) => x !== id));
   }
-
   function selecionarTodosVisiveis() {
     const visiveis = servicosFiltrados.map((s) => s.id);
     setServicoIds((prev) => Array.from(new Set([...prev, ...visiveis])));
   }
-
   function limparSelecao() {
     setServicoIds([]);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setErro(null);
 
-    const valor = parseFloat(valorTotal);
-    if (!clienteId || isNaN(valor)) {
-      alert("Preencha todos os campos corretamente.");
+    if (!clienteId) {
+      setErro("Selecione um cliente.");
       return;
     }
 
+    // total: usa o digitado se válido; se vazio, usa o subtotal somado dos serviços
+    const digitado = parseMoeda(valorTotal);
+    const total = digitado ?? subtotalServicos;
+
+    if (!Number.isFinite(total) || total <= 0) {
+      setErro("Informe um valor total válido ou selecione serviços com preço.");
+      return;
+    }
+
+    setEnviando(true);
     try {
       const payload = {
         clienteId,
-        descricao,
-        valorTotal: valor,
+        descricao: descricao?.trim() || "",
+        valorTotal: total,
         servicoIds, // enviado para o backend
       };
 
@@ -152,13 +191,16 @@ export default function NovoOrcamentoPage() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        alert(err.error || "Erro ao criar orçamento");
+        setErro(err.error || "Erro ao criar orçamento.");
         return;
-        }
+      }
+
       router.push("/orcamentos");
     } catch (err) {
       console.error(err);
-      alert("Erro inesperado ao criar orçamento.");
+      setErro("Erro inesperado ao criar orçamento.");
+    } finally {
+      setEnviando(false);
     }
   }
 
@@ -187,6 +229,12 @@ export default function NovoOrcamentoPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="grid gap-5">
+                {erro && (
+                  <div className="text-sm text-red-600 border border-red-300 bg-red-50 rounded px-3 py-2">
+                    {erro}
+                  </div>
+                )}
+
                 {/* Cliente */}
                 <div className="grid gap-2">
                   <Label htmlFor="cliente">Cliente</Label>
@@ -194,7 +242,7 @@ export default function NovoOrcamentoPage() {
                     id="cliente"
                     value={clienteId}
                     onChange={(e) => setClienteId(e.target.value)}
-                    disabled={clientes.length === 0}
+                    disabled={clientes.length === 0 || enviando}
                     className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
                   >
                     {clientes.length === 0 ? (
@@ -227,7 +275,7 @@ export default function NovoOrcamentoPage() {
                             variant="secondary"
                             className="flex items-center gap-1"
                           >
-                            {s.nome}
+                            {s.nome} · {brl.format(s.preco || 0)}
                             <button
                               type="button"
                               onClick={() => removerServico(id)}
@@ -247,13 +295,23 @@ export default function NovoOrcamentoPage() {
                     </p>
                   )}
 
+                  {/* Subtotal e sugestão de total */}
+                  <div className="text-xs text-muted-foreground">
+                    Subtotal serviços: <span className="font-medium">{brl.format(subtotalServicos)}</span>
+                    {valorTotal.trim() === "" && (
+                      <span className="ml-2">
+                        (usaremos este total se você não informar outro valor)
+                      </span>
+                    )}
+                  </div>
+
                   {/* Botão que abre o Dialog */}
                   <Dialog open={servicosDialogOpen} onOpenChange={setServicosDialogOpen}>
                     <DialogTrigger asChild>
                       <Button
                         type="button"
                         variant="outline"
-                        disabled={servicosLoading}
+                        disabled={servicosLoading || enviando}
                         className="w-full"
                       >
                         {servicosLoading ? "Carregando serviços..." : "Selecionar serviços"}
@@ -316,13 +374,18 @@ export default function NovoOrcamentoPage() {
                             servicosFiltrados.map((s) => (
                               <label
                                 key={s.id}
-                                className="flex items-center gap-3 rounded-md px-2 py-2 hover:bg-muted cursor-pointer"
+                                className="flex items-center justify-between gap-3 rounded-md px-2 py-2 hover:bg-muted cursor-pointer"
                               >
-                                <Checkbox
-                                  checked={servicoIds.includes(s.id)}
-                                  onCheckedChange={() => toggleServico(s.id)}
-                                />
-                                <span className="text-sm">{s.nome}</span>
+                                <div className="flex items-center gap-3">
+                                  <Checkbox
+                                    checked={servicoIds.includes(s.id)}
+                                    onCheckedChange={() => toggleServico(s.id)}
+                                  />
+                                  <span className="text-sm">{s.nome}</span>
+                                </div>
+                                <span className="text-xs text-muted-foreground">
+                                  {brl.format(s.preco || 0)}
+                                </span>
                               </label>
                             ))
                           )}
@@ -358,6 +421,7 @@ export default function NovoOrcamentoPage() {
                     onChange={(e) => setDescricao(e.target.value)}
                     placeholder="Ex: Instalação elétrica, troca de tomada..."
                     rows={4}
+                    disabled={enviando}
                   />
                 </div>
 
@@ -366,16 +430,20 @@ export default function NovoOrcamentoPage() {
                   <Label htmlFor="valor">Valor total (R$)</Label>
                   <Input
                     id="valor"
-                    type="number"
-                    step="0.01"
+                    inputMode="decimal"
                     value={valorTotal}
                     onChange={(e) => setValorTotal(e.target.value)}
-                    placeholder="Ex: 250.00"
+                    placeholder={brl.format(subtotalServicos).replace("\u00A0", " ")}
+                    disabled={enviando}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Sugestão atual: <span className="font-medium">{brl.format(sugestaoTotal || 0)}</span>
+                    {valorTotal.trim() ? " (usando o valor digitado)" : " (usando o subtotal dos serviços)"}
+                  </p>
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Gerar Orçamento
+                <Button type="submit" className="w-full" disabled={enviando || clientes.length === 0}>
+                  {enviando ? "Gerando..." : "Gerar Orçamento"}
                 </Button>
               </form>
             )}

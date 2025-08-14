@@ -10,9 +10,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const token = req.cookies.get("token")?.value;
-  if (!token) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
+  if (!token) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
   try {
     const payload = jwt.verify(token, secretKey) as { id: string };
@@ -21,36 +19,42 @@ export async function PATCH(
       where: { id: payload.id },
       select: { companyId: true },
     });
-
     if (!user?.companyId) {
       return NextResponse.json({ error: "Usuário sem empresa vinculada" }, { status: 403 });
     }
 
     const { id } = await params;
-    const body = await req.json();
-    const { nome, email, telefone } = body;
+    const { nome, preco } = (await req.json()) as { nome?: string; preco?: number | string };
 
     if (!nome || typeof nome !== "string" || !nome.trim()) {
       return NextResponse.json({ error: "Nome é obrigatório" }, { status: 400 });
     }
 
-    const clienteExistente = await prisma.cliente.findUnique({ where: { id } });
-    if (!clienteExistente || clienteExistente.companyId !== user.companyId) {
+    let precoNumber: number | undefined;
+    if (typeof preco !== "undefined") {
+      precoNumber = typeof preco === "string" ? Number(preco.replace(",", ".")) : Number(preco);
+      if (!Number.isFinite(precoNumber) || precoNumber < 0) {
+        return NextResponse.json({ error: "Preço inválido" }, { status: 400 });
+      }
+    }
+
+    const servico = await prisma.servico.findUnique({ where: { id } });
+    if (!servico || servico.companyId !== user.companyId) {
       return NextResponse.json(
-        { error: "Cliente não encontrado ou sem permissão" },
+        { error: "Serviço não encontrado ou sem permissão" },
         { status: 404 }
       );
     }
 
-    const clienteAtualizado = await prisma.cliente.update({
+    const atualizado = await prisma.servico.update({
       where: { id },
-      data: { nome: nome.trim(), email: email ?? null, telefone: telefone ?? null },
+      data: { nome: nome.trim(), ...(typeof precoNumber === "number" ? { preco: precoNumber } : {}) },
     });
 
-    return NextResponse.json(clienteAtualizado);
+    return NextResponse.json(atualizado);
   } catch (err) {
-    console.error("Erro no PATCH /clientes/:id:", err);
-    return NextResponse.json({ error: "Erro ao atualizar cliente" }, { status: 500 });
+    console.error("Erro no PATCH /servicos/:id:", err);
+    return NextResponse.json({ error: "Erro ao atualizar serviço" }, { status: 500 });
   }
 }
 
@@ -59,9 +63,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const token = req.cookies.get("token")?.value;
-  if (!token) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
+  if (!token) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
   try {
     const payload = jwt.verify(token, secretKey) as { id: string };
@@ -70,34 +72,33 @@ export async function DELETE(
       where: { id: payload.id },
       select: { companyId: true },
     });
-
     if (!user?.companyId) {
       return NextResponse.json({ error: "Usuário sem empresa vinculada" }, { status: 403 });
     }
 
     const { id } = await params;
 
-    const cliente = await prisma.cliente.findUnique({ where: { id } });
-    if (!cliente || cliente.companyId !== user.companyId) {
+    const servico = await prisma.servico.findUnique({ where: { id } });
+    if (!servico || servico.companyId !== user.companyId) {
       return NextResponse.json(
-        { error: "Cliente não encontrado ou sem permissão" },
+        { error: "Serviço não encontrado ou sem permissão" },
         { status: 404 }
       );
     }
 
-    await prisma.cliente.delete({ where: { id } });
+    await prisma.servico.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error("Erro no DELETE /clientes/:id:", err);
+    console.error("Erro no DELETE /servicos/:id:", err);
 
-    // FK: cliente vinculado a orçamentos
+    // Vinculado a orçamento (FK)
     if (err.code === "P2003") {
       return NextResponse.json(
-        { error: "Não é possível excluir: cliente vinculado a orçamento." },
+        { error: "Não é possível excluir: serviço vinculado a orçamento." },
         { status: 409 }
       );
     }
 
-    return NextResponse.json({ error: "Erro ao excluir cliente" }, { status: 500 });
+    return NextResponse.json({ error: "Erro ao excluir serviço" }, { status: 500 });
   }
 }

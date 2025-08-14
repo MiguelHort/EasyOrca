@@ -20,8 +20,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { usePremium } from "@/components/PremiumProvider";
 
 import CardClient from "./CardClient";
+
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 const formSchema = z.object({
@@ -47,6 +49,8 @@ export default function ClientesPage() {
   >([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const { isPremium, loading: premiumLoading } = usePremium();
+  const MAX_CLIENTES = isPremium ? 100 : 30;
 
   const {
     register,
@@ -191,7 +195,8 @@ export default function ClientesPage() {
           <CardHeader className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Lista de Clientes</h2>
             <p className="text-muted-foreground text-sm">
-              {clientes.length} clientes cadastrados
+              {clientes.length} clientes cadastrados (restam{" "}
+              {MAX_CLIENTES - clientes.length})
             </p>
           </CardHeader>
           <CardContent className="p-4">
@@ -212,14 +217,15 @@ export default function ClientesPage() {
                     <CardClient
                       key={cliente.id}
                       cliente={cliente}
-                      onUpdate={(clienteAtualizado) => {
+                      onUpdate={(s) => {
                         setClientes((old) =>
                           old.map((c) =>
-                            c.id === clienteAtualizado.id
-                              ? clienteAtualizado
-                              : c
+                            c.id === s.id ? s : c
                           )
                         );
+                      }}
+                      onDelete={(id) => {
+                        setClientes((old) => old.filter((c) => c.id !== id));
                       }}
                     />
                   ))}

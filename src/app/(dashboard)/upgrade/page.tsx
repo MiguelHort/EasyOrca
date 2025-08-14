@@ -59,21 +59,21 @@ export default function AssinarPlanoPage() {
             {/* Lista de benefícios */}
             <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-4">
               <div className="flex items-start gap-3">
-                <FileText className="h-10 w-10 text-blue-500 mt-1" />
+                <FileText className="h-8 w-8 text-blue-500 mt-1" />
                 <p className="text-sm text-gray-800">
                   <strong>Orçamentos ilimitados</strong> e personalizações para
                   acompanhar o crescimento do seu trabalho.
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <LayoutDashboard className="h-10 w-10 text-blue-500 mt-1" />
+                <LayoutDashboard className="h-8 w-8 text-blue-500 mt-1" />
                 <p className="text-sm text-gray-800">
                   <strong>Dashboard</strong> para você visualizar informações do
                   seu negócio que passam batido na correria do dia-a-dia.
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <Layers className="h-10 w-10 text-blue-500 mt-1" />
+                <Layers className="h-8 w-8 text-blue-500 mt-1" />
                 <p className="text-sm text-gray-800">
                   <strong>Mais opções de templates</strong> para você escolher
                   qual se enquadra melhor para cada serviço.

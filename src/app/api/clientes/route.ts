@@ -48,30 +48,42 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: payload.id },
-      select: { companyId: true },
+      select: { companyId: true, isPremium: true, id: true },
     });
 
     if (!user?.companyId) {
       return NextResponse.json({ error: 'Usuário sem empresa vinculada' }, { status: 403 });
     }
 
+    // Limite por empresa: 30 (normal) ou 100 (premium)
+    const limite = user.isPremium ? 100 : 30;
+    const totalClientes = await prisma.cliente.count({
+      where: { companyId: user.companyId },
+    });
+    if (totalClientes >= limite) {
+      return NextResponse.json(
+        { error: `Limite de ${limite} clientes atingido para esta empresa.` },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const { nome, email, telefone } = body;
 
-    if (!nome || typeof nome !== 'string') {
+    if (!nome || typeof nome !== 'string' || !nome.trim()) {
       return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 });
     }
 
     const novoCliente = await prisma.cliente.create({
       data: {
-        nome,
-        email,
-        telefone,
+        nome: nome.trim(),
+        email: email ?? null,
+        telefone: telefone ?? null,
         companyId: user.companyId,
       },
     });
 
-    return NextResponse.json(novoCliente);
+    return NextResponse.json(novoCliente, { status: 201 });
   } catch (err) {
     console.error('Erro no POST /clientes:', err);
     return NextResponse.json({ error: 'Erro ao criar cliente' }, { status: 500 });

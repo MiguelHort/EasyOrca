@@ -12,6 +12,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
+import { usePremium } from "@/components/PremiumProvider";
 
 import {
   Card,
@@ -40,7 +41,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [erroMsg, setErroMsg] = useState<string | null>(null);
 
-  const { user, isLoading, isError, errorMessage } = useUser();
+  const { user, isLoading: userLoading, isError, errorMessage } = useUser();
+  const { isPremium, loading: premiumLoading } = usePremium();
 
   useEffect(() => {
     fetchOrcamentos();
@@ -54,9 +56,11 @@ export default function DashboardPage() {
       if (!res.ok) throw new Error(`Erro ${res.status}`);
       const data = await res.json();
       setOrcamentos(data);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Erro ao carregar orçamentos:", err);
-      setErroMsg(err?.message || "Erro ao carregar orçamentos");
+      setErroMsg(
+        err instanceof Error ? err.message : "Erro ao carregar orçamentos"
+      );
     } finally {
       setLoading(false);
     }
@@ -70,31 +74,43 @@ export default function DashboardPage() {
         <div>
           <header className="flex justify-between mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r from-primary to-blue-400 dark:to-blue-800 text-white">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                Olá{user?.name ? `, ${user?.name}` : ""}! 👋
+              <h1 className="text-xl sm:text-3xl font-bold tracking-tight">
+                Olá{user?.name ? `, ${user.name}` : ""}! 👋
               </h1>
-              <p className="mt-1">
+              <p className="text-sm mt-1">
                 Mais um dia para fechar bons negócios com confiança!
               </p>
+              {isError && (
+                <p className="mt-2 text-sm text-red-100/90">
+                  {errorMessage ??
+                    "Não foi possível obter informações do usuário."}
+                </p>
+              )}
             </div>
-            {user?.isPremium ? (
+
+            {/* Badge do plano + CTA */}
             <div className="flex items-center gap-4">
-              <div className="flex text-xs font-semibold border-1 border-gray-200 rounded-2xl py-1 px-3">
-                <Crown className="h-4 w-4 mr-2" />
-                Plano PRO
-              </div>
+              {premiumLoading ? (
+                <Skeleton className="h-7 w-28 rounded-2xl" />
+              ) : isPremium ? (
+                <div className="flex items-center text-xs font-semibold border border-white/40 rounded-2xl py-1 px-3 bg-white/10">
+                  <Crown className="h-4 w-4 mr-2" />
+                  Plano PRO
+                </div>
+              ) : (
+                <>
+                  <div className="text-xs font-semibold border border-white/40 rounded-2xl py-1 px-3 bg-blue-400/60">
+                    Plano Grátis
+                  </div>
+                  <Link href="/upgrade">
+                    <Button className="flex items-center bg-background text-primary">
+                      <Crown className="h-4 w-4 mr-2" />
+                      Upgrade para PRO
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
-            ) : (
-            <div className="flex items-center gap-4">    
-              <div className="text-xs font-semibold border-1 border-gray-200 rounded-2xl py-0.5 px-2 bg-blue-400">
-                Plano Grátis
-              </div>
-              <Button className="flex items-center bg-background text-primary">
-                <Crown className="h-4 w-4 mr-2" />
-                Upgrade para PRO
-              </Button>
-            </div>
-            )}
           </header>
         </div>
 
@@ -134,9 +150,11 @@ export default function DashboardPage() {
 
           <section>
             <h2 className="text-xl font-semibold mb-4">Estatísticas</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-4 gap-6">
               <InfoCard
-                icon={<FilePlus2 className="text-primary h-6 w-6" />}
+                icon={
+                  <FilePlus2 className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
+                }
                 title="Orçamentos criados"
                 value={24}
                 description="Este mês"
@@ -144,7 +162,7 @@ export default function DashboardPage() {
                 valueType="number"
               />
               <InfoCard
-                icon={<Users className="h-6 w-6 text-primary" />}
+                icon={<Users className="text-primary h-4 w-4 sm:h-6 sm:w-6" />}
                 title="Clientes cadastrados"
                 value={48}
                 description="Total cadastrado"
@@ -152,7 +170,9 @@ export default function DashboardPage() {
                 valueType="number"
               />
               <InfoCard
-                icon={<TrendingUp className="h-6 w-6 text-primary" />}
+                icon={
+                  <TrendingUp className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
+                }
                 title="Taxa de Conversão"
                 value={86}
                 description="Orçamentos aceitos"
@@ -160,7 +180,9 @@ export default function DashboardPage() {
                 valueType="percent"
               />
               <InfoCard
-                icon={<DollarSign className="h-6 w-6 text-primary" />}
+                icon={
+                  <DollarSign className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
+                }
                 title="Valor Total"
                 value={16040}
                 description="Em orçamentos"
@@ -212,44 +234,76 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Card da direita: Plano Premium */}
-            <Card className="flex-1 rounded-xl border border-blue-600 bg-blue-50/50 dark:bg-blue-950 p-6 shadow-sm">
-              <CardHeader className="p-0 mb-4">
-                <CardTitle className="flex items-center gap-2 text-blue-600 text-xl font-semibold">
-                  <Crown className="h-5 w-5 text-blue-600" />
-                  Upgrade para PRO
-                </CardTitle>
-                <CardDescription className="text-sm text-gray-500">
-                  Desbloqueie recursos avançados para seu negócio
-                </CardDescription>
-              </CardHeader>
+            {/* Card da direita: Plano (Upsell quando NÃO é premium) */}
+            {!premiumLoading && !isPremium ? (
+              <Card className="flex-1 rounded-xl border border-blue-600 bg-blue-50/50 dark:bg-blue-950 p-6 shadow-sm">
+                <CardHeader className="p-0 mb-4">
+                  <CardTitle className="flex items-center gap-2 text-blue-600 text-xl font-semibold">
+                    <Crown className="h-5 w-5 text-blue-600" />
+                    Upgrade para PRO
+                  </CardTitle>
+                  <CardDescription className="text-sm text-gray-500">
+                    Desbloqueie recursos avançados para seu negócio
+                  </CardDescription>
+                </CardHeader>
 
-              <CardContent className="p-0">
-                <ul className="space-y-2 text-gray-500 text-sm mb-6">
-                  {[
-                    "Orçamentos ilimitados",
-                    "Templates premium",
-                    "Integração com Pix",
-                    "Relatórios avançados",
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-blue-600" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/upgrade">
-                  <Button className="w-full bg-primary text-white text-sm shadow-md">
-                    Fazer parte
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+                <CardContent className="p-0">
+                  <ul className="space-y-2 text-gray-500 text-sm mb-6">
+                    {[
+                      "Orçamentos ilimitados",
+                      "Templates premium",
+                      "Integração com Pix",
+                      "Relatórios avançados",
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-600" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/upgrade">
+                    <Button className="w-full bg-primary text-white text-sm shadow-md">
+                      Fazer parte
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ) : null}
+
+            {/* Caso já seja premium, mostra um cartão simples de status */}
+            {!premiumLoading && isPremium ? (
+              <Card className="flex-1 rounded-xl border border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950 p-6 shadow-sm">
+                <CardHeader className="p-0 mb-4">
+                  <CardTitle className="flex items-center gap-2 text-emerald-700 text-xl font-semibold">
+                    <Crown className="h-5 w-5" />
+                    Você é PRO ✨
+                  </CardTitle>
+                  <CardDescription className="text-sm text-emerald-700/80">
+                    Obrigado por apoiar o EasyOrça! Aproveite todos os recursos.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <ul className="space-y-2 text-emerald-700/90 text-sm">
+                    {[
+                      "Acesso a templates premium",
+                      "Relatórios e métricas avançadas",
+                      "Prioridade em futuras integrações",
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ) : null}
           </section>
         </div>
       </main>
 
-      <ShowPremiumDialog />
+      {/* Só exibe o diálogo se NÃO for premium */}
+      {!premiumLoading && !isPremium && <ShowPremiumDialog />}
     </>
   );
 }
@@ -260,7 +314,7 @@ type InfoCardProps = {
   value: number | null;
   description: string;
   percentage: number | null;
-  valueType?: "percent" | "currency" | "number"; // novo
+  valueType?: "percent" | "currency" | "number";
 };
 
 function InfoCard({
@@ -269,9 +323,8 @@ function InfoCard({
   value,
   description,
   percentage,
-  valueType = "number", // padrão
+  valueType = "number",
 }: InfoCardProps) {
-  // Formata valor dependendo do tipo
   const formattedValue =
     valueType === "currency"
       ? value?.toLocaleString("pt-BR", {
@@ -286,20 +339,32 @@ function InfoCard({
 
   return (
     <Card className="border-border">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl md:text-xl font-bold text-foreground">
-              {formattedValue}
+      <CardContent className="px-6">
+        <div className="flex flex-col items-center justify-between">
+          <div className="flex items-center justify-between w-full">
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground text-start w-full">
+              {title}
             </p>
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <div className="flex sm:hidden bg-primary/10 p-3 rounded-lg">{icon}</div>
           </div>
-          <div className="bg-primary/10 p-3 rounded-lg">{icon}</div>
+
+          <div className="flex items-center justify-between w-full mt-2">
+            <div>
+              <p className="text-xl sm:text-xl font-bold text-foreground">
+                {formattedValue}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                {description}
+              </p>
+            </div>
+            <div className="hidden sm:flex bg-primary/10 p-3 rounded-lg">{icon}</div>
+          </div>
         </div>
         <div className="mt-4">
-          <p className="text-muted-foreground">
-            <span className="text-green-600 font-semibold ">{percentage}%</span>{" "}
+          <p className="text-muted-foreground text-xs sm:text-sm">
+            <span className="text-green-600 font-semibold">
+              {percentage ?? 0}%
+            </span>{" "}
             vs mês anterior
           </p>
         </div>

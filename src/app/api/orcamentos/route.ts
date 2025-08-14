@@ -7,7 +7,6 @@ const secretKey = process.env.JWT_SECRET || "dev_fallback_inseguro"; // use vari
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
-
   if (!token) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
@@ -20,7 +19,6 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       include: {
         cliente: { select: { id: true, nome: true } },
-        // itens: { select: { id: true } }, // <- descomente se quiser a contagem
       },
     });
 
@@ -28,9 +26,9 @@ export async function GET(req: NextRequest) {
       id: o.id,
       cliente: o.cliente?.nome ?? "—",
       valor: parseFloat(o.valorTotal.toString()),
-      data: o.createdAt.toISOString(), // mantenha ISO; o front formata pt-BR
+      data: o.createdAt.toISOString(), // front formata em pt-BR
       status: o.status,
-      // itensCount: o.itens?.length ?? 0,
+      descricao: o.descricao ?? null,
     }));
 
     return NextResponse.json(response, { status: 200 });
