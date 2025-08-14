@@ -178,7 +178,12 @@ export async function DELETE(
   }
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { params } = context;
+
   const token = req.cookies.get("token")?.value;
   if (!token) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
