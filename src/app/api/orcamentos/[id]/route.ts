@@ -12,6 +12,95 @@ const STATUS_OPTIONS = new Set([
   "rejeitado",
 ]);
 
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const token = req.cookies.get("token")?.value;
+  if (!token) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  }
+
+  try {
+    const payload = jwt.verify(token, secretKey) as { id: string };
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+      select: { id: true, companyId: true },
+    });
+
+    if (!user?.companyId) {
+      return NextResponse.json(
+        { error: "Usuário sem empresa vinculada" },
+        { status: 403 }
+      );
+    }
+
+    const { id } = params;
+
+    const o = await prisma.orcamento.findUnique({
+      where: { id },
+      include: {
+        user: { select: { companyId: true } },
+        cliente: {
+          select: { id: true, nome: true, email: true, telefone: true, companyId: true },
+        },
+        itens: {
+          include: {
+            servico: { select: { id: true, nome: true } },
+          },
+          orderBy: { id: "asc" },
+        },
+      },
+    });
+
+    if (!o || o.user.companyId !== user.companyId || o.cliente.companyId !== user.companyId) {
+      return NextResponse.json(
+        { error: "Orçamento não encontrado ou sem permissão" },
+        { status: 404 }
+      );
+    }
+
+    const itens = (o.itens ?? []).map((it) => {
+      const quantidade = Number(it.quantidade);
+      const precoUnitario = Number(it.precoUnitario);
+      return {
+        id: it.id,
+        servicoId: it.servico?.id ?? null,
+        servicoNome: it.servico?.nome ?? "Serviço",
+        quantidade,
+        precoUnitario,
+        subtotal: quantidade * precoUnitario,
+      };
+    });
+
+    const totalCalculadoDosItens = itens.reduce((acc, i) => acc + i.subtotal, 0);
+
+    const payloadResp = {
+      id: o.id,
+      cliente: {
+        id: o.cliente.id,
+        nome: o.cliente.nome,
+        email: o.cliente.email ?? null,
+        telefone: o.cliente.telefone ?? null,
+      },
+      descricao: o.descricao ?? null,
+      status: o.status,
+      data: o.createdAt.toISOString(),
+      valorTotal: Number(o.valorTotal), // Prisma Decimal -> number
+      itens,
+      totalCalculadoDosItens,
+    };
+
+    return NextResponse.json(payloadResp, { status: 200 });
+  } catch (err: any) {
+    if (err?.name === "TokenExpiredError" || err?.name === "JsonWebTokenError") {
+      return NextResponse.json({ error: "Token inválido ou expirado" }, { status: 401 });
+    }
+    console.error("Erro no GET /api/orcamentos/:id:", err);
+    return NextResponse.json({ error: "Erro ao buscar orçamento" }, { status: 500 });
+  }
+}
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -175,82 +264,5 @@ export async function DELETE(
       { error: "Erro ao excluir orçamento" },
       { status: 500 }
     );
-  }
-}
-
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-
-  const token = req.cookies.get("token")?.value;
-  if (!token) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-
-  try {
-    const payload = jwt.verify(token, secretKey) as { id: string };
-
-    const user = await prisma.user.findUnique({
-      where: { id: payload.id },
-      select: { id: true, companyId: true },
-    });
-    if (!user?.companyId) {
-      return NextResponse.json({ error: "Usuário sem empresa vinculada" }, { status: 403 });
-    }
-
-    const { id } = await params;
-
-    const o = await prisma.orcamento.findUnique({
-      where: { id },
-      include: {
-        user: { select: { companyId: true } },
-        cliente: { select: { id: true, nome: true, email: true, telefone: true, companyId: true } },
-        itens: {
-          include: {
-            servico: { select: { id: true, nome: true } }, // Servico não tem descricao no seu schema
-          },
-          orderBy: { id: "asc" },
-        },
-      },
-    });
-
-    if (!o || o.user.companyId !== user.companyId || o.cliente.companyId !== user.companyId) {
-      return NextResponse.json({ error: "Orçamento não encontrado ou sem permissão" }, { status: 404 });
-    }
-
-    const itens = (o.itens ?? []).map((it) => ({
-      id: it.id,
-      servicoId: it.servico?.id ?? null,
-      servicoNome: it.servico?.nome ?? "Serviço",
-      quantidade: Number(it.quantidade),
-      precoUnitario: Number(it.precoUnitario), // Decimal -> number
-      subtotal: Number(it.precoUnitario) * Number(it.quantidade),
-    }));
-
-    const valorItens = itens.reduce((acc, i) => acc + i.subtotal, 0);
-
-    const payloadResp = {
-      id: o.id,
-      cliente: {
-        id: o.cliente.id,
-        nome: o.cliente.nome,
-        email: o.cliente.email ?? null,
-        telefone: o.cliente.telefone ?? null,
-      },
-      descricao: o.descricao ?? null,
-      status: o.status,
-      data: o.createdAt.toISOString(),
-      valorTotal: Number(o.valorTotal.toString()), // Decimal -> number com segurança
-      itens,
-      totalCalculadoDosItens: valorItens, // útil para conferência
-    };
-
-    return NextResponse.json(payloadResp, { status: 200 });
-  } catch (err: any) {
-    if (err?.name === "TokenExpiredError" || err?.name === "JsonWebTokenError") {
-      return NextResponse.json({ error: "Token inválido ou expirado" }, { status: 401 });
-    }
-    console.error("Erro no GET /api/orcamentos/:id:", err);
-    return NextResponse.json({ error: "Erro ao buscar orçamento" }, { status: 500 });
   }
 }
