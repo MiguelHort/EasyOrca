@@ -180,9 +180,9 @@ export async function DELETE(
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
+  const { id } = await params;
 
   const token = req.cookies.get("token")?.value;
   if (!token) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
@@ -198,7 +198,7 @@ export async function GET(
       return NextResponse.json({ error: "Usuário sem empresa vinculada" }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     const o = await prisma.orcamento.findUnique({
       where: { id },
