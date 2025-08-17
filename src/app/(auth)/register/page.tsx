@@ -1,5 +1,15 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+
+import { createUser } from "@/lib/services/auth";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,28 +19,45 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  NotepadTextDashed,
-  Lock,
-  Mail,
-  User,
-  Phone,
-  Building2,
-} from "lucide-react";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { createUser } from "@/lib/services/auth";
-import Image from "next/image";
-import Link from "next/link";
 
-type Inputs = {
-  name: string;
-  email: string;
-  password: string;
-  phone?: string;
-  userName?: string;
-};
+import { NotepadTextDashed, Lock, Mail, User, Phone } from "lucide-react";
+
+// --------- Helpers para transformar string vazia em undefined ---------
+const emptyToUndefined = (val: unknown) =>
+  typeof val === "string" && val.trim() === "" ? undefined : val;
+
+// --------- ZOD SCHEMA (Zod v4, sem required_error) ---------
+const RegisterSchema = z.object({
+  name: z.string().trim().min(1, "Nome é obrigatório."),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, "Email é obrigatório.")
+    .email("E-mail inválido."),
+  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
+  userName: z.preprocess(
+    emptyToUndefined,
+    z
+      .string()
+      .trim()
+      .min(3, "Usuário deve ter ao menos 3 caracteres.")
+      .max(30, "Usuário muito longo.")
+      .regex(/^[a-zA-Z0-9._-]+$/, "Use letras, números, ponto, _ ou -.")
+      .optional()
+  ),
+  phone: z.preprocess(
+    emptyToUndefined,
+    z
+      .string()
+      .trim()
+      // Aceita +DD... ou só dígitos, 10 a 15 dígitos
+      .regex(/^\+?\d{10,15}$/, "Telefone inválido.")
+      .optional()
+  ),
+});
+
+type Inputs = z.infer<typeof RegisterSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -38,8 +65,11 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>();
+    formState: { errors, isSubmitting },
+  } = useForm<Inputs>({
+    resolver: zodResolver(RegisterSchema),
+    mode: "onSubmit",
+  });
 
   async function handleRegister(data: Inputs) {
     try {
@@ -49,6 +79,8 @@ export default function RegisterPage() {
         toast.success(
           "Cadastro realizado com sucesso! Faça login para continuar."
         );
+      } else {
+        toast.error("Não foi possível concluir o cadastro.");
       }
     } catch {
       toast.error(
@@ -77,85 +109,145 @@ export default function RegisterPage() {
               Crie sua conta para acessar a plataforma
             </CardDescription>
           </CardHeader>
+
           <CardContent>
-            <form onSubmit={handleSubmit(handleRegister)}>
+            <form onSubmit={handleSubmit(handleRegister)} noValidate>
               <div className="grid gap-4">
                 {/* Nome */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <User className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Nome"
-                    className="border-none"
-                    {...register("name", { required: "Nome é obrigatório" })}
-                  />
+                <div className="flex flex-col gap-1">
+                  <div
+                    className={[
+                      "flex items-center rounded-md pl-4 border-2",
+                      errors.name ? "border-red-500" : "border-zinc-200",
+                    ].join(" ")}
+                  >
+                    <User className="h-4 w-4 stroke-zinc-600" />
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Nome"
+                      className="border-none"
+                      aria-invalid={!!errors.name}
+                      aria-describedby="name-error"
+                      {...register("name")}
+                    />
+                  </div>
+                  {errors.name && (
+                    <p id="name-error" className="text-red-500 text-xs">
+                      {errors.name.message}
+                    </p>
+                  )}
                 </div>
-                {errors.name && (
-                  <p className="text-red-500 text-xs">{errors.name.message}</p>
-                )}
 
                 {/* Email */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <Mail className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Email"
-                    className="border-none"
-                    {...register("email", { required: "Email é obrigatório" })}
-                  />
+                <div className="flex flex-col gap-1">
+                  <div
+                    className={[
+                      "flex items-center rounded-md pl-4 border-2",
+                      errors.email ? "border-red-500" : "border-zinc-200",
+                    ].join(" ")}
+                  >
+                    <Mail className="h-4 w-4 stroke-zinc-600" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Email"
+                      className="border-none"
+                      inputMode="email"
+                      aria-invalid={!!errors.email}
+                      aria-describedby="email-error"
+                      {...register("email")}
+                    />
+                  </div>
+                  {errors.email && (
+                    <p id="email-error" className="text-red-500 text-xs">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
-                {errors.email && (
-                  <p className="text-red-500 text-xs">{errors.email.message}</p>
-                )}
 
                 {/* Senha */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <Lock className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Senha"
-                    className="border-none"
-                    {...register("password", {
-                      required: "Senha é obrigatória",
-                    })}
-                  />
-                </div>
-                {errors.password && (
-                  <p className="text-red-500 text-xs">
-                    {errors.password.message}
-                  </p>
-                )}
-
-                {/* Username */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <User className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="userName"
-                    type="text"
-                    placeholder="Nome de usuário (opcional)"
-                    className="border-none"
-                    {...register("userName")}
-                  />
+                <div className="flex flex-col gap-1">
+                  <div
+                    className={[
+                      "flex items-center rounded-md pl-4 border-2",
+                      errors.password ? "border-red-500" : "border-zinc-200",
+                    ].join(" ")}
+                  >
+                    <Lock className="h-4 w-4 stroke-zinc-600" />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Senha"
+                      className="border-none"
+                      aria-invalid={!!errors.password}
+                      aria-describedby="password-error"
+                      {...register("password")}
+                    />
+                  </div>
+                  {errors.password && (
+                    <p id="password-error" className="text-red-500 text-xs">
+                      {errors.password.message}
+                    </p>
+                  )}
                 </div>
 
-                {/* Telefone */}
-                <div className="flex items-center border-2 rounded-md pl-4">
-                  <Phone className="h-4 w-4 stroke-zinc-600" />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="Telefone (opcional)"
-                    className="border-none"
-                    {...register("phone")}
-                  />
+                {/* Username (opcional) */}
+                <div className="flex flex-col gap-1">
+                  <div
+                    className={[
+                      "flex items-center rounded-md pl-4 border-2",
+                      errors.userName ? "border-red-500" : "border-zinc-200",
+                    ].join(" ")}
+                  >
+                    <User className="h-4 w-4 stroke-zinc-600" />
+                    <Input
+                      id="userName"
+                      type="text"
+                      placeholder="Nome de usuário (opcional)"
+                      className="border-none"
+                      aria-invalid={!!errors.userName}
+                      aria-describedby="userName-error"
+                      {...register("userName")}
+                    />
+                  </div>
+                  {errors.userName && (
+                    <p id="userName-error" className="text-red-500 text-xs">
+                      {errors.userName.message}
+                    </p>
+                  )}
                 </div>
 
-                <Button type="submit" className="w-full cursor-pointer">
-                  Cadastrar
+                {/* Telefone (opcional) */}
+                <div className="flex flex-col gap-1">
+                  <div
+                    className={[
+                      "flex items-center rounded-md pl-4 border-2",
+                      errors.phone ? "border-red-500" : "border-zinc-200",
+                    ].join(" ")}
+                  >
+                    <Phone className="h-4 w-4 stroke-zinc-600" />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="Telefone (opcional)"
+                      className="border-none"
+                      aria-invalid={!!errors.phone}
+                      aria-describedby="phone-error"
+                      {...register("phone")}
+                    />
+                  </div>
+                  {errors.phone && (
+                    <p id="phone-error" className="text-red-500 text-xs">
+                      {errors.phone.message}
+                    </p>
+                  )}
+                </div>
+
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                 </Button>
+
                 <p className="text-sm text-muted-foreground text-center">
                   Já tem uma conta?{" "}
                   <a href="/login" className="text-blue-600 hover:underline">
@@ -168,24 +260,5 @@ export default function RegisterPage() {
         </Card>
       </div>
     </div>
-    // <div className="min-h-screen flex items-center justify-center bg-sidebar-border p-4">
-    //   <Card className="py-8 px-6 max-w-md w-full text-center">
-    //     <CardHeader>
-    //       <CardTitle>Atenção</CardTitle>
-    //       <CardDescription>
-    //         Para realizar o cadastro, entre em contato com o desenvolvedor.
-    //       </CardDescription>
-    //     </CardHeader>
-    //     <CardContent>
-    //       <p className="text-muted-foreground mb-4">
-    //         Caso precise de acesso, envie um e-mail para{" "}
-    //         <span className="font-semibold">miguel.hort@gmail.com</span>
-    //       </p>
-    //       <Button onClick={() => router.push("/login")} className="w-full">
-    //         Voltar para Login
-    //       </Button>
-    //     </CardContent>
-    //   </Card>
-    // </div>
   );
 }

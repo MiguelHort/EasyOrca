@@ -1,5 +1,18 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { mutate } from "swr";
+import { toast } from "sonner";
+
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { getUser } from "@/lib/services/auth";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,8 +21,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { Input } from "@/components/ui/input";
+
 import {
   NotepadTextDashed,
   Lock,
@@ -18,19 +31,24 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { getUser } from "@/lib/services/auth";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { useState } from "react";
-import Image from "next/image";
-import { mutate } from "swr";
-import Link from "next/link";
 
-type Inputs = {
-  email: string;
-  passwordHash: string;
-};
+// ================== ZOD SCHEMA ==================
+const LoginSchema = z.object({
+  email: z
+    .string()                      // sem required_error
+    .min(1, "Informe o e-mail.")   // obriga preenchimento
+    .trim()
+    .toLowerCase()
+    .email("E-mail inválido."),    // valida formato
+
+  passwordHash: z
+    .string()
+    .min(1, "Informe a senha.")    // obriga preenchimento
+    .min(6, "A senha deve ter pelo menos 6 caracteres."),
+});
+
+type Inputs = z.infer<typeof LoginSchema>;
+// ================================================
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,8 +58,12 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>();
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<Inputs>({
+    resolver: zodResolver(LoginSchema),
+    mode: "onSubmit", // "onChange" se quiser validar enquanto digita
+  });
 
   async function handleLogin(data: Inputs) {
     try {
@@ -59,13 +81,18 @@ export default function LoginPage() {
           localStorage.setItem("showPremiumDialog", "true");
           router.push("/home");
         }, 3000);
+      } else {
+        // Caso a API retorne algo falsy sem erro lançado
+        setError("root", { message: "Credenciais inválidas." });
       }
-    } catch {
+    } catch (err) {
+      // Mapeia erro de autenticação no form
+      setError("root", { message: "Erro ao fazer login. Verifique os dados." });
       toast.error(<div className="text-red-500">Erro ao fazer login</div>);
     }
   }
 
-  // Tela de carregamento
+  // Tela de carregamento pós-login
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-sidebar-border p-4">
@@ -113,36 +140,60 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit(handleLogin)}>
+            <form onSubmit={handleSubmit(handleLogin)} noValidate>
               <div className="grid gap-4">
+                {/* Campo Email */}
                 <div className="flex flex-col gap-1">
-                  {/* Campo Email */}
-                  <div className="flex items-center border-2 rounded-md pl-4">
+                  <div
+                    className={[
+                      "flex items-center rounded-md pl-4",
+                      "border-2",
+                      errors.email ? "border-red-500" : "border-zinc-200",
+                    ].join(" ")}
+                  >
                     <Mail className="h-4 w-4 stroke-zinc-600" />
                     <Input
                       id="email"
-                      type="text"
+                      type="email"
+                      inputMode="email"
                       placeholder="Email"
                       className="border-none"
+                      aria-invalid={!!errors.email}
+                      aria-describedby="email-error"
                       {...register("email")}
                     />
                   </div>
-                  {errors.email && <p className="text-red-500 text-xs"></p>}
+                  {errors.email && (
+                    <p id="email-error" className="text-red-500 text-xs">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
 
-                  {/* Campo Senha com botão de ver senha */}
-                  <div className="flex items-center border-2 rounded-md pl-4 pr-2">
+                {/* Campo Senha */}
+                <div className="flex flex-col gap-1">
+                  <div
+                    className={[
+                      "flex items-center rounded-md pl-4 pr-2",
+                      "border-2",
+                      errors.passwordHash ? "border-red-500" : "border-zinc-200",
+                    ].join(" ")}
+                  >
                     <Lock className="h-4 w-4 stroke-zinc-600" />
                     <Input
                       id="senha"
                       type={showPassword ? "text" : "password"}
                       placeholder="Senha"
                       className="border-none flex-1"
+                      aria-invalid={!!errors.passwordHash}
+                      aria-describedby="senha-error"
                       {...register("passwordHash")}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
                       className="text-gray-500 hover:text-gray-700"
+                      aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -152,12 +203,30 @@ export default function LoginPage() {
                     </button>
                   </div>
                   {errors.passwordHash && (
-                    <p className="text-red-500 text-xs"></p>
+                    <p id="senha-error" className="text-red-500 text-xs">
+                      {errors.passwordHash.message}
+                    </p>
                   )}
                 </div>
 
-                <Button type="submit" className="w-full cursor-pointer">
-                  Entrar
+                {/* Erro geral do formulário (ex.: credenciais inválidas) */}
+                {"root" in errors && errors.root?.message && (
+                  <p className="text-red-600 text-sm">{errors.root.message}</p>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full cursor-pointer"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Entrando...
+                    </span>
+                  ) : (
+                    "Entrar"
+                  )}
                 </Button>
 
                 <p className="text-sm text-muted-foreground text-center">
