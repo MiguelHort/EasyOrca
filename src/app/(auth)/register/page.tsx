@@ -1,3 +1,4 @@
+// app/(auth)/register/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -20,26 +21,27 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-import { NotepadTextDashed, Lock, Mail, User, Phone } from "lucide-react";
+import {
+  Lock,
+  Mail,
+  User,
+  Phone,
+  Building2,
+} from "lucide-react";
 
 // --------- Helpers para transformar string vazia em undefined ---------
 const emptyToUndefined = (val: unknown) =>
   typeof val === "string" && val.trim() === "" ? undefined : val;
 
-// --------- ZOD SCHEMA (Zod v4, sem required_error) ---------
+// --------- ZOD SCHEMA (Zod v4) ---------
 const RegisterSchema = z.object({
   name: z.string().trim().min(1, "Nome é obrigatório."),
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .min(1, "Email é obrigatório.")
-    .email("E-mail inválido."),
+  email: z.string().trim().toLowerCase().min(1, "Email é obrigatório.").email("E-mail inválido."),
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
+  // opcionais
   userName: z.preprocess(
     emptyToUndefined,
-    z
-      .string()
+    z.string()
       .trim()
       .min(3, "Usuário deve ter ao menos 3 caracteres.")
       .max(30, "Usuário muito longo.")
@@ -48,11 +50,17 @@ const RegisterSchema = z.object({
   ),
   phone: z.preprocess(
     emptyToUndefined,
-    z
-      .string()
+    z.string()
       .trim()
-      // Aceita +DD... ou só dígitos, 10 a 15 dígitos
       .regex(/^\+?\d{10,15}$/, "Telefone inválido.")
+      .optional()
+  ),
+  companyName: z.preprocess(
+    emptyToUndefined,
+    z.string()
+      .trim()
+      .min(2, "Nome da empresa muito curto.")
+      .max(80, "Nome da empresa muito longo.")
       .optional()
   ),
 });
@@ -73,21 +81,24 @@ export default function RegisterPage() {
 
   async function handleRegister(data: Inputs) {
     try {
+      // Envia somente campos preenchidos (os undefined não vão no body final,
+      // depende de como seu createUser implementa o fetch; mantenha do lado do serviço se preferir)
       const response = await createUser(data);
+
       if (response) {
+        toast.success("Cadastro realizado com sucesso! Faça login para continuar.");
         router.push("/login");
-        toast.success(
-          "Cadastro realizado com sucesso! Faça login para continuar."
-        );
       } else {
         toast.error("Não foi possível concluir o cadastro.");
       }
-    } catch {
-      toast.error(
-        <div className="text-red-500">Erro ao cadastrar usuário</div>
-      );
+    } catch (err) {
+      console.error(err);
+      toast.error(<div className="text-red-500">Erro ao cadastrar usuário</div>);
     }
   }
+
+  const borderClass = (hasError?: boolean) =>
+    ["flex items-center rounded-md pl-4 border-2", hasError ? "border-red-500" : "border-zinc-200"].join(" ");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-sidebar-border p-4">
@@ -105,9 +116,7 @@ export default function RegisterPage() {
         <Card className="py-8 px-6">
           <CardHeader>
             <CardTitle>Cadastro</CardTitle>
-            <CardDescription>
-              Crie sua conta para acessar a plataforma
-            </CardDescription>
+            <CardDescription>Crie sua conta para acessar a plataforma</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -115,12 +124,7 @@ export default function RegisterPage() {
               <div className="grid gap-4">
                 {/* Nome */}
                 <div className="flex flex-col gap-1">
-                  <div
-                    className={[
-                      "flex items-center rounded-md pl-4 border-2",
-                      errors.name ? "border-red-500" : "border-zinc-200",
-                    ].join(" ")}
-                  >
+                  <div className={borderClass(!!errors.name)}>
                     <User className="h-4 w-4 stroke-zinc-600" />
                     <Input
                       id="name"
@@ -133,20 +137,13 @@ export default function RegisterPage() {
                     />
                   </div>
                   {errors.name && (
-                    <p id="name-error" className="text-red-500 text-xs">
-                      {errors.name.message}
-                    </p>
+                    <p id="name-error" className="text-red-500 text-xs">{errors.name.message}</p>
                   )}
                 </div>
 
                 {/* Email */}
                 <div className="flex flex-col gap-1">
-                  <div
-                    className={[
-                      "flex items-center rounded-md pl-4 border-2",
-                      errors.email ? "border-red-500" : "border-zinc-200",
-                    ].join(" ")}
-                  >
+                  <div className={borderClass(!!errors.email)}>
                     <Mail className="h-4 w-4 stroke-zinc-600" />
                     <Input
                       id="email"
@@ -160,20 +157,13 @@ export default function RegisterPage() {
                     />
                   </div>
                   {errors.email && (
-                    <p id="email-error" className="text-red-500 text-xs">
-                      {errors.email.message}
-                    </p>
+                    <p id="email-error" className="text-red-500 text-xs">{errors.email.message}</p>
                   )}
                 </div>
 
                 {/* Senha */}
                 <div className="flex flex-col gap-1">
-                  <div
-                    className={[
-                      "flex items-center rounded-md pl-4 border-2",
-                      errors.password ? "border-red-500" : "border-zinc-200",
-                    ].join(" ")}
-                  >
+                  <div className={borderClass(!!errors.password)}>
                     <Lock className="h-4 w-4 stroke-zinc-600" />
                     <Input
                       id="password"
@@ -186,20 +176,34 @@ export default function RegisterPage() {
                     />
                   </div>
                   {errors.password && (
-                    <p id="password-error" className="text-red-500 text-xs">
-                      {errors.password.message}
+                    <p id="password-error" className="text-red-500 text-xs">{errors.password.message}</p>
+                  )}
+                </div>
+
+                {/* Nome da empresa (opcional) */}
+                <div className="flex flex-col gap-1">
+                  <div className={borderClass(!!errors.companyName)}>
+                    <Building2 className="h-4 w-4 stroke-zinc-600" />
+                    <Input
+                      id="companyName"
+                      type="text"
+                      placeholder="Nome da empresa (opcional)"
+                      className="border-none"
+                      aria-invalid={!!errors.companyName}
+                      aria-describedby="companyName-error"
+                      {...register("companyName")}
+                    />
+                  </div>
+                  {errors.companyName && (
+                    <p id="companyName-error" className="text-red-500 text-xs">
+                      {errors.companyName.message}
                     </p>
                   )}
                 </div>
 
                 {/* Username (opcional) */}
                 <div className="flex flex-col gap-1">
-                  <div
-                    className={[
-                      "flex items-center rounded-md pl-4 border-2",
-                      errors.userName ? "border-red-500" : "border-zinc-200",
-                    ].join(" ")}
-                  >
+                  <div className={borderClass(!!errors.userName)}>
                     <User className="h-4 w-4 stroke-zinc-600" />
                     <Input
                       id="userName"
@@ -212,20 +216,13 @@ export default function RegisterPage() {
                     />
                   </div>
                   {errors.userName && (
-                    <p id="userName-error" className="text-red-500 text-xs">
-                      {errors.userName.message}
-                    </p>
+                    <p id="userName-error" className="text-red-500 text-xs">{errors.userName.message}</p>
                   )}
                 </div>
 
                 {/* Telefone (opcional) */}
                 <div className="flex flex-col gap-1">
-                  <div
-                    className={[
-                      "flex items-center rounded-md pl-4 border-2",
-                      errors.phone ? "border-red-500" : "border-zinc-200",
-                    ].join(" ")}
-                  >
+                  <div className={borderClass(!!errors.phone)}>
                     <Phone className="h-4 w-4 stroke-zinc-600" />
                     <Input
                       id="phone"
@@ -238,9 +235,7 @@ export default function RegisterPage() {
                     />
                   </div>
                   {errors.phone && (
-                    <p id="phone-error" className="text-red-500 text-xs">
-                      {errors.phone.message}
-                    </p>
+                    <p id="phone-error" className="text-red-500 text-xs">{errors.phone.message}</p>
                   )}
                 </div>
 

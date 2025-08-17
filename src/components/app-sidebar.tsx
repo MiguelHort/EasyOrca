@@ -8,6 +8,7 @@ import {
   Users2,
   Settings2,
   Sparkles,
+  Gauge,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -58,6 +59,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Serviços",
       url: "/servicos",
       icon: Settings2,
+    },
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: Gauge,
     },
     // Só adiciona o Upgrade se o usuário NÃO for premium
     ...(!userPlaceholder.isPremium
