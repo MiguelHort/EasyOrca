@@ -76,8 +76,6 @@ export default function ClientesPage() {
         if (!res.ok) throw new Error("Erro ao buscar clientes");
         const data = await res.json();
         setClientes(data);
-      } catch {
-        alert("Erro ao carregar clientes");
       } finally {
         setLoading(false);
       }

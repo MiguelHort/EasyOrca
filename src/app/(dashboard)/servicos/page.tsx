@@ -71,8 +71,6 @@ export default function ServicosPage() {
       if (!res.ok) throw new Error("Erro ao buscar serviços");
       const data = await res.json();
       setServicos(data.map((s: any) => ({ ...s, preco: Number(s.preco) })));
-    } catch {
-      alert("Erro ao carregar serviços");
     } finally {
       setLoading(false);
     }
