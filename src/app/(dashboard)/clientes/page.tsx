@@ -49,7 +49,8 @@ export default function ClientesPage() {
   >([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const { isPremium, loading: premiumLoading } = usePremium();
+  const { isPremium, resolved } = usePremium();
+  const premiumLoading = !resolved;
   const MAX_CLIENTES = isPremium ? 100 : 30;
 
   const {

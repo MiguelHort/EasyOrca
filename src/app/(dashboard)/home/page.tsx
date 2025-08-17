@@ -42,7 +42,8 @@ export default function DashboardPage() {
   const [erroMsg, setErroMsg] = useState<string | null>(null);
 
   const { user, isLoading: userLoading, isError, errorMessage } = useUser();
-  const { isPremium, loading: premiumLoading } = usePremium();
+  const { isPremium, resolved } = usePremium();
+  const premiumLoading = !resolved;
 
   useEffect(() => {
     fetchOrcamentos();
@@ -345,7 +346,9 @@ function InfoCard({
             <p className="text-xs sm:text-sm font-medium text-muted-foreground text-start w-full">
               {title}
             </p>
-            <div className="flex sm:hidden bg-primary/10 p-3 rounded-lg">{icon}</div>
+            <div className="flex sm:hidden bg-primary/10 p-3 rounded-lg">
+              {icon}
+            </div>
           </div>
 
           <div className="flex items-center justify-between w-full mt-2">
@@ -357,7 +360,9 @@ function InfoCard({
                 {description}
               </p>
             </div>
-            <div className="hidden sm:flex bg-primary/10 p-3 rounded-lg">{icon}</div>
+            <div className="hidden sm:flex bg-primary/10 p-3 rounded-lg">
+              {icon}
+            </div>
           </div>
         </div>
         <div className="mt-4">

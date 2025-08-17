@@ -45,7 +45,8 @@ export default function ServicosPage() {
   const [servicos, setServicos] = useState<Servico[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const { isPremium, loading: premiumLoading } = usePremium();
+  const { isPremium, resolved } = usePremium();
+  const premiumLoading = !resolved;
   const MAX_SERVIÇOS = isPremium ? 100 : 20;
 
   const {

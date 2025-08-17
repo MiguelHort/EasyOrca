@@ -5,7 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SWRProvider } from "@/components/SWRprovider";
-import { PremiumProvider } from "@/components/PremiumProvider"; // mesmo nome de antes
+import { PremiumProvider } from "@/components/PremiumProvider";
 import { getUserFromToken } from "@/lib/auth-server";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -18,8 +18,9 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // ✔ síncrono no server (não use await em cookies())
-  const token = cookies().get("token")?.value ?? null;
+  // ✔ em Next 15 no seu contexto, cookies() é Promise → use await
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
 
   // ✔ resolve usuário antes da 1ª pintura
   const user = await getUserFromToken(token);

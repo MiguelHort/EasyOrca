@@ -20,7 +20,8 @@ export default function OrcamentosPage() {
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
   const [loading, setLoading] = useState(true);
   const [erroMsg, setErroMsg] = useState<string | null>(null);
-  const { isPremium, loading: premiumLoading } = usePremium();
+  const { isPremium, resolved } = usePremium();
+  const premiumLoading = !resolved;
   const MAX_ORCAMENTOS = isPremium ? 100 : 20;
 
   useEffect(() => {
