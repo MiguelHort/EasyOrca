@@ -1,3 +1,4 @@
+// app/home/page.tsx (ou o caminho correspondente ao seu DashboardPage)
 "use client";
 
 import { useEffect, useState } from "react";
@@ -21,13 +22,6 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SiteHeader } from "@/components/site-header";
 import Link from "next/link";
@@ -36,34 +30,58 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import CardOrcamento, { Orcamento } from "@/components/CardOrcamento";
 import { ShowPremiumDialog } from "@/components/ShowPremiumDialog";
 
+type StatItem = { value: number; changePct: number; label: string };
+type DashboardStats = {
+  orcamentosCriados: StatItem;
+  clientesCadastrados: StatItem;
+  taxaConversao: StatItem; // value em %
+  valorTotal: StatItem;    // value em BRL
+};
+
 export default function DashboardPage() {
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
   const [loading, setLoading] = useState(true);
   const [erroMsg, setErroMsg] = useState<string | null>(null);
+
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
 
   const { user, isLoading: userLoading, isError, errorMessage } = useUser();
   const { isPremium, resolved } = usePremium();
   const premiumLoading = !resolved;
 
   useEffect(() => {
-    fetchOrcamentos();
+    fetchAll();
   }, []);
 
-  async function fetchOrcamentos() {
+  async function fetchAll() {
+    setErroMsg(null);
+    setStatsError(null);
+    setLoading(true);
+    setStatsLoading(true);
     try {
-      setLoading(true);
-      setErroMsg(null);
-      const res = await fetch("/api/orcamentos", { credentials: "include" });
-      if (!res.ok) throw new Error(`Erro ${res.status}`);
-      const data = await res.json();
-      setOrcamentos(data);
+      const [orcRes, statsRes] = await Promise.all([
+        fetch("/api/orcamentos", { credentials: "include" }),
+        fetch("/api/dashboard/stats", { credentials: "include" }),
+      ]);
+
+      if (!orcRes.ok) throw new Error(`Erro orçamentos ${orcRes.status}`);
+      if (!statsRes.ok) throw new Error(`Erro stats ${statsRes.status}`);
+
+      const orcData = await orcRes.json();
+      const statsData = await statsRes.json();
+
+      setOrcamentos(orcData);
+      setStats(statsData?.stats ?? null);
     } catch (err) {
-      console.error("Erro ao carregar orçamentos:", err);
-      setErroMsg(
-        err instanceof Error ? err.message : "Erro ao carregar orçamentos"
-      );
+      console.error("Erro ao carregar dashboard:", err);
+      const msg = err instanceof Error ? err.message : "Erro ao carregar dados";
+      setErroMsg(msg);
+      setStatsError(msg);
     } finally {
       setLoading(false);
+      setStatsLoading(false);
     }
   }
 
@@ -83,13 +101,11 @@ export default function DashboardPage() {
               </p>
               {isError && (
                 <p className="mt-2 text-sm text-red-100/90">
-                  {errorMessage ??
-                    "Não foi possível obter informações do usuário."}
+                  {errorMessage ?? "Não foi possível obter informações do usuário."}
                 </p>
               )}
             </div>
 
-            {/* Badge do plano + CTA */}
             <div className="flex items-center gap-4">
               {premiumLoading ? (
                 <Skeleton className="h-7 w-28 rounded-2xl" />
@@ -120,28 +136,19 @@ export default function DashboardPage() {
             <h2 className="text-xl font-semibold mb-4">Acesso Rápido</h2>
             <div className="flex flex-wrap gap-4">
               <Link href="/orcamentos">
-                <Button
-                  variant={"outline"}
-                  className="border-primary border-2 dark:border-primary cursor-pointer"
-                >
+                <Button variant={"outline"} className="border-primary border-2 dark:border-primary cursor-pointer">
                   <FilePlus2 className="h-5 w-5" />
                   Orçamentos
                 </Button>
               </Link>
               <Link href="/clientes">
-                <Button
-                  variant={"outline"}
-                  className="border-primary border-2 dark:border-primary cursor-pointer"
-                >
+                <Button variant={"outline"} className="border-primary border-2 dark:border-primary cursor-pointer">
                   <Users className="h-5 w-5" />
                   Clientes
                 </Button>
               </Link>
               <Link href="/servicos">
-                <Button
-                  variant={"outline"}
-                  className="border-primary border-2 dark:border-primary cursor-pointer"
-                >
+                <Button variant={"outline"} className="border-primary border-2 dark:border-primary cursor-pointer">
                   <Wrench className="h-5 w-5" />
                   Serviços
                 </Button>
@@ -151,59 +158,56 @@ export default function DashboardPage() {
 
           <section>
             <h2 className="text-xl font-semibold mb-4">Estatísticas</h2>
+
             <div className="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-4 gap-6">
               <InfoCard
-                icon={
-                  <FilePlus2 className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
-                }
+                icon={<FilePlus2 className="text-primary h-4 w-4 sm:h-6 sm:w-6" />}
                 title="Orçamentos criados"
-                value={24}
-                description="Este mês"
-                percentage={12}
+                value={stats?.orcamentosCriados.value ?? null}
+                description={stats?.orcamentosCriados.label ?? "—"}
+                percentage={stats?.orcamentosCriados.changePct ?? null}
                 valueType="number"
+                loading={statsLoading}
               />
               <InfoCard
                 icon={<Users className="text-primary h-4 w-4 sm:h-6 sm:w-6" />}
                 title="Clientes cadastrados"
-                value={48}
-                description="Total cadastrado"
-                percentage={5}
+                value={stats?.clientesCadastrados.value ?? null}
+                description={stats?.clientesCadastrados.label ?? "—"}
+                percentage={stats?.clientesCadastrados.changePct ?? null}
                 valueType="number"
+                loading={statsLoading}
               />
               <InfoCard
-                icon={
-                  <TrendingUp className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
-                }
+                icon={<TrendingUp className="text-primary h-4 w-4 sm:h-6 sm:w-6" />}
                 title="Taxa de Conversão"
-                value={86}
-                description="Orçamentos aceitos"
-                percentage={15}
+                value={stats?.taxaConversao.value ?? null}
+                description={stats?.taxaConversao.label ?? "—"}
+                percentage={stats?.taxaConversao.changePct ?? null} // delta em pp
                 valueType="percent"
+                loading={statsLoading}
               />
               <InfoCard
-                icon={
-                  <DollarSign className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
-                }
+                icon={<DollarSign className="text-primary h-4 w-4 sm:h-6 sm:w-6" />}
                 title="Valor Total"
-                value={16040}
-                description="Em orçamentos"
-                percentage={23}
+                value={stats?.valorTotal.value ?? null}
+                description={stats?.valorTotal.label ?? "—"}
+                percentage={stats?.valorTotal.changePct ?? null}
                 valueType="currency"
+                loading={statsLoading}
               />
             </div>
           </section>
 
           <section className="flex flex-col md:flex-row mt-10 gap-10">
-            {/* Card da esquerda: Orçamentos */}
+            {/* Orçamentos */}
             <Card className="border-border flex-1">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FilePlus2 className="h-6 w-6 text-primary" />
                   Seus Orçamentos
                 </CardTitle>
-                <CardDescription>
-                  Veja e gerencie todos os orçamentos criados.
-                </CardDescription>
+                <CardDescription>Veja e gerencie todos os orçamentos criados.</CardDescription>
               </CardHeader>
               <CardContent className="text-muted-foreground text-sm flex flex-col gap-4">
                 <ScrollArea className="pr-2">
@@ -216,9 +220,7 @@ export default function DashboardPage() {
                   ) : erroMsg ? (
                     <p className="text-sm text-red-600">{erroMsg}</p>
                   ) : orcamentos.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">
-                      Nenhum orçamento encontrado.
-                    </p>
+                    <p className="text-muted-foreground text-sm">Nenhum orçamento encontrado.</p>
                   ) : (
                     <div className="grid gap-4">
                       {orcamentos.map((o) => (
@@ -235,7 +237,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Card da direita: Plano (Upsell quando NÃO é premium) */}
+            {/* Upsell vs PRO */}
             {!premiumLoading && !isPremium ? (
               <Card className="flex-1 rounded-xl border border-blue-600 bg-blue-50/50 dark:bg-blue-950 p-6 shadow-sm">
                 <CardHeader className="p-0 mb-4">
@@ -247,31 +249,24 @@ export default function DashboardPage() {
                     Desbloqueie recursos avançados para seu negócio
                   </CardDescription>
                 </CardHeader>
-
                 <CardContent className="p-0">
                   <ul className="space-y-2 text-gray-500 text-sm mb-6">
-                    {[
-                      "Orçamentos ilimitados",
-                      "Templates premium",
-                      "Integração com Pix",
-                      "Relatórios avançados",
-                    ].map((item, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-blue-600" />
-                        {item}
-                      </li>
-                    ))}
+                    {["Orçamentos ilimitados", "Templates premium", "Integração com Pix", "Relatórios avançados"].map(
+                      (item, i) => (
+                        <li key={i} className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-blue-600" />
+                          {item}
+                        </li>
+                      )
+                    )}
                   </ul>
                   <Link href="/upgrade">
-                    <Button className="w-full bg-primary text-white text-sm shadow-md">
-                      Fazer parte
-                    </Button>
+                    <Button className="w-full bg-primary text-white text-sm shadow-md">Fazer parte</Button>
                   </Link>
                 </CardContent>
               </Card>
             ) : null}
 
-            {/* Caso já seja premium, mostra um cartão simples de status */}
             {!premiumLoading && isPremium ? (
               <Card className="flex-1 rounded-xl border border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950 p-6 shadow-sm">
                 <CardHeader className="p-0 mb-4">
@@ -303,7 +298,6 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {/* Só exibe o diálogo se NÃO for premium */}
       {!premiumLoading && !isPremium && <ShowPremiumDialog />}
     </>
   );
@@ -314,8 +308,9 @@ type InfoCardProps = {
   title: string;
   value: number | null;
   description: string;
-  percentage: number | null;
+  percentage: number | null; // "vs mês anterior"
   valueType?: "percent" | "currency" | "number";
+  loading?: boolean;
 };
 
 function InfoCard({
@@ -325,10 +320,13 @@ function InfoCard({
   description,
   percentage,
   valueType = "number",
+  loading = false,
 }: InfoCardProps) {
   const formattedValue =
-    valueType === "currency"
-      ? value?.toLocaleString("pt-BR", {
+    value == null
+      ? "—"
+      : valueType === "currency"
+      ? value.toLocaleString("pt-BR", {
           style: "currency",
           currency: "BRL",
           minimumFractionDigits: 0,
@@ -338,6 +336,9 @@ function InfoCard({
       ? `${value}%`
       : value;
 
+  const delta = percentage ?? 0;
+  const isNeg = delta < 0;
+
   return (
     <Card className="border-border">
       <CardContent className="px-6">
@@ -346,32 +347,32 @@ function InfoCard({
             <p className="text-xs sm:text-sm font-medium text-muted-foreground text-start w-full">
               {title}
             </p>
-            <div className="flex sm:hidden bg-primary/10 p-3 rounded-lg">
-              {icon}
-            </div>
+            <div className="flex sm:hidden bg-primary/10 p-3 rounded-lg">{icon}</div>
           </div>
 
           <div className="flex items-center justify-between w-full mt-2">
             <div>
               <p className="text-xl sm:text-xl font-bold text-foreground">
-                {formattedValue}
+                {loading ? <Skeleton className="h-6 w-24 rounded-md" /> : formattedValue}
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                {description}
+                {loading ? <Skeleton className="h-4 w-28 rounded-md mt-1" /> : description}
               </p>
             </div>
-            <div className="hidden sm:flex bg-primary/10 p-3 rounded-lg">
-              {icon}
-            </div>
+            <div className="hidden sm:flex bg-primary/10 p-3 rounded-lg">{icon}</div>
           </div>
         </div>
         <div className="mt-4">
-          <p className="text-muted-foreground text-xs sm:text-sm">
-            <span className="text-green-600 font-semibold">
-              {percentage ?? 0}%
-            </span>{" "}
-            vs mês anterior
-          </p>
+          {loading ? (
+            <Skeleton className="h-4 w-32 rounded-md" />
+          ) : (
+            <p className="text-muted-foreground text-xs sm:text-sm">
+              <span className={`${isNeg ? "text-red-600" : "text-green-600"} font-semibold`}>
+                {valueType === "percent" ? `${delta >= 0 ? "+" : ""}${delta} pp` : `${delta >= 0 ? "+" : ""}${delta}%`}
+              </span>{" "}
+              vs mês anterior
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>
