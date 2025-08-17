@@ -60,11 +60,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       url: "/servicos",
       icon: Settings2,
     },
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: Gauge,
-    },
+    // Só adiciona o DashBoard se o usuário for premium
+    ...(userPlaceholder.isPremium
+      ? [
+          {
+            title: "Dashboard",
+            url: "/dashboard",
+            icon: Gauge,
+          },
+        ]
+      : []),
     // Só adiciona o Upgrade se o usuário NÃO for premium
     ...(!userPlaceholder.isPremium
       ? [

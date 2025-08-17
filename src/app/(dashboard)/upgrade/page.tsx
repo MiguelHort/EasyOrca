@@ -29,10 +29,6 @@ export default function AssinarPlanoPage() {
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  if (user?.isPremium) {
-    router.push("/home");
-  }
-
   const handleSubscribe = async () => {
     alert("Assinatura iniciada!");
   };

@@ -1,3 +1,4 @@
+// middleware.ts
 import { type NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
@@ -11,17 +12,23 @@ const publicRoutes = [
 
 const REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE = "/login";
 
-export async function  middleware(request: NextRequest) {
+type TokenPayload = {
+  id: string;
+  isPremium?: boolean;
+  // exp?: number // (opcional) padrão do JWT
+};
+
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const publicRoute = publicRoutes.find((route) => route.path === path);
   const authToken = request.cookies.get("token")?.value;
 
-  // Se não houver token e for uma rota pública, permite a requisição
+  // 1) Sem token + rota pública → segue
   if (!authToken && publicRoute) {
     return NextResponse.next();
   }
 
-  // Se não houver token e não for rota pública, redireciona para login
+  // 2) Sem token + rota privada → login
   if (!authToken && !publicRoute) {
     request.cookies.clear();
     const redirectUrl = request.nextUrl.clone();
@@ -29,18 +36,37 @@ export async function  middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Se houver token, mas o usuário está acessando login, redireciona para home
+  // 3) Com token e pedindo login/register/home → manda pra /home
   if (authToken && publicRoute?.whenAuthenticated === "redirect") {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/home";
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Verificação de JWT: Se o token for inválido ou expirado, remove cookie e redireciona
+  // 4) Verifica token
   try {
-    await jwtVerify(authToken as string, new TextEncoder().encode(SECRET_KEY));
-    return NextResponse.next(); // Token válido, permite acesso
+    const { payload } = await jwtVerify(authToken as string, new TextEncoder().encode(SECRET_KEY));
+    const isPremium = Boolean((payload as TokenPayload).isPremium);
+
+    // 4.a) /dashboard é somente para premium
+    if (path.startsWith("/dashboard") && !isPremium) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/upgrade";
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    // 4.b) /upgrade não deve ser acessível por premium
+    if (path.startsWith("/upgrade") && isPremium) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/home";
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    // Token ok e regras atendidas
+    return NextResponse.next();
+
   } catch {
+    // Token inválido/expirado → limpa e manda pro login
     request.cookies.delete("token");
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE;
@@ -50,13 +76,7 @@ export async function  middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for os que começam com:
-     * - api (rotas da API)
-     * - _next/static (arquivos estáticos)
-     * - _next/image (imagens otimizadas)
-     * - favicon.ico, sitemap.xml, robots.txt (arquivos de metadata)
-     */
+    // Todas as rotas, exceto estáticos e afins
     "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|webp|svg|gif|ico|pdf|css|js|TTF|woff|woff2|otf|ttf)).*)",
   ],
 };

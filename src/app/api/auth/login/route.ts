@@ -6,7 +6,9 @@ import "dotenv/config";
 import type { SignOptions } from "jsonwebtoken";
 
 const prisma = new PrismaClient();
-const secretKey = process.env.NEXT_PUBLIC_JWT_SECRET || "testeSIH";
+
+// ✅ Use a mesma env do middleware (nada de NEXT_PUBLIC aqui)
+const secretKey = process.env.JWT_SECRET || "dev_fallback_inseguro";
 const expiresIn = (process.env.NEXT_PUBLIC_JWT_EXPIRATION || "8h") as SignOptions["expiresIn"];
 
 export async function POST(req: NextRequest) {
@@ -32,7 +34,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Valida senha normal
+    // Valida senha
     const isPasswordValid = await bcrypt.compare(passwordHash, user.passwordHash);
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -41,8 +43,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ✅ Inclua isPremium no payload (pode incluir outros campos que usar no middleware)
+    const payload = {
+      id: user.id,
+      isPremium: user.isPremium,
+      // opcional: companyId: user.companyId,
+      // opcional: name: user.name,
+    };
+
     // Gera token JWT
-    const token = jwt.sign({ id: user.id }, secretKey, { expiresIn });
+    const token = jwt.sign(payload, secretKey, { expiresIn });
 
     const response = NextResponse.json(
       { message: "Login realizado com sucesso" },

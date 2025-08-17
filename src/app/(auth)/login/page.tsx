@@ -80,6 +80,7 @@ export default function LoginPage() {
         setTimeout(() => {
           localStorage.setItem("showPremiumDialog", "true");
           router.push("/home");
+          window.location.href = "/";
         }, 3000);
       } else {
         // Caso a API retorne algo falsy sem erro lançado
