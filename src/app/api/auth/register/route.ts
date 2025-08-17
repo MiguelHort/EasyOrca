@@ -59,16 +59,12 @@ export async function POST(req: NextRequest) {
     // Hash da senha
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Nome padrão da empresa (edite se quiser outra regra)
-    const firstName = name.split(" ")[0] ?? name;
-    const defaultCompanyName = `Empresa de ${firstName}`;
-
     // Transação: cria Company e User vinculados
     const result = await prisma.$transaction(async (tx) => {
       const company = await tx.company.create({
         data: {
           // Se quiser, troque por body.companyName quando tiver esse campo no form
-          name: defaultCompanyName,
+          name: body.companyName,
           // image: "default.jpg", // já tem default no schema
         },
         select: { id: true, name: true },
