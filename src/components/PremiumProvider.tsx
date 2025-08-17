@@ -1,34 +1,47 @@
 // components/PremiumProvider.tsx
 "use client";
+import { createContext, useContext, useMemo, useState, useEffect } from "react";
 
-import { createContext, useContext, useMemo, useContext as useReactContext } from "react";
-import { useUser } from "@/hooks/useUser";
-
-type PremiumContextType = {
+type Ctx = {
   isPremium: boolean;
-  loading: boolean;
+  resolved: boolean;              // útil para skeletons
+  setIsPremium: (v: boolean) => void;
 };
 
-const PremiumContext = createContext<PremiumContextType | undefined>(undefined);
+const PremiumCtx = createContext<Ctx | null>(null);
 
-export function PremiumProvider({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useUser();
+export function PremiumProvider({
+  children,
+  initialIsPremium = false,
+}: {
+  children: React.ReactNode;
+  initialIsPremium?: boolean;
+}) {
+  // ✅ já começa correto na 1ª render
+  const [isPremium, setIsPremium] = useState<boolean>(initialIsPremium);
+  const [resolved, setResolved] = useState<boolean>(true);
 
-  const value = useMemo(
-    () => ({
-      isPremium: Boolean(user?.isPremium),
-      loading: isLoading,
-    }),
-    [user?.isPremium, isLoading]
-  );
+  // (Opcional) Revalida em background; não precisa alterar UI se nada mudar
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch("/api/me", { credentials: "include" });
+        if (r.ok) {
+          const { isPremium: fresh } = await r.json();
+          setIsPremium(Boolean(fresh));
+        }
+      } finally {
+        setResolved(true);
+      }
+    })();
+  }, []);
 
-  return <PremiumContext.Provider value={value}>{children}</PremiumContext.Provider>;
+  const value = useMemo(() => ({ isPremium, resolved, setIsPremium }), [isPremium, resolved]);
+  return <PremiumCtx.Provider value={value}>{children}</PremiumCtx.Provider>;
 }
 
 export function usePremium() {
-  const ctx = useReactContext(PremiumContext);
-  if (!ctx) {
-    throw new Error("usePremium deve ser usado dentro de <PremiumProvider>.");
-  }
+  const ctx = useContext(PremiumCtx);
+  if (!ctx) throw new Error("usePremium must be used within PremiumProvider");
   return ctx;
 }
