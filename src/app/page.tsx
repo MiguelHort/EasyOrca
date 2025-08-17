@@ -23,9 +23,12 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import HeaderLandingPage from "./HeaderLandingPage";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 export default function AutoOrcaLanding() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const { theme, setTheme } = useTheme();
+  setTheme("light");
 
   const testimonials = [
     {
