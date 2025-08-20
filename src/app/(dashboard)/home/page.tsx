@@ -91,7 +91,7 @@ export default function DashboardPage() {
 
       <main className="min-h-screen bg-background">
         <div>
-          <header className="flex justify-between mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r from-primary to-blue-400 dark:to-blue-800 text-white">
+          <header className={`flex justify-between mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r ${isPremium ? "from-[#172658]" : "from-primary" } to-blue-400 dark:to-blue-800 text-white`}>
             <div>
               <h1 className="text-xl sm:text-3xl font-bold tracking-tight">
                 Olá{user?.name ? `, ${user.name}` : ""}! 👋
@@ -112,7 +112,7 @@ export default function DashboardPage() {
               ) : isPremium ? (
                 <div className="flex items-center text-xs font-semibold border border-white/40 rounded-2xl py-1 px-3 bg-white/10">
                   <Crown className="h-4 w-4 mr-2" />
-                  Plano PRO
+                  The One
                 </div>
               ) : (
                 <>

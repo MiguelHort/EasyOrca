@@ -3,6 +3,7 @@
 import { FilePlus2 } from "lucide-react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
+import { usePremium } from "@/components/PremiumProvider";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -25,6 +26,7 @@ export function NavMain({
   }[]
 }) {
   const pathname = usePathname()
+  const { isPremium } = usePremium();
 
   return (
     <SidebarGroup>
@@ -36,8 +38,8 @@ export function NavMain({
                 tooltip="Novo Orçamento"
                 className={`min-w-8 duration-200 ease-linear ${
                   pathname === "/orcamentos/novo"
-                    ? "bg-primary text-foreground hover:text-foreground hover:bg-primary/90 dark:text-foreground dark:hover:bg-primary/90"
-                    : "bg-primary text-primary-foreground hover:text-primary-foreground hover:bg-primary/90 dark:text-foreground"
+                    ? `${isPremium ? "bg-[#172658] hover:bg-[#172658]/90" : "bg-primary hover:bg-primary/90"} text-primary-foreground hover:text-primary-foreground dark:text-foreground cursor-pointer`
+                    : `${isPremium ? "bg-[#172658] hover:bg-[#172658]/90" : "bg-primary hover:bg-primary/90"} text-primary-foreground hover:text-primary-foreground dark:text-foreground cursor-pointer`
                 }`}
               >
                 <FilePlus2 />
@@ -55,7 +57,7 @@ export function NavMain({
                 <Link href={item.url} className="w-full">
                   <SidebarMenuButton
                     tooltip={item.title}
-                    className={`duration-200 ease-linear ${
+                    className={`duration-200 ease-linear cursor-pointer ${
                       isActive
                         ? "bg-border dark:text-foreground"
                         : "hover:bg-muted"

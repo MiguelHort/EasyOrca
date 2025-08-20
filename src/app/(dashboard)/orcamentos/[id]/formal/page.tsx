@@ -134,7 +134,7 @@ export default function OrcamentoDetalhePage() {
       </div>
 
       {/* “Folha” da proposta */}
-      <div className="bg-foreground shadow-sm ring-1 ring-border rounded-lg p-8 leading-relaxed text-[15px] text-foreground print:shadow-none print:ring-0 print:rounded-none">
+      <div className="bg-primary-foreground shadow-sm ring-1 ring-border rounded-lg p-8 leading-relaxed text-[15px] text-foreground print:shadow-none print:ring-0 print:rounded-none">
         {/* Cabeçalho: cidade + data */}
         <div className="text-right text-sm text-muted-foreground">
           {COMPANY_CITY}, {datePt(data.data)}
