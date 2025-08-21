@@ -8,20 +8,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-  DialogFooter, DialogClose,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
-  AlertDialogTitle, AlertDialogTrigger,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuSeparator,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  FileText, BadgeDollarSign, Calendar, Edit2, Trash2, User, Info, MoreVertical, FileTextIcon, LayoutDashboard
+  FileText,
+  BadgeDollarSign,
+  Calendar,
+  Edit2,
+  Trash2,
+  User,
+  Info,
+  MoreVertical,
+  FileTextIcon,
+  LayoutDashboard,
 } from "lucide-react";
 
 export type Status = "rascunho" | "enviado" | "aprovado" | "rejeitado";
@@ -41,14 +64,26 @@ type CardOrcamentoProps = {
   onDelete?: (id: string) => void;
 };
 
-const currency = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+const currency = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
 const dateFmt = (iso: string) => {
   const d = new Date(iso);
   return isNaN(d.getTime()) ? "—" : d.toLocaleDateString("pt-BR");
 };
-const STATUS_OPTIONS: Status[] = ["rascunho", "enviado", "aprovado", "rejeitado"];
+const STATUS_OPTIONS: Status[] = [
+  "rascunho",
+  "enviado",
+  "aprovado",
+  "rejeitado",
+];
 
-export default function CardOrcamento({ orcamento, onUpdate, onDelete }: CardOrcamentoProps) {
+export default function CardOrcamento({
+  orcamento,
+  onUpdate,
+  onDelete,
+}: CardOrcamentoProps) {
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
@@ -68,7 +103,8 @@ export default function CardOrcamento({ orcamento, onUpdate, onDelete }: CardOrc
     setSaving(true);
     try {
       const valorNumber = Number(String(valor).replace(",", "."));
-      if (!Number.isFinite(valorNumber) || valorNumber < 0) throw new Error("Valor inválido");
+      if (!Number.isFinite(valorNumber) || valorNumber < 0)
+        throw new Error("Valor inválido");
 
       const res = await fetch(`/api/orcamentos/${orcamento.id}`, {
         method: "PATCH",
@@ -89,7 +125,9 @@ export default function CardOrcamento({ orcamento, onUpdate, onDelete }: CardOrc
       const novo: Orcamento = {
         id: updated.id ?? orcamento.id,
         cliente: updated.cliente?.nome ?? updated.cliente ?? orcamento.cliente,
-        valor: Number.parseFloat(String(updated.valorTotal ?? updated.valor ?? valorNumber)),
+        valor: Number.parseFloat(
+          String(updated.valorTotal ?? updated.valor ?? valorNumber)
+        ),
         data: updated.createdAt ?? updated.data ?? orcamento.data,
         status: (updated.status as Status) ?? status,
         descricao: (updated.descricao ?? descricao) || null,
@@ -171,26 +209,6 @@ export default function CardOrcamento({ orcamento, onUpdate, onDelete }: CardOrc
                   <Edit2 className="w-4 h-4" />
                 </Button>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => router.push(`/orcamentos/${orcamento.id}/formal`)}
-                  aria-label="Orçamento Formal"
-                  title="Orçamento Formal"
-                >
-                  <FileTextIcon className="w-4 h-4" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => router.push(`/orcamentos/${orcamento.id}/moderno`)}
-                  aria-label="Orçamento Moderno"
-                  title="Orçamento Moderno"
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                </Button>
-
                 <AlertDialogTrigger asChild>
                   <Button
                     variant="destructive"
@@ -201,6 +219,59 @@ export default function CardOrcamento({ orcamento, onUpdate, onDelete }: CardOrc
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </AlertDialogTrigger>
+
+                <Button variant="outline" className="hidden md:flex p-0">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="icon"
+                        aria-label="Ações"
+                        title="Ações"
+                        className="bg-blue-800 text-white hover:bg-blue-800 dark:bg-blue-700"
+                      >
+                        <LayoutDashboard className="w-5 h-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-44"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <DropdownMenuItem
+                        className="gap-2"
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          router.push(`/orcamentos/${orcamento.id}/tipo1`);
+                        }}
+                      >
+                        <FileTextIcon className="w-4 h-4" />
+                        Orçamento Tipo 1
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        className="gap-2"
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          router.push(`/orcamentos/${orcamento.id}/tipo2`);
+                        }}
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        Orçamento Tipo 2
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        className="gap-2"
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          router.push(`/orcamentos/${orcamento.id}/tipo3`);
+                        }}
+                      >
+                        <FileTextIcon className="w-4 h-4" />
+                        Orçamento Tipo 3
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </Button>
               </div>
 
               {/* MOBILE: menu de 3 pontinhos */}
@@ -236,22 +307,33 @@ export default function CardOrcamento({ orcamento, onUpdate, onDelete }: CardOrc
                       className="gap-2"
                       onSelect={(e) => {
                         e.preventDefault();
-                        router.push(`/orcamentos/${orcamento.id}/formal`);
+                        router.push(`/orcamentos/${orcamento.id}/tipo1`);
                       }}
                     >
                       <FileTextIcon className="w-4 h-4" />
-                      Orçamento Formal
+                      Orçamento Tipo 1
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
                       className="gap-2"
                       onSelect={(e) => {
                         e.preventDefault();
-                        router.push(`/orcamentos/${orcamento.id}/moderno`);
+                        router.push(`/orcamentos/${orcamento.id}/tipo2`);
                       }}
                     >
                       <LayoutDashboard className="w-4 h-4" />
-                      Orçamento Moderno
+                      Orçamento Tipo 2
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      className="gap-2"
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        router.push(`/orcamentos/${orcamento.id}/tipo3`);
+                      }}
+                    >
+                      <FileTextIcon className="w-4 h-4" />
+                      Orçamento Tipo 3
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
@@ -276,7 +358,8 @@ export default function CardOrcamento({ orcamento, onUpdate, onDelete }: CardOrc
                 <AlertDialogHeader>
                   <AlertDialogTitle>Excluir orçamento?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Esta ação não pode ser desfeita. O orçamento e seus itens serão removidos.
+                    Esta ação não pode ser desfeita. O orçamento e seus itens
+                    serão removidos.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -295,7 +378,9 @@ export default function CardOrcamento({ orcamento, onUpdate, onDelete }: CardOrc
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Orçamento</DialogTitle>
-            <DialogDescription>Atualize os dados do orçamento e salve.</DialogDescription>
+            <DialogDescription>
+              Atualize os dados do orçamento e salve.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">

@@ -223,8 +223,8 @@ export default function DashboardPage() {
                     <p className="text-muted-foreground text-sm">Nenhum orçamento encontrado.</p>
                   ) : (
                     <div className="grid gap-4">
-                      {orcamentos.map((o) => (
-                        <CardOrcamento key={o.id} orcamento={o} />
+                      {orcamentos.slice(-3).reverse().map((o) => (
+                      <CardOrcamento key={o.id} orcamento={o} />
                       ))}
                     </div>
                   )}
@@ -272,7 +272,7 @@ export default function DashboardPage() {
                 <CardHeader className="p-0 mb-4">
                   <CardTitle className="flex items-center gap-2 text-emerald-700 text-xl font-semibold">
                     <Crown className="h-5 w-5" />
-                    Você é PRO ✨
+                    Você é The One!
                   </CardTitle>
                   <CardDescription className="text-sm text-emerald-700/80">
                     Obrigado por apoiar o EasyOrça! Aproveite todos os recursos.
