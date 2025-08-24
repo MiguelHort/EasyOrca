@@ -7,7 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Tabela de Usuário (funcionário)
+enum SubscriptionStatus {
+  INACTIVE
+  INCOMPLETE
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+}
+
 model User {
   id               String   @id @default(uuid())
   name             String
@@ -16,17 +25,27 @@ model User {
   phone            String?
   userName         String?  @unique
   profileImage     String?  @default("default.jpg")
+
+  // ⇩ Você pode deixar de usar este campo e derivar do status; se mantiver, mantenha sincronizado no webhook
   isPremium        Boolean  @default(false)
-  stripeCustomerId String?
+
+  stripeCustomerId     String? @unique
+  stripeSubscriptionId String? @unique
+  subscriptionStatus   SubscriptionStatus @default(INACTIVE)
+  currentPeriodEnd     DateTime?
+  priceId              String?
+  planNickname         String?
+
   createdAt        DateTime @default(now())
 
-  // Relacionamento: Um usuário pertence a uma empresa
-  companyId String? // Tornar opcional para permitir usuários sem empresa
-  // Relacionamento: Um usuário pertence a uma empresa, mas pode ser nulo
+  companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
-  // Relacionamento: Um usuário cria muitos orçamentos
   orcamentos Orcamento[]
+
+  @@index([email])
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
 }
 
 // NOVA TABELA: Empresa
