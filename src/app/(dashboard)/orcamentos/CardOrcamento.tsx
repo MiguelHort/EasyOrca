@@ -164,9 +164,9 @@ export default function CardOrcamento({
 
   return (
     <>
-      <Card className="hover:bg-muted transition flex">
+      <Card className="hover:bg-muted transition flex w-full">
         <CardContent
-          className="flex w-full justify-between items-center cursor-pointer"
+          className="flex w-full justify-between items-center cursor-pointer pr-1"
           onClick={() => setOpen(true)}
         >
           <div className="flex items-start gap-4">
@@ -176,9 +176,9 @@ export default function CardOrcamento({
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-muted-foreground" />
-                <h3 className="font-medium">{orcamento.cliente}</h3>
+                <h3 className="font-medium text-xs md:text-lg">{orcamento.cliente}</h3>
               </div>
-              <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <p className="text-xs md:text-sm text-muted-foreground flex items-center gap-1">
                 <BadgeDollarSign className="w-4 h-4" />
                 {currency.format(orcamento.valor)}
               </p>
@@ -284,7 +284,7 @@ export default function CardOrcamento({
                       aria-label="Ações"
                       title="Ações"
                     >
-                      <MoreVertical className="w-5 h-5" />
+                      <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
