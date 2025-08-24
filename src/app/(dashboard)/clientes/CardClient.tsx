@@ -128,7 +128,7 @@ const CardCliente: React.FC<CardClienteProps> = ({ cliente, onUpdate, onDelete }
     <>
       <Card className="hover:bg-muted transition">
         <CardContent
-          className="flex w-full justify-between items-center cursor-pointer py-4"
+          className="flex w-full justify-between items-center cursor-pointer py-4 pr-1"
           onClick={() => setOpen(true)}
         >
           <div className="flex items-start gap-4">
