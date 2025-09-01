@@ -7,7 +7,10 @@ import jwt from "jsonwebtoken";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = process.env.GEMINI_API_KEY!;
-const secretKey = process.env.JWT_SECRET || process.env.NEXT_PUBLIC_JWT_SECRET || "dev_fallback_inseguro";
+const secretKey =
+  process.env.JWT_SECRET ||
+  process.env.NEXT_PUBLIC_JWT_SECRET ||
+  "dev_fallback_inseguro";
 
 // cache simples em memória
 type CacheVal = { expiresAt: number; text: string };
@@ -25,7 +28,11 @@ type KPI = {
 type TopItem = { name: string; qty?: number; count?: number; total: number };
 
 function fmtBRL(n: number) {
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(n || 0);
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: 0,
+  }).format(n || 0);
 }
 
 function clamp3lines(s: string) {
@@ -35,15 +42,21 @@ function clamp3lines(s: string) {
   return trimmed.slice(0, 360);
 }
 
-function localFallback(range: string, kpis: KPI, top: { services: TopItem[]; clients: TopItem[] }) {
+function localFallback(
+  range: string,
+  kpis: KPI,
+  top: { services: TopItem[]; clients: TopItem[] }
+) {
   const topServ = top.services?.[0]?.name;
-  const topCli  = top.clients?.[0]?.name;
+  const topCli = top.clients?.[0]?.name;
   const partes: string[] = [];
   partes.push(
     `No período (${range}), foram ${kpis.budgets} orçamentos e ${kpis.approved} aprovados (${kpis.conversion}%).`
   );
   partes.push(
-    `Faturamento acumulado de ${fmtBRL(kpis.totalValue)} e ticket médio em ${fmtBRL(kpis.avgTicket)}.`
+    `Faturamento acumulado de ${fmtBRL(
+      kpis.totalValue
+    )} e ticket médio em ${fmtBRL(kpis.avgTicket)}.`
   );
   if (topServ || topCli) {
     const extra = [
@@ -60,9 +73,13 @@ function localFallback(range: string, kpis: KPI, top: { services: TopItem[]; cli
 export async function POST(req: NextRequest) {
   try {
     const token = req.cookies.get("token")?.value;
-    if (!token) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+    if (!token)
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
-    const payload = jwt.verify(token, secretKey) as { id: string; companyId?: string };
+    const payload = jwt.verify(token, secretKey) as {
+      id: string;
+      companyId?: string;
+    };
     // recebemos o overview já pronto do client
     const body = await req.json().catch(() => ({}));
     const range: string = body?.period?.range ?? "this-month";
@@ -91,7 +108,7 @@ export async function POST(req: NextRequest) {
       "- Tom profissional e direto; sem floreios.",
       "- Pode citar valores e % que vierem no input (formato BRL/percentual).",
       "- Destaque brevemente 1 serviço e/ou 1 cliente quando houver.",
-      "- Sem bullets; apenas texto corrido."
+      "- Sem bullets; apenas texto corrido.",
     ].join("\n");
 
     const payloadForAi = {
@@ -106,9 +123,13 @@ export async function POST(req: NextRequest) {
         catalogo_servicos: kpis.servicesCatalog,
       },
       destaques: {
-        top_servicos: top.services?.slice(0, 2)?.map(s => ({ nome: s.name, total_brl: fmtBRL(s.total) })),
-        top_clientes: top.clients?.slice(0, 2)?.map(c => ({ nome: c.name, total_brl: fmtBRL(c.total) })),
-      }
+        top_servicos: top.services
+          ?.slice(0, 2)
+          ?.map((s: TopItem) => ({ nome: s.name, total_brl: fmtBRL(s.total) })),
+        top_clientes: top.clients
+          ?.slice(0, 2)
+          ?.map((c: TopItem) => ({ nome: c.name, total_brl: fmtBRL(c.total) })),
+      },
     };
 
     let summary = "";
@@ -117,7 +138,7 @@ export async function POST(req: NextRequest) {
         const genAI = new GoogleGenerativeAI(API_KEY);
         const model = genAI.getGenerativeModel({
           model: "gemini-1.5-flash",
-          generationConfig: { responseMimeType: "text/plain" as any }
+          generationConfig: { responseMimeType: "text/plain" as any },
         });
         const res = await model.generateContent([
           { text: system },
@@ -135,11 +156,18 @@ export async function POST(req: NextRequest) {
     }
 
     // salva em cache
-    cache.set(cacheKey, { expiresAt: now + 10 * 60 * 1000, data: undefined as any, text: summary } as any);
+    cache.set(cacheKey, {
+      expiresAt: now + 10 * 60 * 1000,
+      data: undefined as any,
+      text: summary,
+    } as any);
 
     return NextResponse.json({ summary });
   } catch (err) {
     console.error("[IA/dashboard-summary] ERRO:", err);
-    return NextResponse.json({ error: "Falha ao gerar resumo" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Falha ao gerar resumo" },
+      { status: 500 }
+    );
   }
 }
