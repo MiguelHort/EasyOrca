@@ -18,17 +18,21 @@ import {
   Briefcase,
   MessageCircle,
   Globe,
+  ArrowRight,
+  Shield,
+  Target,
+  TrendingUp,
+  Sparkles,
+  Crown,
+  Gift,
+  X,
+  Menu,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import HeaderLandingPage from "./HeaderLandingPage";
-import Link from "next/link";
-import { useTheme } from "next-themes";
 
-export default function AutoOrcaLanding() {
+export default function ModernEasyOrcaLanding() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const { theme, setTheme } = useTheme();
-  setTheme("light");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const testimonials = [
     {
@@ -54,132 +58,176 @@ export default function AutoOrcaLanding() {
     },
   ];
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-white overflow-x-hidden">
+      {/* Modern Header */}
       <HeaderLandingPage />
 
       {/* Hero Section */}
-      <section className="bg-secondary/50">
-        <div className="pt-32 pb-20 bg-blue-600 rounded-b-[60px] sm:rounded-b-[80px] sm:px-6 lg:rounded-b-[100px] text-white overflow-hidden relative">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col-reverse lg:flex-row items-center justify-between gap-8">
-            {/* Texto à esquerda */}
-            <div className="flex flex-col pl-4 lg:w-1/2 text-left">
-              <h1
-                className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 md:mb-8 leading-tight"
-                style={{ fontFamily: "Hammersmith One" }}
-              >
-                Faça orçamentos
-                <br />
-                em menos de
-                <br />
-                um{" "}
-                <span className="relative inline-block">
-                  <span className="relative z-10">minuto</span>
-                  <span className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-lime-400 to-transparent rounded-full"></span>
-                </span>
-              </h1>
+      <section className="pt-24 pb-20 bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-1000"></div>
 
-              <p
-                className="text-base sm:text-lg md:text-xl text-white/90 mb-6 md:mb-8 leading-relaxed max-w-lg"
-                style={{ fontFamily: "Dreaming Out Loud" }}
-              >
-                Uma boa entrega para o seu
-                <br />
-                cliente, começa aqui.
-              </p>
-
-              {/* Imagem da seta curva */}
-              <div className="relative mb-6 md:mb-8">
-                <img
-                  src="/seta.png"
-                  alt="Seta curva apontando para o botão"
-                  className="absolute -top-10 left-36 sm:left-44 md:left-48 w-24 sm:w-20 md:w-24 h-22 object-contain"
-                  draggable={false}
-                />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full text-blue-800 text-sm font-semibold">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Novo: Integração com WhatsApp
               </div>
 
-              <div className="flex justify-start">
-                <Link href="/register">
-                  <Button className="h-12 text-sm sm:text-base md:text-lg font-semibold px-6 sm:px-8 py-3 sm:py-4 bg-lime-400 text-white hover:bg-lime-400 transition-all shadow-2xl transform hover:scale-103">
-                    Começar agora
-                  </Button>
-                </Link>
+              <div className="space-y-6">
+                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                  Orçamentos
+                  <span className="block bg-primary bg-clip-text text-transparent">
+                    profissionais
+                  </span>
+                  em segundos
+                </h1>
+
+                <p className="text-xl text-gray-600 max-w-lg leading-relaxed">
+                  Transforme sua forma de criar orçamentos. Rápido, profissional
+                  e direto no WhatsApp do seu cliente.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="group bg-primary text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl transform hover:scale-105 transition-all flex items-center justify-center">
+                  Começar Grátis Agora
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button className="flex items-center justify-center px-8 py-4 border border-gray-300 rounded-full text-lg font-semibold hover:bg-gray-50 transition-all">
+                  <Play className="w-5 h-5 mr-2" />
+                  Ver Demonstração
+                </button>
+              </div>
+
+              <div className="flex items-center space-x-8 text-sm text-gray-500">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                  Grátis para começar
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                  Sem cartão necessário
+                </div>
               </div>
             </div>
 
-            {/* Mockup à direita */}
-            <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
-              <Image
-                src="/mockup1.png"
-                alt="Mockup da aplicação EasyOrça"
-                width={500}
-                height={300}
-                className="flex items-end w-full max-w-[380px] sm:max-w-[500px] lg:max-w-[500px]"
-              />
+            <div className="relative">
+              <div className="relative z-10 transform rotate-3 hover:rotate-0 transition-transform duration-700">
+                <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 bg-blue-200 rounded animate-pulse delay-100"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse delay-200"></div>
+                    <div className="h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
+                      <span className="text-2xl font-bold text-blue-600">
+                        R$ 1.250,00
+                      </span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <div className="h-10 bg-blue-600 rounded flex-1 flex items-center justify-center">
+                        <Send className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="h-10 bg-green-500 rounded flex-1 flex items-center justify-center">
+                        <MessageCircle className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg animate-bounce">
+                <Clock className="w-8 h-8" />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 p-6 md:px-16 bg-secondary/50">
-        <div className="max-w-7xl mx-auto">
+      <section id="recursos" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              Por que escolher o EasyOrça?
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+              Tudo que você precisa para
+              <span className="block text-blue-600">vender mais e melhor</span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Desenvolvido especificamente para profissionais que valorizam
-              tempo e qualidade
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Recursos pensados para profissionais que querem crescer
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: <Zap className="w-8 h-8 text-yellow-500" />, // Relaciona-se bem com rapidez e praticidade
-                title: "Praticidade",
+                icon: <Zap className="w-8 h-8" />,
+                title: "Criação Instantânea",
                 description:
-                  "Cadastre seus serviços e somente personalize o orçamento para cada cliente em poucos passos!",
+                  "Gere orçamentos profissionais em menos de 30 segundos. Cadastre uma vez, use sempre.",
+                color: "from-yellow-400 to-orange-400",
               },
               {
-                icon: <BarChart3 className="w-8 h-8 text-blue-500" />, // Controle → gráfico/gestão
-                title: "Controle",
+                icon: <MessageCircle className="w-8 h-8" />,
+                title: "Envio Direto WhatsApp",
                 description:
-                  "Gestão completa da quantidade de orçamentos feitos, aceitos, recusados, clientes atendidos e serviços prestados/produtos vendidos.",
+                  "Um clique e seu orçamento vai direto para o WhatsApp do cliente. Sem downloads, sem complicação.",
+                color: "from-green-400 to-emerald-400",
               },
               {
-                icon: <Briefcase className="w-8 h-8 text-green-500" />, // Profissionalismo → trabalho/negócios
-                title: "Profissionalismo",
+                icon: <BarChart3 className="w-8 h-8" />,
+                title: "Dashboard Inteligente",
                 description:
-                  "Envie orçamentos completos e com valores claros, transmitindo mais profissionalismo ao seu cliente.",
+                  "Acompanhe métricas importantes: orçamentos enviados, aceitos, faturamento e muito mais.",
+                color: "from-blue-400 to-cyan-400",
               },
               {
-                icon: <MessageCircle className="w-8 h-8 text-purple-500" />, // Direto no WhatsApp → conversa/mensagem
-                title: "Direto no Whatsapp",
+                icon: <Briefcase className="w-8 h-8" />,
+                title: "Visual Profissional",
                 description:
-                  "Com um botão, você encaminha o orçamento direto para o Whatsapp do seu cliente, sem precisar fazer download do arquivo.",
+                  "Orçamentos com design moderno que transmitem confiança e profissionalismo.",
+                color: "from-purple-400 to-pink-400",
               },
               {
-                icon: <Globe className="w-8 h-8 text-cyan-500" />, // Acessível de qualquer lugar → mundo/internet
-                title: "Acessível de qualquer lugar",
+                icon: <Globe className="w-8 h-8" />,
+                title: "Acesso em Qualquer Lugar",
                 description:
-                  "Gera o orçamento personalizado com as informações que seu cliente precisa para você fazer negócio!",
+                  "Use no celular, tablet ou computador. Seus dados sempre sincronizados na nuvem.",
+                color: "from-indigo-400 to-purple-400",
               },
               {
-                icon: <UserCheck className="w-8 h-8 text-red-500" />, // Feito para quem faz acontecer → pessoa determinada
-                title: "Feito para quem faz acontecer",
+                icon: <Shield className="w-8 h-8" />,
+                title: "Segurança Total",
                 description:
-                  "Um sistema pensado para a rotina do empreendedor: intuitivo, fácil de usar e que se encaixa no seu dia a dia.",
+                  "Seus dados e dos seus clientes protegidos com criptografia de ponta.",
+                color: "from-red-400 to-pink-400",
               },
             ].map((feature, index) => (
               <div key={index} className="group relative">
-                <div className="md:h-70 bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition-all duration-300 transform hover:scale-103">
-                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="bg-white border border-gray-100 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                  <div
+                    className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform`}
+                  >
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-bold mb-4">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -190,78 +238,61 @@ export default function AutoOrcaLanding() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 px-16">
-        <div className="max-w-7xl mx-auto">
+      <section id="como-funciona" className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              Como funciona?
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+              Simples como
+              <span className="text-blue-600"> 1, 2, 3</span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Três passos simples para revolucionar seus orçamentos
+            <p className="text-xl text-gray-600">
+              Três passos para revolucionar seus orçamentos
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-12 relative">
+          <div className="grid md:grid-cols-3 gap-8 relative">
             {/* Connecting lines */}
-            {/* Animated dotted arrow */}
-            <div className="hidden md:flex animated-dotted-arrow">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <span key={i}>•</span>
-              ))}
-            </div>
+            <div className="hidden md:block absolute top-1/3 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400"></div>
 
             {[
               {
                 step: "01",
-                title: "Cadastre-se Grátis",
-                description: (
-                  <>
-                    Você cadastra seu serviço/produto
-                    <br />
-                    <span className="text-sm text-muted-foreground">
-                      (Nome, descrição, preço)
-                    </span>
-                  </>
-                ),
-                icon: <Users className="w-8 h-8" />,
+                title: "Cadastre seus Serviços",
+                description:
+                  "Registre seus produtos e serviços uma única vez com nome, descrição e valores.",
+                icon: <FileText className="w-8 h-8" />,
+                color: "from-blue-400 to-blue-600",
               },
               {
                 step: "02",
-                title: "Configure seus Serviços",
-                description: (
-                  <>
-                    Coloca os dados do seu cliente
-                    <br />
-                    <span className="text-sm text-muted-foreground">
-                      (Nome, telefone, email)
-                    </span>
-                  </>
-                ),
-                icon: <FileText className="w-8 h-8" />,
+                title: "Adicione o Cliente",
+                description:
+                  "Insira os dados básicos do cliente: nome, telefone e email. Rápido e prático.",
+                icon: <Users className="w-8 h-8" />,
+                color: "from-purple-400 to-purple-600",
               },
               {
                 step: "03",
-                title: "Gere Orçamentos",
-                description: (
-                  <>
-                    Gera o orçamento personalizado com as informações que seu
-                    cliente precisa
-                    <br />
-                    para você fazer negócio!
-                  </>
-                ),
-                icon: <CheckCircle className="w-8 h-8" />,
+                title: "Envie e Venda",
+                description:
+                  "Gere o orçamento profissional e envie direto no WhatsApp. Feche mais negócios!",
+                icon: <Target className="w-8 h-8" />,
+                color: "from-green-400 to-green-600",
               },
             ].map((step, index) => (
               <div key={index} className="text-center relative">
-                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-12 relative z-10">
+                <div
+                  className={`w-20 h-20 bg-gradient-to-r ${step.color} text-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg relative z-10 transform hover:scale-110 transition-transform`}
+                >
                   {step.icon}
                 </div>
-                <div className="text-6xl font-bold mb-4 text-primary/20">
+                <div className="text-6xl font-bold mb-6 text-gray-200">
                   {step.step}
                 </div>
-                <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  {step.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed max-w-sm mx-auto">
                   {step.description}
                 </p>
               </div>
@@ -270,46 +301,169 @@ export default function AutoOrcaLanding() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section id="testimonials" className="py-20 px-4 bg-secondary/50">
-        <div className="max-w-7xl mx-auto">
+      {/* Plans Section */}
+      <section id="planos" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              Nós somos suspeitos para dizer
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+              Escolha o plano ideal
+              <span className="block text-blue-600">para seu negócio</span>
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Então confira alguns depoimentos de clientes que já usaram e
-              aprovaram nosso sistema!
+            <p className="text-xl text-gray-600">
+              Comece grátis e evolua conforme sua necessidade
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Free Plan */}
+            <div className="bg-white border-2 border-gray-200 rounded-3xl p-8 relative hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-full text-gray-700 text-sm font-semibold mb-4">
+                  <Gift className="w-4 h-4 mr-2" />
+                  Para Começar
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  EasyOrça Free
+                </h3>
+                <div className="flex items-baseline justify-center">
+                  <span className="text-5xl font-bold text-gray-900">R$ 0</span>
+                  <span className="text-gray-500 ml-2">/mês</span>
+                </div>
+                <p className="text-gray-600 mt-2">Para sempre grátis</p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                {[
+                  "Até 10 orçamentos/mês",
+                  "2 modelos de orçamento",
+                  "Envio por WhatsApp",
+                  "Dashboard básico",
+                  "Suporte por email",
+                ].map((feature, index) => (
+                  <div key={index} className="flex items-center">
+                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                    <span className="text-gray-600">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              <button className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition-colors">
+                Começar Grátis
+              </button>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-3xl p-8 relative hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <div className="bg-primary text-white px-6 py-2 rounded-full text-sm font-semibold">
+                  <Crown className="w-4 h-4 inline mr-2" />
+                  Mais Popular
+                </div>
+              </div>
+
+              <div className="text-center mb-8 mt-4">
+                <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full text-blue-800 text-sm font-semibold mb-4">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Para Crescer
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  OneOrça Pro
+                </h3>
+                <div className="flex items-baseline justify-center">
+                  <span className="text-5xl font-bold bg-primary bg-clip-text text-transparent">
+                    R$ 39
+                  </span>
+                  <span className="text-gray-500 ml-2">,90/mês</span>
+                </div>
+                <p className="text-gray-600 mt-2">Faturado mensalmente</p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                {[
+                  "Orçamentos ilimitados",
+                  "Modelos personalizáveis",
+                  "WhatsApp + Email automático",
+                  "Dashboard completo com métricas",
+                  "Gestão de clientes avançada",
+                  "Relatórios detalhados",
+                  "Suporte prioritário",
+                  "Backup automático na nuvem",
+                ].map((feature, index) => (
+                  <div key={index} className="flex items-center">
+                    <CheckCircle className="w-5 h-5 text-blue-500 mr-3 flex-shrink-0" />
+                    <span className="text-gray-700 font-medium">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              <button className="w-full bg-primary text-white py-4 rounded-full font-semibold hover:shadow-lg transform hover:scale-105 transition-all">
+                Começar Teste Grátis
+              </button>
+              <p className="text-center text-sm text-gray-500 mt-2">
+                7 dias grátis, cancele quando quiser
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-gray-600">
+              Precisa de algo personalizado?
+              <a
+                href="#"
+                className="text-blue-600 font-semibold hover:text-blue-800 ml-1"
+              >
+                Entre em contato
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section
+        id="depoimentos"
+        className="py-20 bg-gradient-to-br from-gray-50 to-blue-50"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+              Quem usa
+              <span className="text-blue-600"> recomenda</span>
+            </h2>
+            <p className="text-xl text-gray-600">
+              Mais de 5.000 profissionais já transformaram seus negócios
             </p>
           </div>
 
           <div className="relative max-w-4xl mx-auto">
-            <div className="bg-card border border-border rounded-2xl p-8 text-center shadow-lg">
-              <div className="flex justify-center mb-4">
-                {[...Array(testimonials[currentTestimonial].rating)].map(
-                  (_, i) => (
-                    <Star
-                      key={i}
-                      className="w-6 h-6 text-yellow-500 fill-current"
-                    />
-                  )
-                )}
-              </div>
-              <p className="text-2xl mb-6 italic">
-                "{testimonials[currentTestimonial].content}"
-              </p>
-              <div className="flex items-center justify-center space-x-4">
-                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
-                  <span className="font-bold">
-                    {testimonials[currentTestimonial].name.charAt(0)}
-                  </span>
+            <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-xl border border-gray-100">
+              <div className="text-center">
+                <div className="flex justify-center mb-6">
+                  {[...Array(testimonials[currentTestimonial].rating)].map(
+                    (_, i) => (
+                      <Star
+                        key={i}
+                        className="w-6 h-6 text-yellow-400 fill-current"
+                      />
+                    )
+                  )}
                 </div>
-                <div>
-                  <div className="font-semibold">
-                    {testimonials[currentTestimonial].name}
+
+                <blockquote className="text-2xl lg:text-3xl text-gray-900 font-medium mb-8 italic leading-relaxed">
+                  "{testimonials[currentTestimonial].content}"
+                </blockquote>
+
+                <div className="flex items-center justify-center space-x-4">
+                  <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold">
+                    {testimonials[currentTestimonial].name.charAt(0)}
                   </div>
-                  <div className="text-muted-foreground">
-                    {testimonials[currentTestimonial].role}
+                  <div className="text-left">
+                    <div className="font-bold text-gray-900 text-lg">
+                      {testimonials[currentTestimonial].name}
+                    </div>
+                    <div className="text-gray-600">
+                      {testimonials[currentTestimonial].role}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -321,7 +475,9 @@ export default function AutoOrcaLanding() {
                   key={index}
                   onClick={() => setCurrentTestimonial(index)}
                   className={`w-3 h-3 rounded-full transition-all ${
-                    index === currentTestimonial ? "bg-blue-600" : "bg-muted"
+                    index === currentTestimonial
+                      ? "bg-blue-600 w-8"
+                      : "bg-gray-300 hover:bg-gray-400"
                   }`}
                 />
               ))}
@@ -331,146 +487,135 @@ export default function AutoOrcaLanding() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-primary text-primary-foreground">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Pronto para transformar seu negócio?
+      <section className="py-20 bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-10 left-10 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"></div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+            Pronto para transformar
+            <span className="block text-blue-300">seu negócio?</span>
           </h2>
-          <p className="text-lg mb-8 text-primary-foreground/80">
-            Junte-se a milhares de profissionais que já revolucionaram seus
-            orçamentos
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Junte-se aos milhares de profissionais que já revolucionaram seus
+            orçamentos e aumentaram suas vendas
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <button className="group bg-background text-foreground px-8 py-4 rounded-xl text-lg font-semibold hover:bg-muted transition-all transform hover:scale-103 shadow-xl">
-              <span className="flex items-center justify-center space-x-2">
-                <span>Começar Grátis Agora</span>
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
+            <button className="group bg-white text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl flex items-center justify-center">
+              Começar Grátis Agora
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button className="border-2 border-white text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white hover:text-gray-900 transition-all">
+              Falar com Especialista
             </button>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-8 text-primary-foreground/80">
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-5 h-5" />
-              <span>Fácil de usar</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-white/80">
+            <div className="flex items-center justify-center space-x-2">
+              <CheckCircle className="w-5 h-5 text-green-400" />
+              <span>7 dias grátis</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-5 h-5" />
-              <span>Valor acessível</span>
+            <div className="flex items-center justify-center space-x-2">
+              <CheckCircle className="w-5 h-5 text-green-400" />
+              <span>Sem compromisso</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-5 h-5" />
-              <span>Suporte de qualidade</span>
+            <div className="flex items-center justify-center space-x-2">
+              <CheckCircle className="w-5 h-5 text-green-400" />
+              <span>Suporte incluído</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-secondary py-12 px-4 border-t border-border">
+      <footer className="bg-gray-900 py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="text-xl font-bold text-primary">
-                  <Image
-                    src="/logoHeader2.png"
-                    alt="Logo"
-                    width={120}
-                    height={120}
-                  />
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center space-x-2 mb-6">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">E</span>
                 </div>
+                <span className="text-2xl font-bold text-white">EasyOrça</span>
               </div>
-              <p className="text-muted-foreground">
+              <p className="text-gray-400 mb-6 max-w-md">
                 A ferramenta mais rápida e profissional para criar orçamentos.
+                Transforme sua forma de vender com tecnologia de ponta.
               </p>
+              <div className="flex space-x-4">
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                >
+                  <span className="text-white text-sm">f</span>
+                </a>
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                >
+                  <span className="text-white text-sm">in</span>
+                </a>
+                <a
+                  href="https://www.instagram.com/easyorca"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                >
+                  <span className="text-white text-sm">@</span>
+                </a>
+              </div>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Produto</h4>
-              <ul className="space-y-2 text-muted-foreground">
+              <h4 className="font-semibold text-white mb-6">Produto</h4>
+              <ul className="space-y-3 text-gray-400">
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
+                  <a href="#" className="hover:text-white transition-colors">
                     Recursos
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
+                  <a href="#" className="hover:text-white transition-colors">
                     Preços
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
+                  <a href="#" className="hover:text-white transition-colors">
                     Demonstração
                   </a>
                 </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Empresa</h4>
-              <ul className="space-y-2 text-muted-foreground">
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Sobre
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Contato
+                  <a href="#" className="hover:text-white transition-colors">
+                    API
                   </a>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Suporte</h4>
-              <ul className="space-y-2 text-muted-foreground">
+              <h4 className="font-semibold text-white mb-6">Suporte</h4>
+              <ul className="space-y-3 text-gray-400">
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
+                  <a href="#" className="hover:text-white transition-colors">
                     Central de Ajuda
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Termos
+                  <a href="#" className="hover:text-white transition-colors">
+                    Contato
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
+                  <a href="#" className="hover:text-white transition-colors">
+                    Termos de Uso
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
                     Privacidade
                   </a>
                 </li>
@@ -478,8 +623,21 @@ export default function AutoOrcaLanding() {
             </div>
           </div>
 
-          <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2025 EasyOrça. Todos os direitos reservados.</p>
+          <div className="border-t border-gray-800 mt-12 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-gray-400 text-sm">
+                &copy; 2025 EasyOrça. Todos os direitos reservados.
+              </p>
+              <div className="flex items-center space-x-6 mt-4 md:mt-0">
+                <span className="text-gray-400 text-sm">
+                  Feito com ❤️ no Brasil
+                </span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-gray-400 text-sm">Sistema online</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
