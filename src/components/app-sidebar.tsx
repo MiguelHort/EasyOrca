@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   LayoutDashboard,
-  NotepadTextDashed, // (não usado: remova se não precisar)
   ListOrdered,
   Users2,
   Settings2,
@@ -24,6 +23,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  // ⬇️ importe o hook do provider do shadcn/ui
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 import { useUser } from "@/hooks/useUser";
@@ -32,15 +33,32 @@ import { usePremium } from "@/components/PremiumProvider";
 import { Logo } from "@/assets/icons/Logo";
 import { LogoOneDark, LogoOneLight } from "@/assets/icons/LogoOne";
 
+// --- Fecha automaticamente 8s após abrir ---
+function AutoCloseWatcher({ ms = 8_000 }: { ms?: number }) {
+  const { open, setOpen /* , isMobile */ } = useSidebar();
+
+  React.useEffect(() => {
+    // Se quiser fechar só no mobile, use:
+    // if (!open || !isMobile) return;
+    if (!open) return;
+
+    const timer = setTimeout(() => {
+      setOpen(false);
+    }, ms);
+
+    return () => clearTimeout(timer);
+  }, [open, setOpen, ms]);
+
+  return null;
+}
+
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { user, isLoading, isError, errorMessage } = useUser();
   const { isPremium, resolved } = usePremium();
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
 
-  // Enquanto o premium não foi resolvido, podemos cair no isPremium do usuário
   const isPremiumEffective = resolved ? isPremium : !!user?.isPremium;
 
-  // Dados para o componente de usuário (evita undefined)
   const userPlaceholder = {
     name: user?.name ?? "",
     email: user?.email ?? "",
@@ -51,37 +69,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   };
 
   const navItems = [
-    {
-      title: "Início",
-      url: "/home",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Histórico de Orçamentos",
-      url: "/orcamentos",
-      icon: ListOrdered,
-    },
-    {
-      title: "Clientes",
-      url: "/clientes",
-      icon: Users2,
-    },
-    {
-      title: "Serviços",
-      url: "/servicos",
-      icon: Settings2,
-    },
-    // Só adiciona o Dashboard se for premium
+    { title: "Início", url: "/home", icon: LayoutDashboard },
+    { title: "Histórico de Orçamentos", url: "/orcamentos", icon: ListOrdered },
+    { title: "Clientes", url: "/clientes", icon: Users2 },
+    { title: "Serviços", url: "/servicos", icon: Settings2 },
     ...(isPremiumEffective
-      ? [
-          {
-            title: "Dashboard",
-            url: "/dashboard",
-            icon: Gauge,
-          } as const,
-        ]
+      ? [{ title: "Dashboard", url: "/dashboard", icon: Gauge } as const]
       : []),
-    // Só adiciona o Upgrade se NÃO for premium
     ...(!isPremiumEffective
       ? [
           {
@@ -107,7 +101,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
               <Link className="text-sm font-medium flex items-center gap-2" href="/">
                 {isPremiumEffective ? (
                   <>
-                    {theme === 'dark' ? <LogoOneLight /> : <LogoOneDark />}
+                    {theme === "dark" ? <LogoOneLight /> : <LogoOneDark />}
                     <span className="text-[#172658] dark:text-white text-xl">
                       OneOrça
                     </span>
@@ -131,6 +125,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <NavUser user={userPlaceholder} />
       </SidebarFooter>
+
+      {/* Observador: fecha 10s após abrir */}
+      <AutoCloseWatcher ms={10_000} />
     </Sidebar>
   );
 }

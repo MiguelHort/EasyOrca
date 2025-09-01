@@ -34,6 +34,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Textarea } from "@/components/ui/textarea";
 import {
   FileText,
   BadgeDollarSign,
@@ -386,7 +387,7 @@ export default function CardOrcamento({
           <div className="grid gap-4 py-4">
             <div className="grid gap-1">
               <Label htmlFor="descricao">Descrição</Label>
-              <Input
+              <Textarea
                 id="descricao"
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
