@@ -4,12 +4,30 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, LayoutDashboard, Layers, Sparkles, Clock } from "lucide-react";
+import { 
+  FileText, 
+  LayoutDashboard, 
+  Layers, 
+  Sparkles, 
+  Clock,
+  Crown,
+  CheckCircle,
+  Shield,
+  Zap,
+  TrendingUp,
+  MessageCircle,
+  BarChart3,
+  Globe,
+  ArrowRight,
+  Star,
+  Users,
+  Target,
+  ArrowLeft
+} from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { useUser } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export default function AssinarPlanoPage() {
   const { user } = useUser();
@@ -24,7 +42,6 @@ export default function AssinarPlanoPage() {
   }, []);
 
   // --------- Cupom e contador ---------
-  // Prazo do cupom (BRT). Ajuste se necessário:
   const couponDeadline = useMemo(() => new Date("2025-10-01T23:59:59-03:00"), []);
   const [now, setNow] = useState<Date>(new Date());
   useEffect(() => {
@@ -40,20 +57,15 @@ export default function AssinarPlanoPage() {
   const couponActive = msLeft > 0;
 
   const [loading, setLoading] = useState(false);
-  const [showCouponHelp, setShowCouponHelp] = useState(false);
 
   async function handleSubscribe() {
     try {
       setLoading(true);
-      // Aqui chamamos seu endpoint que cria a Checkout Session de assinatura (R$49,90/mês)
-      // O campo de cupom será exibido no próprio checkout (allow_promotion_codes: true).
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          // passe o email do usuário se você não tiver o customerId ainda
           customerEmail: user?.email ?? undefined,
-          // não enviamos promotion_code aqui para manter o campo aberto no Checkout
         }),
       });
 
@@ -64,7 +76,7 @@ export default function AssinarPlanoPage() {
 
       const data = await res.json();
       if (data?.url) {
-        window.location.href = data.url; // redireciona para a página segura da Stripe
+        window.location.href = data.url;
       } else {
         throw new Error("URL do checkout não recebida.");
       }
@@ -75,168 +87,222 @@ export default function AssinarPlanoPage() {
   }
 
   return (
-    <>
-      <SiteHeader title="Assinar Plano Premium" />
+    <div className="min-h-screen bg-slate-50">
+      <SiteHeader title="Assinar OneOrça" />
 
-      <main className="px-6 md:px-16 py-10 bg-white">
-        <div className="grid md:grid-cols-2 gap-10 items-center">
-          {/* Coluna esquerda: texto */}
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 text-blue-700 px-3 py-1 mb-3 border border-blue-200">
-              <Sparkles className="h-4 w-4" />
-              <span className="text-xs font-semibold">EasyOrça Pro</span>
-            </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header minimalista */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Upgrade para <span className="text-primary">OneOrça</span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Transforme seu negócio com ferramentas profissionais de orçamento
+          </p>
+        </div>
 
-            <h1 className="text-3xl md:text-4xl font-bold text-blue-600">
-              Orçamentos <span className="text-lime-500">ilimitados</span>,
-              <br />
-              com mais templates e personalizações
-            </h1>
+        <div className="grid lg:grid-cols-5 gap-12">
+          {/* Coluna Principal - Plano */}
+          <div className="lg:col-span-3 space-y-8">
+            
+            {/* Timer de Oferta (se ativo) */}
+            {couponActive && (
+              <div className="bg-primary text-white rounded-2xl p-6 shadow-lg">
+                <div className="flex items-center gap-3 mb-6">
+                  <Clock className="h-6 w-6" />
+                  <span className="text-lg font-medium">Oferta por tempo limitado</span>
+                </div>
+                
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="bg-white/20 backdrop-blur rounded-xl p-4 text-center">
+                    <div className="text-2xl font-bold">{dd.toString().padStart(2, '0')}</div>
+                    <div className="text-sm opacity-90 mt-1">Dias</div>
+                  </div>
+                  <div className="bg-white/20 backdrop-blur rounded-xl p-4 text-center">
+                    <div className="text-2xl font-bold">{hh.toString().padStart(2, '0')}</div>
+                    <div className="text-sm opacity-90 mt-1">Horas</div>
+                  </div>
+                  <div className="bg-white/20 backdrop-blur rounded-xl p-4 text-center">
+                    <div className="text-2xl font-bold">{mm.toString().padStart(2, '0')}</div>
+                    <div className="text-sm opacity-90 mt-1">Min</div>
+                  </div>
+                  <div className="bg-white/20 backdrop-blur rounded-xl p-4 text-center">
+                    <div className="text-2xl font-bold">{ss.toString().padStart(2, '0')}</div>
+                    <div className="text-sm opacity-90 mt-1">Seg</div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-            <p className="mt-4 text-gray-700 text-base md:text-lg">
-              A versão <strong>Premium</strong> foi feita para acelerar seu fluxo:
-              mais controles, mais modelos e liberdade para escalar seu trabalho.
-            </p>
-
-            {/* Box de preço */}
-            <div className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-6">
-              <div className="flex items-end gap-3">
-                <span className="text-4xl md:text-5xl font-extrabold text-blue-700">R$ 49,90</span>
-                <span className="text-gray-700 mb-1">/ mês</span>
+            {/* Card do Plano */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-primary to-blue-700 p-8 text-white">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
+                    <Crown className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold">OneOrça Pro</h2>
+                    <p className="text-blue-100">Para profissionais que querem mais</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-end gap-2">
+                  <span className="text-5xl font-bold">R$ 49</span>
+                  <span className="text-xl opacity-90 mb-2">90</span>
+                  <span className="text-blue-100 mb-3">/mês</span>
+                </div>
               </div>
 
-              <ul className="mt-4 space-y-3">
-                <li className="flex items-start gap-3">
-                  <FileText className="h-6 w-6 text-blue-500 mt-0.5" />
-                  <p className="text-sm text-gray-800">
-                    <strong>Orçamentos ilimitados</strong> e personalizações para
-                    acompanhar seu crescimento.
-                  </p>
-                </li>
-                <li className="flex items-start gap-3">
-                  <LayoutDashboard className="h-6 w-6 text-blue-500 mt-0.5" />
-                  <p className="text-sm text-gray-800">
-                    <strong>Dashboard</strong> com indicadores do seu negócio.
-                  </p>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Layers className="h-6 w-6 text-blue-500 mt-0.5" />
-                  <p className="text-sm text-gray-800">
-                    <strong>+ Templates</strong> para cada tipo de serviço.
-                  </p>
-                </li>
-              </ul>
-
-              {/* Cupom */}
-              <div className="mt-5 rounded-xl bg-white border border-blue-200 p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm text-gray-800">
-                    Tem um código promocional?
-                    <button
-                      className="ml-2 text-blue-700 underline underline-offset-2"
-                      onClick={() => setShowCouponHelp((s) => !s)}
-                    >
-                      Como usar
-                    </button>
-                  </div>
-
-                  {couponActive ? (
-                    <div className="flex items-center gap-2 text-blue-700 text-sm">
-                      <Clock className="h-4 w-4" />
-                      <span>
-                        {dd}d {hh}h {mm}m {ss}s para usar:{" "}
-                        <strong>ONEORCA29</strong>
-                      </span>
+              <div className="p-8">
+                <div className="grid md:grid-cols-2 gap-6">
+                  {[
+                    {
+                      icon: <Zap className="h-6 w-6" />,
+                      title: "Orçamentos Ilimitados",
+                      description: "Sem limites para crescer"
+                    },
+                    {
+                      icon: <BarChart3 className="h-6 w-6" />,
+                      title: "Analytics Avançado",
+                      description: "Insights para otimizar vendas"
+                    },
+                    {
+                      icon: <Layers className="h-6 w-6" />,
+                      title: "Templates Exclusivos",
+                      description: "Designs profissionais prontos"
+                    },
+                    {
+                      icon: <MessageCircle className="h-6 w-6" />,
+                      title: "WhatsApp Pro",
+                      description: "Automação inteligente"
+                    },
+                    {
+                      icon: <Users className="h-6 w-6" />,
+                      title: "CRM Integrado",
+                      description: "Gestão completa de clientes"
+                    },
+                    {
+                      icon: <Shield className="h-6 w-6" />,
+                      title: "Backup na Nuvem",
+                      description: "Dados sempre protegidos"
+                    }
+                  ].map((feature, index) => (
+                    <div key={index} className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-primary flex-shrink-0">
+                        {feature.icon}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 mb-1">{feature.title}</h3>
+                        <p className="text-gray-600 text-sm">{feature.description}</p>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="text-sm text-gray-500">
-                      Código <strong>ONEORCA29</strong> encerrado
-                    </div>
-                  )}
+                  ))}
                 </div>
 
-                <AnimatePresence>
-                  {showCouponHelp && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
-                      className="mt-3 text-sm text-gray-700"
-                    >
-                      <p className="mb-2">
-                        No próximo passo (Checkout seguro da Stripe) haverá um campo
-                        “<em>Adicionar código</em>”. Digite <strong>ONEORCA29</strong> para
-                        pagar <strong>R$ 29,90 no 1º mês</strong> (depois R$ 49,90/mês).
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          readOnly
-                          value="ONEORCA29"
-                          className="font-mono text-sm"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => navigator.clipboard.writeText("ONEORCA29")}
-                        >
-                          Copiar
-                        </Button>
-                      </div>
-                    </motion.div>
+                <Button
+                  onClick={handleSubscribe}
+                  disabled={loading}
+                  className="w-full bg-primary hover:bg-blue-700 text-white font-semibold py-4 rounded-2xl mt-8 text-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      Começar agora
+                      <ArrowRight className="h-5 w-5" />
+                    </>
                   )}
+                </Button>
+                
+                <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
+                  <Shield className="h-4 w-4" />
+                  <span>Pagamento seguro • Cancele quando quiser</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar - Preview e Garantias */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Preview do App */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-lg overflow-hidden">
+              <div className="p-6 border-b border-gray-50">
+                <h3 className="font-semibold text-gray-900 text-center">Veja em ação</h3>
+              </div>
+              
+              <div className="relative h-80">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.4 }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={slides[index]}
+                      alt={`Preview ${index + 1}`}
+                      fill
+                      className="object-contain p-6"
+                      priority
+                    />
+                  </motion.div>
                 </AnimatePresence>
               </div>
 
-              <Button
-                className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                size="lg"
-                onClick={handleSubscribe}
-                disabled={loading}
-              >
-                {loading ? "Redirecionando..." : "Assinar Agora"}
-              </Button>
-
-              <p className="mt-3 text-xs text-gray-500 text-center">
-                Pagamento processado pela Stripe. Você pode cancelar quando quiser
-                no Portal do Cliente.
-              </p>
-            </div>
-          </div>
-
-          {/* Coluna direita: carrossel */}
-          <div className="relative flex justify-center items-center">
-            <div className="relative w-full max-w-md h-[400px] overflow-hidden rounded-2xl border border-gray-200">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ duration: 0.5 }}
-                  className="absolute inset-0"
-                >
-                  <Image
-                    src={slides[index]}
-                    alt={`Slide ${index + 1}`}
-                    width={500}
-                    height={400}
-                    className="object-contain"
-                    priority
-                  />
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Micro badge “Oferta ativa” quando cupom ainda válido */}
-            {couponActive && (
-              <div className="absolute -top-3 -right-3 rounded-full bg-lime-500 text-white text-xs font-semibold px-3 py-1 shadow">
-                Oferta ativa
+              <div className="p-6">
+                <div className="flex justify-center gap-2">
+                  {slides.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setIndex(i)}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        i === index ? "bg-primary w-8" : "bg-gray-200 w-2"
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Garantias minimalistas */}
+            <div className="space-y-4">
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center shadow-sm">
+                <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-3" />
+                <h4 className="font-semibold text-gray-900 mb-1">30 dias grátis</h4>
+                <p className="text-gray-600 text-sm">Teste sem compromisso</p>
+              </div>
+              
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center shadow-sm">
+                <Users className="h-12 w-12 text-primary mx-auto mb-3" />
+                <h4 className="font-semibold text-gray-900 mb-1">+10k usuários</h4>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                  ))}
+                  <span className="text-sm text-gray-600 ml-2">4.9/5</span>
+                </div>
+              </div>
+
+              <div className="bg-primary/5 rounded-2xl border border-primary/20 p-6 text-center">
+                <MessageCircle className="h-12 w-12 text-primary mx-auto mb-3" />
+                <h4 className="font-semibold text-gray-900 mb-2">Suporte VIP</h4>
+                <p className="text-gray-600 text-sm mb-4">
+                  Atendimento prioritário via WhatsApp
+                </p>
+                <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white">
+                  Falar conosco
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
-      </main>
-    </>
+      </div>
+    </div>
   );
 }

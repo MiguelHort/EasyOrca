@@ -120,7 +120,7 @@ export default function DashboardPage() {
                     Plano Grátis
                   </div>
                   <Link href="/upgrade">
-                    <Button className="flex items-center bg-background text-primary">
+                    <Button className="flex items-center bg-background text-primary cursor-pointer hover:bg-gray-100">
                       <Crown className="h-4 w-4 mr-2" />
                       Upgrade para PRO
                     </Button>
