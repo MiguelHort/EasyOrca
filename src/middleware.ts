@@ -18,44 +18,22 @@ type TokenPayload = {
   // exp?: number // (opcional) padrão do JWT
 };
 
-function json(
-  body: unknown,
-  init?: ResponseInit
-): NextResponse {
-  // Compat: NextResponse.json pode não estar disponível dependendo da versão/edge
-  return new NextResponse(JSON.stringify(body), {
-    ...init,
-    headers: {
-      "content-type": "application/json",
-      ...(init?.headers || {}),
-    },
-  });
-}
-
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const publicRoute = publicRoutes.find((route) => route.path === path);
   const authToken = request.cookies.get("token")?.value;
-
-  const isIAApi = path.startsWith("/api/ia");
 
   // 1) Sem token + rota pública → segue
   if (!authToken && publicRoute) {
     return NextResponse.next();
   }
 
-  // 2) Sem token + rota privada
+  // 2) Sem token + rota privada → login
   if (!authToken && !publicRoute) {
-    if (isIAApi) {
-      // Para API, retorne 401 em JSON (não redirecione)
-      return json({ message: "Não autenticado." }, { status: 401 });
-    }
+    request.cookies.clear();
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE;
-    const res = NextResponse.redirect(redirectUrl);
-    // limpe o cookie na RESPONSE (request.cookies.* é somente leitura)
-    res.cookies.delete("token");
-    return res;
+    return NextResponse.redirect(redirectUrl);
   }
 
   // 3) Com token e pedindo login/register/home → manda pra /home
@@ -67,10 +45,7 @@ export async function middleware(request: NextRequest) {
 
   // 4) Verifica token
   try {
-    const { payload } = await jwtVerify(
-      authToken as string,
-      new TextEncoder().encode(SECRET_KEY)
-    );
+    const { payload } = await jwtVerify(authToken as string, new TextEncoder().encode(SECRET_KEY));
     const isPremium = Boolean((payload as TokenPayload).isPremium);
 
     // 4.a) /dashboard é somente para premium
@@ -80,15 +55,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
-    // 4.b) /api/ia/* é somente para premium
-    if (isIAApi && !isPremium) {
-      return json(
-        { message: "Recurso disponível apenas para usuários Premium." },
-        { status: 403 }
-      );
-    }
-
-    // 4.c) /upgrade não deve ser acessível por premium
+    // 4.b) /upgrade não deve ser acessível por premium
     if (path.startsWith("/upgrade") && isPremium) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/home";
@@ -97,6 +64,7 @@ export async function middleware(request: NextRequest) {
 
     // Token ok e regras atendidas
     return NextResponse.next();
+
   } catch {
     // Token inválido/expirado → limpa e manda pro login
     request.cookies.delete("token");

@@ -81,7 +81,7 @@ export default function ModernEasyOrcaLanding() {
             <div className="space-y-8">
               <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full text-blue-800 text-sm font-semibold">
                 <Sparkles className="w-4 h-4 mr-2" />
-                Novo: Integração com WhatsApp
+                Novo: Integração com IA
               </div>
 
               <div className="space-y-6">

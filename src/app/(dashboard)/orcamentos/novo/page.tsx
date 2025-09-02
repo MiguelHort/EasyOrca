@@ -39,8 +39,9 @@ import {
   Wallet,
   User2,
   X,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
+import { usePremium } from "@/components/PremiumProvider";
 
 const brl = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -103,6 +104,9 @@ export default function NovoOrcamentoPage() {
   const [valorTotal, setValorTotal] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+
+  // Premium status (front)
+  const { isPremium, resolved } = usePremium();
 
   // Busca clientes
   useEffect(() => {
@@ -583,11 +587,15 @@ export default function NovoOrcamentoPage() {
                       </div>
 
                       <div className="flex items-center gap-2">
+                        {/* Botão IA só habilita se Premium */}
                         <Button
                           type="button"
                           variant="outline"
-                          disabled={iaLoading || enviando}
+                          disabled={
+                            iaLoading || enviando || !resolved || !isPremium
+                          }
                           onClick={async () => {
+                            if (!resolved || !isPremium) return;
                             if (iaLoading) return;
                             setIaErro(null);
                             setIaLoading(true);
@@ -615,15 +623,13 @@ export default function NovoOrcamentoPage() {
                                 body: JSON.stringify(payload),
                                 credentials: "include",
                               });
-                              const data = await res.json();
+                              const data = await res.json().catch(() => ({}));
                               if (!res.ok || !data?.descricao) {
                                 throw new Error(
                                   data?.error || "Falha ao gerar descrição."
                                 );
                               }
                               setDescricao(data.descricao);
-                              // opcional: avançar automaticamente para a etapa de confirmação
-                              // setStepIndex(steps.findIndex(s => s.key === "confirmar"));
                             } catch (e: any) {
                               setIaErro(
                                 e?.message || "Erro ao gerar descrição."
@@ -632,8 +638,22 @@ export default function NovoOrcamentoPage() {
                               setIaLoading(false);
                             }
                           }}
+                          title={
+                            !resolved
+                              ? "Verificando seu status..."
+                              : !isPremium
+                              ? "Recurso exclusivo do Premium"
+                              : "Gerar descrição com IA"
+                          }
                         >
-                          {iaLoading ? "Gerando..." : <span className="flex justify-center items-center gap-1"><Sparkles className="inline text-primary mr-1 h-4 w-4" /> Gerar com IA</span>}
+                          {iaLoading ? (
+                            "Gerando..."
+                          ) : (
+                            <span className="flex justify-center items-center gap-1">
+                              <Sparkles className="inline text-primary mr-1 h-4 w-4" />
+                              Gerar com IA
+                            </span>
+                          )}
                         </Button>
 
                         <Button
@@ -646,6 +666,19 @@ export default function NovoOrcamentoPage() {
                         </Button>
                       </div>
                     </div>
+
+                    {/* CTA para não-assinantes */}
+                    {resolved && !isPremium && (
+                      <div className="text-xs border rounded-md p-3">
+                        <span className="text-muted-foreground">
+                          Este recurso é exclusivo para assinantes{" "}
+                          <strong>OneOrça</strong>.
+                        </span>{" "}
+                        <a href="/upgrade" className="underline">
+                          Fazer parte
+                        </a>
+                      </div>
+                    )}
 
                     {iaErro && (
                       <div className="text-xs text-red-600 border border-red-300 bg-red-50 rounded px-3 py-2">
@@ -700,8 +733,7 @@ export default function NovoOrcamentoPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Cliente</span>
                         <strong>
-                          {clientes.find((c) => c.id === clienteId)?.nome ??
-                            "—"}
+                          {clientes.find((c) => c.id === clienteId)?.nome ?? "—"}
                         </strong>
                       </div>
                       <div className="flex items-start justify-between gap-4">
