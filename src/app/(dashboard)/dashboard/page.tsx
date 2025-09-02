@@ -9,6 +9,7 @@ import {
   FilePlus2,
   Users,
   Wrench,
+  Sparkles,
 } from "lucide-react";
 import {
   Card,
@@ -216,6 +217,8 @@ export default function DashboardPage() {
               description="Média por orçamento"
             />
           </div>
+
+          <DashboardAiSummaryCard data={data} range={range} />
 
           {/* Gráficos */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -527,4 +530,75 @@ function StatusBadge({ status }: { status: string }) {
   };
   const v = map[status] ?? { label: status, variant: "outline" as const };
   return <Badge variant={v.variant as any}>{v.label}</Badge>;
+}
+
+function DashboardAiSummaryCard({
+  data,
+  range,
+}: {
+  data: OverviewResponse | null;
+  range: string;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [txt, setTxt] = useState<string>("");
+  const [err, setErr] = useState<string | null>(null);
+
+  async function load() {
+    if (!data) return;
+    setLoading(true);
+    setErr(null);
+    try {
+      const res = await fetch("/api/ia/dashboard-summary", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          period: data.period,
+          kpis: data.kpis,
+          top: data.top,
+        }),
+      });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j?.error || "Erro ao gerar resumo");
+      setTxt(j.summary || "");
+    } catch (e: any) {
+      setErr(e?.message || "Falha ao gerar resumo");
+      setTxt("");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    // recarrega quando o período muda e já temos dados
+    if (data) load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [range, !!data]);
+
+  return (
+    <Card>
+      <CardHeader className="pb-3 flex items-center justify-between">
+        <div className="flex items-center">
+          <Sparkles className="h-5 w-5 text-primary inline-block mr-2" />
+          <CardTitle>Resumo</CardTitle>
+        </div>
+        <Button size="sm" variant="outline" onClick={load} disabled={loading || !data}>
+          {loading ? "Gerando..." : "Atualizar"}
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <Skeleton className="h-16 w-full rounded-md" />
+        ) : err ? (
+          <p className="text-sm text-red-600">{err}</p>
+        ) : txt ? (
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">{txt}</p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Clique em “Atualizar” para gerar um resumo do período.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
