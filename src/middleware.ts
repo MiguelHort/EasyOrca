@@ -15,25 +15,46 @@ const REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE = "/login";
 type TokenPayload = {
   id: string;
   isPremium?: boolean;
-  // exp?: number // (opcional) padrão do JWT
 };
+
+function json(
+  body: unknown,
+  init?: ResponseInit
+): NextResponse {
+  // Compat: NextResponse.json pode não estar disponível dependendo da versão/edge
+  return new NextResponse(JSON.stringify(body), {
+    ...init,
+    headers: {
+      "content-type": "application/json",
+      ...(init?.headers || {}),
+    },
+  });
+}
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const publicRoute = publicRoutes.find((route) => route.path === path);
   const authToken = request.cookies.get("token")?.value;
 
+  const isIAApi = path.startsWith("/api/ia");
+
   // 1) Sem token + rota pública → segue
   if (!authToken && publicRoute) {
     return NextResponse.next();
   }
 
-  // 2) Sem token + rota privada → login
+  // 2) Sem token + rota privada
   if (!authToken && !publicRoute) {
-    request.cookies.clear();
+    if (isIAApi) {
+      // Para API, retorne 401 em JSON (não redirecione)
+      return json({ message: "Não autenticado." }, { status: 401 });
+    }
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE;
-    return NextResponse.redirect(redirectUrl);
+    const res = NextResponse.redirect(redirectUrl);
+    // limpe o cookie na RESPONSE (request.cookies.* é somente leitura)
+    res.cookies.delete("token");
+    return res;
   }
 
   // 3) Com token e pedindo login/register/home → manda pra /home
@@ -59,8 +80,8 @@ export async function middleware(request: NextRequest) {
     }
 
     // 4.b) /api/ia/* é somente para premium
-    if (path.startsWith("/api/ia") && !isPremium) {
-      return NextResponse.json(
+    if (isIAApi && !isPremium) {
+      return json(
         { message: "Recurso disponível apenas para usuários Premium." },
         { status: 403 }
       );
@@ -76,17 +97,26 @@ export async function middleware(request: NextRequest) {
     // Token ok e regras atendidas
     return NextResponse.next();
   } catch {
-    // Token inválido/expirado → limpa e manda pro login
-    request.cookies.delete("token");
+    // Token inválido/expirado
+    if (path.startsWith("/api/ia")) {
+      const res = json({ message: "Token inválido ou expirado." }, { status: 401 });
+      res.cookies.delete("token");
+      return res;
+    }
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE;
-    return NextResponse.redirect(redirectUrl);
+    const res = NextResponse.redirect(redirectUrl);
+    res.cookies.delete("token");
+    return res;
   }
 }
 
+// 🔑 IMPORTANTE: inclua explicitamente o caminho da API de IA no matcher
 export const config = {
   matcher: [
-    // Todas as rotas, exceto estáticos e afins
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|webp|svg|gif|ico|pdf|css|js|TTF|woff|woff2|otf|ttf)).*)",
+    // todas as páginas (exceto estáticos), como antes:
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|webp|svg|gif|ico|pdf|css|js|TTF|woff|woff2|otf|ttf)).*)",
+    // 👇 adicione explicitamente sua API de IA
+    "/api/ia/:path*",
   ],
 };
