@@ -15,6 +15,7 @@ const REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE = "/login";
 type TokenPayload = {
   id: string;
   isPremium?: boolean;
+  // exp?: number // (opcional) padrão do JWT
 };
 
 function json(
@@ -97,26 +98,17 @@ export async function middleware(request: NextRequest) {
     // Token ok e regras atendidas
     return NextResponse.next();
   } catch {
-    // Token inválido/expirado
-    if (path.startsWith("/api/ia")) {
-      const res = json({ message: "Token inválido ou expirado." }, { status: 401 });
-      res.cookies.delete("token");
-      return res;
-    }
+    // Token inválido/expirado → limpa e manda pro login
+    request.cookies.delete("token");
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE;
-    const res = NextResponse.redirect(redirectUrl);
-    res.cookies.delete("token");
-    return res;
+    return NextResponse.redirect(redirectUrl);
   }
 }
 
-// 🔑 IMPORTANTE: inclua explicitamente o caminho da API de IA no matcher
 export const config = {
   matcher: [
-    // todas as páginas (exceto estáticos), como antes:
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|webp|svg|gif|ico|pdf|css|js|TTF|woff|woff2|otf|ttf)).*)",
-    // 👇 adicione explicitamente sua API de IA
-    "/api/ia/:path*",
+    // Todas as rotas, exceto estáticos e afins
+    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|webp|svg|gif|ico|pdf|css|js|TTF|woff|woff2|otf|ttf)).*)",
   ],
 };
