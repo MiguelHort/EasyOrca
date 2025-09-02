@@ -45,7 +45,10 @@ export async function middleware(request: NextRequest) {
 
   // 4) Verifica token
   try {
-    const { payload } = await jwtVerify(authToken as string, new TextEncoder().encode(SECRET_KEY));
+    const { payload } = await jwtVerify(
+      authToken as string,
+      new TextEncoder().encode(SECRET_KEY)
+    );
     const isPremium = Boolean((payload as TokenPayload).isPremium);
 
     // 4.a) /dashboard é somente para premium
@@ -55,13 +58,15 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
+    // 4.b) /api/ia/* é somente para premium
     if (path.startsWith("/api/ia") && !isPremium) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = "/upgrade";
-      return NextResponse.redirect(redirectUrl);
+      return NextResponse.json(
+        { message: "Recurso disponível apenas para usuários Premium." },
+        { status: 403 }
+      );
     }
 
-    // 4.b) /upgrade não deve ser acessível por premium
+    // 4.c) /upgrade não deve ser acessível por premium
     if (path.startsWith("/upgrade") && isPremium) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/home";
@@ -70,7 +75,6 @@ export async function middleware(request: NextRequest) {
 
     // Token ok e regras atendidas
     return NextResponse.next();
-
   } catch {
     // Token inválido/expirado → limpa e manda pro login
     request.cookies.delete("token");
