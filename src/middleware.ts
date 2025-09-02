@@ -55,6 +55,12 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
+    if (path.startsWith("/api/ia") && !isPremium) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/upgrade";
+      return NextResponse.redirect(redirectUrl);
+    }
+
     // 4.b) /upgrade não deve ser acessível por premium
     if (path.startsWith("/upgrade") && isPremium) {
       const redirectUrl = request.nextUrl.clone();
