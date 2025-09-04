@@ -29,10 +29,14 @@ import {
   Menu,
 } from "lucide-react";
 import HeaderLandingPage from "./HeaderLandingPage";
+import { useTheme } from "next-themes";
 
 export default function ModernEasyOrcaLanding() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+
+  setTheme("light");
 
   const testimonials = [
     {
@@ -252,7 +256,7 @@ export default function ModernEasyOrcaLanding() {
 
           <div className="grid md:grid-cols-3 gap-8 relative">
             {/* Connecting lines */}
-            <div className="hidden md:block absolute top-1/3 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400"></div>
+            <div className="hidden md:block absolute top-1/3 left-1/4 right-1/4 h-1 animated-arrow"></div>
 
             {[
               {
@@ -323,7 +327,7 @@ export default function ModernEasyOrcaLanding() {
                   Para Começar
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  EasyOrça Free
+                  EasyOrça
                 </h3>
                 <div className="flex items-baseline justify-center">
                   <span className="text-5xl font-bold text-gray-900">R$ 0</span>
@@ -367,7 +371,7 @@ export default function ModernEasyOrcaLanding() {
                   Para Crescer
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  OneOrça Pro
+                  OneOrça
                 </h3>
                 <div className="flex items-baseline justify-center">
                   <span className="text-5xl font-bold bg-primary bg-clip-text text-transparent">
@@ -496,12 +500,11 @@ export default function ModernEasyOrcaLanding() {
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-            Pronto para transformar
-            <span className="block text-blue-300">seu negócio?</span>
+            Agora que chegou até aqui,
+            <span className="block text-blue-300 mt-2">você precisa tomar uma decisão.</span>
           </h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Junte-se aos milhares de profissionais que já revolucionaram seus
-            orçamentos e aumentaram suas vendas
+          <p className="text-gray-300 mb-12 max-w-2xl mx-auto">
+            Sabendo que o EasyOrça é totalmente gratuito e vai ser seu braço direito na hora de fechar negócios, você ainda vai preferir ficar fazendo orçamentos no Word, ou vai investir na sua agilidade no dia-a-dia?
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
@@ -548,16 +551,10 @@ export default function ModernEasyOrcaLanding() {
               </p>
               <div className="flex space-x-4">
                 <a
-                  href="#"
+                  href="https://www.tiktok.com/@easyorca"
                   className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
                 >
-                  <span className="text-white text-sm">f</span>
-                </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
-                >
-                  <span className="text-white text-sm">in</span>
+                  <span className="text-white text-sm">Tk</span>
                 </a>
                 <a
                   href="https://www.instagram.com/easyorca"

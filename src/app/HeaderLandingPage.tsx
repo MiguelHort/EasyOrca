@@ -82,14 +82,12 @@ export default function HeaderLandingPage() {
             <ThemePButton2 />
             <Link href="/login" className="flex items-center">
               <User
-                className={`w-6 h-6 ${atTop ? "text-white" : "text-gray-600"}`}
+                className="w-6 h-6 text-gray-600"
               />
             </Link>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`p-2 transition-colors ${
-                atTop ? "text-white" : "text-gray-600"
-              }`}
+              className="p-2 transition-colors text-gray-600"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (

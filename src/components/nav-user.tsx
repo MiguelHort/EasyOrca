@@ -90,7 +90,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage
-                  src={imgUrl || `/api/user/profileImage?file=${user.avatar}`}
+                  src={user.avatar === "default.jpg" ? "default.jpg" : imgUrl || `/api/user/profileImage?nome=${user.avatar}`}
                   alt={user.name}
                 />
               </Avatar>
@@ -113,7 +113,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
-                    src={imgUrl || `/api/user/profileImage?file=${user.avatar}`}
+                    src={user.avatar === "default.jpg" ? "default.jpg" : imgUrl || `/api/user/profileImage?nome=${user.avatar}`}
                     alt={user.name}
                   />
                 </Avatar>
