@@ -70,7 +70,7 @@ export default function HeaderLandingPage() {
               </button>
             </Link>
 
-            <Link href="/register">
+            <Link href="/login">
               <Button className="font-semibold px-6 py-2 rounded-full transition-all duration-200 transform hover:scale-105 bg-primary text-white hover:shadow-lg">
                 Começar Grátis
               </Button>
@@ -143,7 +143,7 @@ export default function HeaderLandingPage() {
                   </button>
                 </Link>
 
-                <Link href="/register" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
                   <Button
                     className={`w-full font-semibold py-3 rounded-full transition-all ${
                       atTop
