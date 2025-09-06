@@ -105,7 +105,7 @@ export default function CardService({ servico, onUpdate, onDelete }: CardService
     <>
       <Card className="hover:bg-muted transition flex">
         <CardContent
-          className="flex justify-between items-center"
+          className="flex justify-between items-center pr-1"
           onClick={() => setOpen(true)}
         >
           <div className="flex items-start gap-4">

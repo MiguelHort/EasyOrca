@@ -35,7 +35,7 @@ type DashboardStats = {
   orcamentosCriados: StatItem;
   clientesCadastrados: StatItem;
   taxaConversao: StatItem; // value em %
-  valorTotal: StatItem;    // value em BRL
+  valorTotal: StatItem; // value em BRL
 };
 
 export default function DashboardPage() {
@@ -102,15 +102,16 @@ export default function DashboardPage() {
         <div>
           <header className={`flex justify-between mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r ${headerFromColor} to-blue-400 dark:to-blue-800 text-white`}>
             <div>
-              <h1 className="text-xl sm:text-3xl font-bold tracking-tight">
-                Olá{user?.name ? `, ${user.name}` : ""}! 👋
+              <h1 className="text-lg sm:text-3xl font-bold tracking-tight">
+                Olá{getFirstAndLastName(user?.name) ? `, ${getFirstAndLastName(user?.name)}` : ""}! 👋
               </h1>
-              <p className="text-sm mt-1">
+              <p className="text-xs md:text-sm mt-1">
                 Mais um dia para fechar bons negócios com confiança!
               </p>
               {isError && (
                 <p className="mt-2 text-sm text-red-100/90">
-                  {errorMessage ?? "Não foi possível obter informações do usuário."}
+                  {errorMessage ??
+                    "Não foi possível obter informações do usuário."}
                 </p>
               )}
             </div>
@@ -119,21 +120,23 @@ export default function DashboardPage() {
               {isBootLoading ? (
                 <Skeleton className="h-7 w-28 rounded-2xl" />
               ) : isPremium ? (
-                <div className="flex items-center text-xs font-semibold border border-white/40 rounded-2xl py-1 px-3 bg-white/10">
+                <div className="flex items-center min-w-25 text-xs font-semibold border border-white/40 rounded-2xl py-1 px-3 bg-white/10">
                   <Crown className="h-4 w-4 mr-2" />
                   The One
                 </div>
               ) : (
                 <>
-                  <div className="text-xs font-semibold border border-white/40 rounded-2xl py-1 px-3 bg-blue-400/60">
-                    Plano Grátis
+                  <div className="flex flex-col md:flex-row items-center gap-2">
+                    <div className="text-xs font-semibold border border-white/40 rounded-2xl py-1 px-2 bg-blue-400/60">
+                      Plano Grátis
+                    </div>
+                    <Link href="/upgrade">
+                      <Button className="flex items-center bg-background text-primary text-[10px] md:text-xs hover:bg-background/90">
+                        <Crown className="h-2 w-2 mr-0.5" />
+                        Seja One
+                      </Button>
+                    </Link>
                   </div>
-                  <Link href="/upgrade">
-                    <Button className="flex items-center bg-background text-primary cursor-pointer hover:bg-gray-100">
-                      <Crown className="h-4 w-4 mr-2" />
-                      Upgrade para PRO
-                    </Button>
-                  </Link>
                 </>
               )}
             </div>
@@ -145,19 +148,28 @@ export default function DashboardPage() {
             <h2 className="text-xl font-semibold mb-4">Acesso Rápido</h2>
             <div className="flex flex-wrap gap-4">
               <Link href="/orcamentos">
-                <Button variant={"outline"} className="border-primary border-2 dark:border-primary cursor-pointer">
+                <Button
+                  variant={"outline"}
+                  className="border-primary border-2 dark:border-primary cursor-pointer"
+                >
                   <FilePlus2 className="h-5 w-5" />
                   Orçamentos
                 </Button>
               </Link>
               <Link href="/clientes">
-                <Button variant={"outline"} className="border-primary border-2 dark:border-primary cursor-pointer">
+                <Button
+                  variant={"outline"}
+                  className="border-primary border-2 dark:border-primary cursor-pointer"
+                >
                   <Users className="h-5 w-5" />
                   Clientes
                 </Button>
               </Link>
               <Link href="/servicos">
-                <Button variant={"outline"} className="border-primary border-2 dark:border-primary cursor-pointer">
+                <Button
+                  variant={"outline"}
+                  className="border-primary border-2 dark:border-primary cursor-pointer"
+                >
                   <Wrench className="h-5 w-5" />
                   Serviços
                 </Button>
@@ -170,7 +182,9 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-4 gap-6">
               <InfoCard
-                icon={<FilePlus2 className="text-primary h-4 w-4 sm:h-6 sm:w-6" />}
+                icon={
+                  <FilePlus2 className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
+                }
                 title="Orçamentos criados"
                 value={stats?.orcamentosCriados.value ?? null}
                 description={stats?.orcamentosCriados.label ?? "—"}
@@ -188,7 +202,9 @@ export default function DashboardPage() {
                 loading={statsLoading}
               />
               <InfoCard
-                icon={<TrendingUp className="text-primary h-4 w-4 sm:h-6 sm:w-6" />}
+                icon={
+                  <TrendingUp className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
+                }
                 title="Taxa de Conversão"
                 value={stats?.taxaConversao.value ?? null}
                 description={stats?.taxaConversao.label ?? "—"}
@@ -197,7 +213,9 @@ export default function DashboardPage() {
                 loading={statsLoading}
               />
               <InfoCard
-                icon={<DollarSign className="text-primary h-4 w-4 sm:h-6 sm:w-6" />}
+                icon={
+                  <DollarSign className="text-primary h-4 w-4 sm:h-6 sm:w-6" />
+                }
                 title="Valor Total"
                 value={stats?.valorTotal.value ?? null}
                 description={stats?.valorTotal.label ?? "—"}
@@ -216,7 +234,9 @@ export default function DashboardPage() {
                   <FilePlus2 className="h-6 w-6 text-primary" />
                   Seus Orçamentos
                 </CardTitle>
-                <CardDescription>Veja e gerencie todos os orçamentos criados.</CardDescription>
+                <CardDescription>
+                  Veja e gerencie todos os orçamentos criados.
+                </CardDescription>
               </CardHeader>
               <CardContent className="text-muted-foreground text-sm flex flex-col gap-4">
                 <ScrollArea className="pr-2">
@@ -229,7 +249,9 @@ export default function DashboardPage() {
                   ) : erroMsg ? (
                     <p className="text-sm text-red-600">{erroMsg}</p>
                   ) : orcamentos.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">Nenhum orçamento encontrado.</p>
+                    <p className="text-muted-foreground text-sm">
+                      Nenhum orçamento encontrado.
+                    </p>
                   ) : (
                     <div className="grid gap-4">
                       {orcamentos.slice(-3).reverse().map((o) => (
@@ -260,17 +282,22 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent className="p-0">
                   <ul className="space-y-2 text-gray-500 text-sm mb-6">
-                    {["Orçamentos ilimitados", "Templates premium", "Integração com Pix", "Relatórios avançados"].map(
-                      (item, i) => (
-                        <li key={i} className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-blue-600" />
-                          {item}
-                        </li>
-                      )
-                    )}
+                    {[
+                      "Orçamentos ilimitados",
+                      "Templates premium",
+                      "Integração com Pix",
+                      "Relatórios avançados",
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-600" />
+                        {item}
+                      </li>
+                    ))}
                   </ul>
                   <Link href="/upgrade">
-                    <Button className="w-full bg-primary text-white text-sm shadow-md">Fazer parte</Button>
+                    <Button className="w-full bg-primary text-white text-sm shadow-md">
+                      Fazer parte
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
@@ -357,19 +384,31 @@ function InfoCard({
             <p className="text-xs sm:text-sm font-medium text-muted-foreground text-start w-full">
               {title}
             </p>
-            <div className="flex sm:hidden bg-primary/10 p-3 rounded-lg">{icon}</div>
+            <div className="flex sm:hidden bg-primary/10 p-3 rounded-lg">
+              {icon}
+            </div>
           </div>
 
           <div className="flex items-center justify-between w-full mt-2">
             <div>
               <p className="text-xl sm:text-xl font-bold text-foreground">
-                {loading ? <Skeleton className="h-6 w-24 rounded-md" /> : formattedValue}
+                {loading ? (
+                  <Skeleton className="h-6 w-24 rounded-md" />
+                ) : (
+                  formattedValue
+                )}
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                {loading ? <Skeleton className="h-4 w-28 rounded-md mt-1" /> : description}
+                {loading ? (
+                  <Skeleton className="h-4 w-28 rounded-md mt-1" />
+                ) : (
+                  description
+                )}
               </p>
             </div>
-            <div className="hidden sm:flex bg-primary/10 p-3 rounded-lg">{icon}</div>
+            <div className="hidden sm:flex bg-primary/10 p-3 rounded-lg">
+              {icon}
+            </div>
           </div>
         </div>
         <div className="mt-4">
@@ -377,8 +416,14 @@ function InfoCard({
             <Skeleton className="h-4 w-32 rounded-md" />
           ) : (
             <p className="text-muted-foreground text-xs sm:text-sm">
-              <span className={`${isNeg ? "text-red-600" : "text-green-600"} font-semibold`}>
-                {valueType === "percent" ? `${delta >= 0 ? "+" : ""}${delta} pp` : `${delta >= 0 ? "+" : ""}${delta}%`}
+              <span
+                className={`${
+                  isNeg ? "text-red-600" : "text-green-600"
+                } font-semibold`}
+              >
+                {valueType === "percent"
+                  ? `${delta >= 0 ? "+" : ""}${delta} pp`
+                  : `${delta >= 0 ? "+" : ""}${delta}%`}
               </span>{" "}
               vs mês anterior
             </p>
