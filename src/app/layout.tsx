@@ -33,6 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <SWRProvider>
             <PremiumProvider initialIsPremium={initialIsPremium}>
               {children}
+              <script defer src="https://cloud.umami.is/script.js" data-website-id="ea1ffab3-db5a-4917-8e5c-62a30756a93a"></script>
             </PremiumProvider>
           </SWRProvider>
         </ThemeProvider>

@@ -501,19 +501,21 @@ export default function ModernEasyOrcaLanding() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
             Agora que chegou até aqui,
-            <span className="block text-blue-300 mt-2">você precisa tomar uma decisão.</span>
+            <span className="block text-blue-300 mt-2">
+              você precisa tomar uma decisão.
+            </span>
           </h2>
           <p className="text-gray-300 mb-12 max-w-2xl mx-auto">
-            Sabendo que o EasyOrça é totalmente gratuito e vai ser seu braço direito na hora de fechar negócios, você ainda vai preferir ficar fazendo orçamentos no Word, ou vai investir na sua agilidade no dia-a-dia?
+            Sabendo que o EasyOrça é totalmente gratuito e vai ser seu braço
+            direito na hora de fechar negócios, você ainda vai preferir ficar
+            fazendo orçamentos no Word, ou vai investir na sua agilidade no
+            dia-a-dia?
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <button className="group bg-white text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl flex items-center justify-center">
+            <button className="button-pulse group bg-white text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl flex items-center justify-center">
               Começar Grátis Agora
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white hover:text-gray-900 transition-all">
-              Falar com Especialista
             </button>
           </div>
 
@@ -567,56 +569,42 @@ export default function ModernEasyOrcaLanding() {
               </div>
             </div>
 
-            <div>
-              <h4 className="font-semibold text-white mb-6">Produto</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Recursos
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Preços
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Demonstração
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    API
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-white mb-6">Suporte</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Central de Ajuda
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Contato
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Termos de Uso
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Privacidade
-                  </a>
-                </li>
-              </ul>
+            <div className="grid grid-cols-1 gap-10">
+              {[
+                {
+                  title: "Institucional",
+                  links: [
+                    { label: "Termos de Uso", href: "/termos" },
+                    {
+                      label: "Política de Privacidade",
+                      href: "/privacidade",
+                    },
+                    {
+                      label: "Pagamentos & Reembolsos",
+                      href: "/pagamentos",
+                    },
+                    { label: "Contato / Suporte", href: "/suporte" },
+                  ],
+                },
+              ].map((section) => (
+                <div key={section.title}>
+                  <h4 className="font-semibold text-white mb-6">
+                    {section.title}
+                  </h4>
+                  <ul className="space-y-3 text-gray-400">
+                    {section.links.map((link) => (
+                      <li key={link.label}>
+                        <a
+                          href={link.href}
+                          className="hover:text-white transition-colors"
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
 

@@ -68,7 +68,11 @@ const RegisterSchema = z.object({
   ),
   phone: z.preprocess(
     emptyToUndefined,
-    z.string().trim().regex(/^\+?\d{10,15}$/, "Telefone inválido.").optional()
+    z
+      .string()
+      .trim()
+      .regex(/^\+?\d{10,15}$/, "Telefone inválido.")
+      .optional()
   ),
   companyName: z.preprocess(
     emptyToUndefined,
@@ -112,7 +116,7 @@ export default function AuthPage() {
         setTimeout(() => {
           localStorage.setItem("showPremiumDialog", "true");
           router.push("/home");
-        }, 1200);
+        }, 6000);
       } else {
         loginForm.setError("root", { message: "Credenciais inválidas." });
       }
@@ -144,22 +148,273 @@ export default function AuthPage() {
   // Loading screen pós-login
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-primary/5">
-        <div className="text-center space-y-8 p-8">
-          <div className="relative w-20 h-20 mx-auto">
-            <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-            <NotepadTextDashed className="relative h-20 w-20 stroke-2 text-primary mx-auto" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-gray-100">
+        <div className="text-center space-y-10">
+          {/* Logo moderno com glassmorphism */}
+          <div className="relative w-24 h-24 mx-auto">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-primary/10 rounded-3xl blur-2xl animate-pulse" />
+            <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-white/50">
+              <NotepadTextDashed className="h-14 w-14 stroke-[1.5] text-primary drop-shadow-sm" />
+            </div>
           </div>
-          <div className="space-y-3">
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+
+          {/* Nome com tipografia moderna */}
+          <div className="space-y-2">
+            <h1 className="text-4xl font-black tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               EasyOrça
             </h1>
-            <div className="flex justify-center">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <p className="text-sm text-gray-500 font-medium">
+              Criando seu orçamento
+            </p>
+          </div>
+
+          {/* Interface moderna de orçamento sendo construída */}
+          <div className="relative">
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl p-8 w-[400px] mx-auto shadow-2xl border border-white/50">
+              <div className="space-y-6">
+                {/* Header com info do cliente */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-green-400 rounded-full opacity-0 animate-fade-in" />
+                      <span
+                        className="text-sm font-semibold text-gray-700 opacity-0 animate-fade-in"
+                        style={{ animationDelay: "0.2s" }}
+                      >
+                        Cliente conectado
+                      </span>
+                    </div>
+                    <div
+                      className="h-3 bg-gradient-to-r from-primary/60 to-transparent rounded-full animate-expand-width w-0"
+                      style={{ animationDelay: "0.5s" }}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className="w-2 h-2 bg-blue-400 rounded-full opacity-0 animate-fade-in"
+                        style={{ animationDelay: "1s" }}
+                      />
+                      <span
+                        className="text-sm font-semibold text-gray-700 opacity-0 animate-fade-in"
+                        style={{ animationDelay: "1.2s" }}
+                      >
+                        Dados carregados
+                      </span>
+                    </div>
+                    <div
+                      className="h-3 bg-gradient-to-r from-blue-400/60 to-transparent rounded-full animate-expand-width w-0"
+                      style={{ animationDelay: "1.5s" }}
+                    />
+                  </div>
+                </div>
+
+                {/* Seção de produtos com cards modernos */}
+                <div className="space-y-4">
+                  <h3
+                    className="text-lg font-bold text-gray-800 opacity-0 animate-fade-in"
+                    style={{ animationDelay: "2s" }}
+                  >
+                    Produtos & Serviços
+                  </h3>
+
+                  <div className="space-y-3">
+                    {/* Card 1 */}
+                    <div
+                      className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/5 to-transparent rounded-xl border border-primary/10 opacity-0 animate-slide-up"
+                      style={{ animationDelay: "2.5s" }}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
+                          <div className="w-3 h-3 bg-primary rounded" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="h-3 bg-gray-300 rounded animate-shimmer w-24" />
+                          <div className="h-2 bg-gray-200 rounded animate-shimmer w-16" />
+                        </div>
+                      </div>
+                      <div className="h-4 bg-gradient-to-r from-primary to-primary/70 rounded animate-shimmer w-16" />
+                    </div>
+
+                    {/* Card 2 */}
+                    <div
+                      className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-500/5 to-transparent rounded-xl border border-blue-500/10 opacity-0 animate-slide-up"
+                      style={{ animationDelay: "3s" }}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                          <div className="w-3 h-3 bg-blue-500 rounded" />
+                        </div>
+                        <div className="space-y-1">
+                          <div
+                            className="h-3 bg-gray-300 rounded animate-shimmer w-28"
+                            style={{ animationDelay: "0.3s" }}
+                          />
+                          <div
+                            className="h-2 bg-gray-200 rounded animate-shimmer w-20"
+                            style={{ animationDelay: "0.6s" }}
+                          />
+                        </div>
+                      </div>
+                      <div
+                        className="h-4 bg-gradient-to-r from-blue-500 to-blue-400 rounded animate-shimmer w-20"
+                        style={{ animationDelay: "0.5s" }}
+                      />
+                    </div>
+
+                    {/* Card 3 */}
+                    <div
+                      className="flex items-center justify-between p-4 bg-gradient-to-r from-green-500/5 to-transparent rounded-xl border border-green-500/10 opacity-0 animate-slide-up"
+                      style={{ animationDelay: "3.5s" }}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                          <div className="w-3 h-3 bg-green-500 rounded" />
+                        </div>
+                        <div className="space-y-1">
+                          <div
+                            className="h-3 bg-gray-300 rounded animate-shimmer w-32"
+                            style={{ animationDelay: "0.2s" }}
+                          />
+                          <div
+                            className="h-2 bg-gray-200 rounded animate-shimmer w-18"
+                            style={{ animationDelay: "0.4s" }}
+                          />
+                        </div>
+                      </div>
+                      <div
+                        className="h-4 bg-gradient-to-r from-green-500 to-green-400 rounded animate-shimmer w-18"
+                        style={{ animationDelay: "0.3s" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Total com destaque especial */}
+                <div className="pt-4 border-t border-gray-200">
+                  <div
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl border border-primary/20 opacity-0 animate-slide-up"
+                    style={{ animationDelay: "4s" }}
+                  >
+                    <span className="text-lg font-bold text-gray-800">
+                      Total do Orçamento
+                    </span>
+                    <div className="h-6 bg-gradient-to-r from-primary to-primary/80 rounded-lg animate-pulse-glow w-32" />
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="text-muted-foreground">Carregando dashboard…</p>
+
+            {/* Cursor animado */}
+            <div className="absolute top-8 right-8 w-6 h-6 bg-primary rounded-full shadow-lg animate-float opacity-75">
+              <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-50" />
+            </div>
+          </div>
+
+          {/* Status moderno */}
+          <div className="flex items-center justify-center space-x-6 text-sm">
+            <div className="flex items-center space-x-2 opacity-0 animate-fade-in">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-gray-600 font-medium">Conectando</span>
+            </div>
+            <div className="w-px h-4 bg-gray-300" />
+            <div
+              className="flex items-center space-x-2 opacity-0 animate-fade-in"
+              style={{ animationDelay: "2s" }}
+            >
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+              <span className="text-gray-600 font-medium">Processando</span>
+            </div>
+            <div className="w-px h-4 bg-gray-300" />
+            <div
+              className="flex items-center space-x-2 opacity-0 animate-fade-in"
+              style={{ animationDelay: "4s" }}
+            >
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+              <span className="text-gray-600 font-medium">Finalizando</span>
+            </div>
           </div>
         </div>
+
+        <style jsx>{`
+          @keyframes fade-in {
+            0% {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          @keyframes expand-width {
+            0% {
+              width: 0;
+            }
+            100% {
+              width: 80px;
+            }
+          }
+          @keyframes slide-up {
+            0% {
+              opacity: 0;
+              transform: translateY(20px) scale(0.95);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
+          }
+          @keyframes shimmer {
+            0%,
+            100% {
+              opacity: 0.3;
+            }
+            50% {
+              opacity: 0.8;
+            }
+          }
+          @keyframes pulse-glow {
+            0%,
+            100% {
+              box-shadow: 0 0 0 rgba(var(--primary), 0);
+            }
+            50% {
+              box-shadow: 0 0 20px rgba(var(--primary), 0.3);
+            }
+          }
+          @keyframes float {
+            0%,
+            100% {
+              transform: translateY(0) rotate(0deg);
+            }
+            33% {
+              transform: translateY(-10px) rotate(120deg);
+            }
+            66% {
+              transform: translateY(5px) rotate(240deg);
+            }
+          }
+          .animate-fade-in {
+            animation: fade-in 0.8s ease-out forwards;
+          }
+          .animate-expand-width {
+            animation: expand-width 1s ease-out forwards;
+          }
+          .animate-slide-up {
+            animation: slide-up 0.6s ease-out forwards;
+          }
+          .animate-shimmer {
+            animation: shimmer 1.5s ease-in-out infinite;
+          }
+          .animate-pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+          }
+          .animate-float {
+            animation: float 3s ease-in-out infinite;
+          }
+        `}</style>
       </div>
     );
   }
@@ -171,7 +426,9 @@ export default function AuthPage() {
         <div className="overflow-hidden rounded-2xl bg-background shadow-xl ring-1 ring-black/5">
           <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[620px]">
             {/* Painel lateral (desktop) */}
-            <div className={`hidden lg:flex flex-col items-center justify-center gap-6 px-12 py-14 text-white relative bg-gradient-to-br from-primary to-primary/80`}>
+            <div
+              className={`hidden lg:flex flex-col items-center justify-center gap-6 px-12 py-14 text-white relative bg-gradient-to-br from-primary to-primary/80`}
+            >
               {/* Decor */}
               <div className="pointer-events-none absolute -top-12 -right-12 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
               <div className="pointer-events-none absolute -bottom-16 -left-16 h-36 w-36 rounded-full bg-white/10 blur-xl" />
@@ -192,8 +449,8 @@ export default function AuthPage() {
                         Bem-vindo de volta!
                       </h2>
                       <p className="text-white/90 text-center leading-relaxed max-w-sm">
-                        Para se manter conectado conosco, faça login com suas informações
-                        pessoais.
+                        Para se manter conectado conosco, faça login com suas
+                        informações pessoais.
                       </p>
                       <Button
                         variant="secondary"
@@ -256,7 +513,9 @@ export default function AuthPage() {
                     type="button"
                     onClick={() => setIsLogin(true)}
                     className={`flex-1 h-10 rounded-full text-sm font-medium transition-all ${
-                      isLogin ? "bg-primary text-white shadow" : "text-foreground/70"
+                      isLogin
+                        ? "bg-primary text-white shadow"
+                        : "text-foreground/70"
                     }`}
                     aria-pressed={isLogin}
                     aria-label="Selecionar Entrar"
@@ -267,7 +526,9 @@ export default function AuthPage() {
                     type="button"
                     onClick={() => setIsLogin(false)}
                     className={`flex-1 h-10 rounded-full text-sm font-medium transition-all ${
-                      !isLogin ? "bg-primary text-white shadow" : "text-foreground/70"
+                      !isLogin
+                        ? "bg-primary text-white shadow"
+                        : "text-foreground/70"
                     }`}
                     aria-pressed={!isLogin}
                     aria-label="Selecionar Cadastrar"
@@ -278,7 +539,10 @@ export default function AuthPage() {
               </div>
 
               {/* Wrapper com animação de deslizamento (login/register) */}
-              <div className="relative mx-auto w-full max-w-sm overflow-hidden" aria-live="polite">
+              <div
+                className="relative mx-auto w-full max-w-sm overflow-hidden"
+                aria-live="polite"
+              >
                 <AnimatePresence mode="wait" initial={false}>
                   {isLogin ? (
                     <motion.div
@@ -286,7 +550,11 @@ export default function AuthPage() {
                       initial={{ x: 40, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       exit={{ x: -40, opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 260, damping: 26 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 26,
+                      }}
                       className="w-full"
                       aria-hidden={!isLogin}
                     >
@@ -296,30 +564,6 @@ export default function AuthPage() {
                           <h2 className="text-3xl font-semibold text-foreground mb-2">
                             Entrar na Conta
                           </h2>
-                          {/* Social */}
-                          <div className="flex justify-center gap-3 mt-4">
-                            <button
-                              type="button"
-                              title="Entrar com Facebook"
-                              className="w-10 h-10 border border-border rounded-full grid place-items-center hover:bg-muted transition-colors"
-                            >
-                              <Facebook className="w-5 h-5" />
-                            </button>
-                            <button
-                              type="button"
-                              title="Entrar com Google"
-                              className="w-10 h-10 border border-border rounded-full grid place-items-center hover:bg-muted transition-colors"
-                            >
-                              <Chrome className="w-5 h-5" />
-                            </button>
-                            <button
-                              type="button"
-                              title="Entrar com LinkedIn"
-                              className="w-10 h-10 border border-border rounded-full grid place-items-center hover:bg-muted transition-colors"
-                            >
-                              <Linkedin className="w-5 h-5" />
-                            </button>
-                          </div>
                           <p className="text-muted-foreground text-sm mt-3">
                             ou use seu email para login
                           </p>
@@ -360,7 +604,9 @@ export default function AuthPage() {
                               type="button"
                               onClick={() => setShowPassword((s) => !s)}
                               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                              aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                              aria-label={
+                                showPassword ? "Ocultar senha" : "Mostrar senha"
+                              }
                             >
                               {showPassword ? (
                                 <EyeOff className="w-5 h-5" />
@@ -370,7 +616,10 @@ export default function AuthPage() {
                             </button>
                             {loginForm.formState.errors.passwordHash && (
                               <p className="text-destructive text-xs mt-1">
-                                {loginForm.formState.errors.passwordHash.message}
+                                {
+                                  loginForm.formState.errors.passwordHash
+                                    .message
+                                }
                               </p>
                             )}
                           </div>
@@ -406,7 +655,11 @@ export default function AuthPage() {
                       initial={{ x: 40, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       exit={{ x: -40, opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 260, damping: 26 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 26,
+                      }}
                       className="w-full"
                       aria-hidden={isLogin}
                     >
@@ -416,30 +669,6 @@ export default function AuthPage() {
                           <h2 className="text-3xl font-semibold text-foreground mb-2">
                             Criar Conta
                           </h2>
-                          {/* Social */}
-                          <div className="flex justify-center gap-3 mt-4">
-                            <button
-                              type="button"
-                              title="Cadastrar com Facebook"
-                              className="w-10 h-10 border border-border rounded-full grid place-items-center hover:bg-muted transition-colors"
-                            >
-                              <Facebook className="w-5 h-5" />
-                            </button>
-                            <button
-                              type="button"
-                              title="Cadastrar com Google"
-                              className="w-10 h-10 border border-border rounded-full grid place-items-center hover:bg-muted transition-colors"
-                            >
-                              <Chrome className="w-5 h-5" />
-                            </button>
-                            <button
-                              type="button"
-                              title="Cadastrar com LinkedIn"
-                              className="w-10 h-10 border border-border rounded-full grid place-items-center hover:bg-muted transition-colors"
-                            >
-                              <Linkedin className="w-5 h-5" />
-                            </button>
-                          </div>
                           <p className="text-muted-foreground text-sm mt-3">
                             ou use seu email para cadastro
                           </p>
@@ -497,7 +726,9 @@ export default function AuthPage() {
                               type="button"
                               onClick={() => setShowPassword((s) => !s)}
                               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                              aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                              aria-label={
+                                showPassword ? "Ocultar senha" : "Mostrar senha"
+                              }
                             >
                               {showPassword ? (
                                 <EyeOff className="w-5 h-5" />
@@ -526,7 +757,10 @@ export default function AuthPage() {
                               />
                               {registerForm.formState.errors.companyName && (
                                 <p className="text-destructive text-xs mt-1">
-                                  {registerForm.formState.errors.companyName.message}
+                                  {
+                                    registerForm.formState.errors.companyName
+                                      .message
+                                  }
                                 </p>
                               )}
                             </div>
