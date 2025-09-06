@@ -56,6 +56,14 @@ export default function DashboardPage() {
     fetchAll();
   }, []);
 
+  function getFirstAndLastName(fullName?: string | null): string {
+    if (!fullName) return "";
+    const parts = fullName.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return "";
+    if (parts.length === 1) return parts[0];
+    return `${parts[0]} ${parts[parts.length - 1]}`;
+  }
+
   async function fetchAll() {
     setErroMsg(null);
     setStatsError(null);
@@ -64,7 +72,10 @@ export default function DashboardPage() {
     try {
       const [orcRes, statsRes] = await Promise.all([
         fetch("/api/orcamentos", { credentials: "include", cache: "no-store" }),
-        fetch("/api/dashboard/stats", { credentials: "include", cache: "no-store" }),
+        fetch("/api/dashboard/stats", {
+          credentials: "include",
+          cache: "no-store",
+        }),
       ]);
 
       if (!orcRes.ok) throw new Error(`Erro orçamentos ${orcRes.status}`);
@@ -91,7 +102,9 @@ export default function DashboardPage() {
 
   // Classe do gradiente só decide depois que premium estiver resolvido
   const headerFromColor = resolved
-    ? (isPremium ? "from-[#172658]" : "from-primary")
+    ? isPremium
+      ? "from-[#172658]"
+      : "from-primary"
     : "from-primary/60";
 
   return (
@@ -100,10 +113,16 @@ export default function DashboardPage() {
 
       <main className="min-h-screen bg-background">
         <div>
-          <header className={`flex justify-between mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r ${headerFromColor} to-blue-400 dark:to-blue-800 text-white`}>
+          <header
+            className={`flex justify-between mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r ${headerFromColor} to-blue-400 dark:to-blue-800 text-white`}
+          >
             <div>
               <h1 className="text-lg sm:text-3xl font-bold tracking-tight">
-                Olá{getFirstAndLastName(user?.name) ? `, ${getFirstAndLastName(user?.name)}` : ""}! 👋
+                Olá
+                {getFirstAndLastName(user?.name)
+                  ? `, ${getFirstAndLastName(user?.name)}`
+                  : ""}
+                ! 👋
               </h1>
               <p className="text-xs md:text-sm mt-1">
                 Mais um dia para fechar bons negócios com confiança!
@@ -254,9 +273,12 @@ export default function DashboardPage() {
                     </p>
                   ) : (
                     <div className="grid gap-4">
-                      {orcamentos.slice(-3).reverse().map((o) => (
-                        <CardOrcamento key={o.id} orcamento={o} />
-                      ))}
+                      {orcamentos
+                        .slice(-3)
+                        .reverse()
+                        .map((o) => (
+                          <CardOrcamento key={o.id} orcamento={o} />
+                        ))}
                     </div>
                   )}
                 </ScrollArea>
