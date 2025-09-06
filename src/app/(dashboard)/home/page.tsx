@@ -1,7 +1,7 @@
-// app/home/page.tsx (ou o caminho correspondente ao seu DashboardPage)
+// app/home/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ClipboardList,
   FilePlus2,
@@ -49,6 +49,7 @@ export default function DashboardPage() {
 
   const { user, isLoading: userLoading, isError, errorMessage } = useUser();
   const { isPremium, resolved } = usePremium();
+
   const premiumLoading = !resolved;
 
   useEffect(() => {
@@ -62,8 +63,8 @@ export default function DashboardPage() {
     setStatsLoading(true);
     try {
       const [orcRes, statsRes] = await Promise.all([
-        fetch("/api/orcamentos", { credentials: "include" }),
-        fetch("/api/dashboard/stats", { credentials: "include" }),
+        fetch("/api/orcamentos", { credentials: "include", cache: "no-store" }),
+        fetch("/api/dashboard/stats", { credentials: "include", cache: "no-store" }),
       ]);
 
       if (!orcRes.ok) throw new Error(`Erro orçamentos ${orcRes.status}`);
@@ -85,12 +86,13 @@ export default function DashboardPage() {
     }
   }
 
-  function getFirstAndLastName(fullName?: string): string | undefined {
-    if (!fullName) return undefined;
-    const parts = fullName.trim().split(/\s+/);
-    if (parts.length === 1) return parts[0];
-    return `${parts[0]} ${parts[parts.length - 1]}`;
-  }
+  // Enquanto usuário/premium não resolveram, evite montar UI "Free" por engano
+  const isBootLoading = userLoading || premiumLoading;
+
+  // Classe do gradiente só decide depois que premium estiver resolvido
+  const headerFromColor = resolved
+    ? (isPremium ? "from-[#172658]" : "from-primary")
+    : "from-primary/60";
 
   return (
     <>
@@ -98,11 +100,7 @@ export default function DashboardPage() {
 
       <main className="min-h-screen bg-background">
         <div>
-          <header
-            className={`flex justify-between mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r ${
-              isPremium ? "from-[#172658]" : "from-primary"
-            } to-blue-400 dark:to-blue-800 text-white`}
-          >
+          <header className={`flex justify-between mx-auto px-4 sm:px-6 lg:px-20 py-8 bg-gradient-to-r ${headerFromColor} to-blue-400 dark:to-blue-800 text-white`}>
             <div>
               <h1 className="text-lg sm:text-3xl font-bold tracking-tight">
                 Olá{getFirstAndLastName(user?.name) ? `, ${getFirstAndLastName(user?.name)}` : ""}! 👋
@@ -119,7 +117,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex items-center gap-4">
-              {premiumLoading ? (
+              {isBootLoading ? (
                 <Skeleton className="h-7 w-28 rounded-2xl" />
               ) : isPremium ? (
                 <div className="flex items-center min-w-25 text-xs font-semibold border border-white/40 rounded-2xl py-1 px-3 bg-white/10">
@@ -210,7 +208,7 @@ export default function DashboardPage() {
                 title="Taxa de Conversão"
                 value={stats?.taxaConversao.value ?? null}
                 description={stats?.taxaConversao.label ?? "—"}
-                percentage={stats?.taxaConversao.changePct ?? null} // delta em pp
+                percentage={stats?.taxaConversao.changePct ?? null}
                 valueType="percent"
                 loading={statsLoading}
               />
@@ -256,12 +254,9 @@ export default function DashboardPage() {
                     </p>
                   ) : (
                     <div className="grid gap-4">
-                      {orcamentos
-                        .slice(-3)
-                        .reverse()
-                        .map((o) => (
-                          <CardOrcamento key={o.id} orcamento={o} />
-                        ))}
+                      {orcamentos.slice(-3).reverse().map((o) => (
+                        <CardOrcamento key={o.id} orcamento={o} />
+                      ))}
                     </div>
                   )}
                 </ScrollArea>
@@ -274,7 +269,7 @@ export default function DashboardPage() {
             </Card>
 
             {/* Upsell vs PRO */}
-            {!premiumLoading && !isPremium ? (
+            {!isBootLoading && !isPremium ? (
               <Card className="flex-1 rounded-xl border border-blue-600 bg-blue-50/50 dark:bg-blue-950 p-6 shadow-sm">
                 <CardHeader className="p-0 mb-4">
                   <CardTitle className="flex items-center gap-2 text-blue-600 text-xl font-semibold">
@@ -308,7 +303,7 @@ export default function DashboardPage() {
               </Card>
             ) : null}
 
-            {!premiumLoading && isPremium ? (
+            {!isBootLoading && isPremium ? (
               <Card className="flex-1 rounded-xl border border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950 p-6 shadow-sm">
                 <CardHeader className="p-0 mb-4">
                   <CardTitle className="flex items-center gap-2 text-emerald-700 text-xl font-semibold">
@@ -339,7 +334,8 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {!premiumLoading && !isPremium && <ShowPremiumDialog />}
+      {/* Só mostre o modal quando tiver certeza de que NÃO é premium */}
+      {!isBootLoading && !isPremium && <ShowPremiumDialog />}
     </>
   );
 }

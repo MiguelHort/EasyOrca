@@ -7,6 +7,10 @@ const SECRET_KEY = process.env.JWT_SECRET;
 const publicRoutes = [
   { path: "/login", whenAuthenticated: "redirect" },
   { path: "/register", whenAuthenticated: "redirect" },
+  { path: "/pagamentos", whenAuthenticated: "redirect" },
+  { path: "/suporte", whenAuthenticated: "redirect" },
+  { path: "/termos", whenAuthenticated: "redirect" },
+  { path: "/privacidade", whenAuthenticated: "redirect" },
   { path: "/", whenAuthenticated: "redirect" },
 ] as const;
 

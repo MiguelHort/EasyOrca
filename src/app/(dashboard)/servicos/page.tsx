@@ -24,6 +24,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { usePremium } from "@/components/PremiumProvider";
 
 import CardService from "./CardService";
+import SuggestionsPanel from "./SuggestionsPainel";
 
 const formSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
@@ -106,7 +107,7 @@ export default function ServicosPage() {
     <>
       <SiteHeader title="Serviços" />
 
-      <main className="p-6 max-w-4xl">
+      <main className="p-6 max-w-6xl lg:max-w-7xl">
         <section className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">Serviços</h1>
           <p className="text-muted-foreground mt-1">
@@ -177,48 +178,61 @@ export default function ServicosPage() {
           </Dialog>
         </div>
 
-        <Card>
-          <CardHeader className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Lista de Serviços</h2>
-            <p className="text-muted-foreground text-sm">
-              {servicos.length} serviços cadastrados (restam{" "}
-              {MAX_SERVIÇOS - servicos.length})
-            </p>
-          </CardHeader>
-
-          <CardContent className="p-4">
-            <ScrollArea className="h-[50vh] pr-2">
-              {loading ? (
-                <div className="grid gap-4">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-20 rounded-xl" />
-                  ))}
-                </div>
-              ) : servicos.length === 0 ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Lista de Serviços</h2>
                 <p className="text-muted-foreground text-sm">
-                  Nenhum serviço cadastrado.
+                  {servicos.length} serviços cadastrados (restam{" "}
+                  {MAX_SERVIÇOS - servicos.length})
                 </p>
-              ) : (
-                <div className="grid gap-4">
-                  {servicos.map((servico) => (
-                    <CardService
-                      key={servico.id}
-                      servico={servico}
-                      onUpdate={(s) =>
-                        setServicos((old) =>
-                          old.map((it) => (it.id === s.id ? s : it))
-                        )
-                      }
-                      onDelete={(id) =>
-                        setServicos((old) => old.filter((it) => it.id !== id))
-                      }
-                    />
-                  ))}
-                </div>
-              )}
-            </ScrollArea>
-          </CardContent>
-        </Card>
+              </CardHeader>
+
+              <CardContent className="p-4">
+                <ScrollArea className="h-[50vh] pr-2">
+                  {loading ? (
+                    <div className="grid gap-4">
+                      {[...Array(3)].map((_, i) => (
+                        <Skeleton key={i} className="h-20 rounded-xl" />
+                      ))}
+                    </div>
+                  ) : servicos.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">
+                      Nenhum serviço cadastrado.
+                    </p>
+                  ) : (
+                    <div className="grid gap-4">
+                      {servicos.map((servico) => (
+                        <CardService
+                          key={servico.id}
+                          servico={servico}
+                          onUpdate={(s) =>
+                            setServicos((old) =>
+                              old.map((it) => (it.id === s.id ? s : it))
+                            )
+                          }
+                          onDelete={(id) =>
+                            setServicos((old) =>
+                              old.filter((it) => it.id !== id)
+                            )
+                          }
+                        />
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* === PAINEL DE SUGESTÕES === */}
+          <SuggestionsPanel
+            onAdded={async () => {
+              await fetchServicos(); // recarrega a lista esquerda
+            }}
+          />
+        </div>
       </main>
     </>
   );

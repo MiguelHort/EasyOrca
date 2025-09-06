@@ -30,9 +30,23 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, ChevronLeft, ChevronRight, ListChecks, Pencil, Wallet, User2, X } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  ListChecks,
+  Pencil,
+  Wallet,
+  User2,
+  X,
+  Sparkles,
+} from "lucide-react";
+import { usePremium } from "@/components/PremiumProvider";
 
-const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+const brl = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
 
 interface Cliente {
   id: string;
@@ -60,10 +74,13 @@ const steps = [
   { key: "confirmar", label: "Confirmar", icon: Wallet },
 ] as const;
 
-type StepKey = typeof steps[number]["key"];
+type StepKey = (typeof steps)[number]["key"];
 
 export default function NovoOrcamentoPage() {
   const router = useRouter();
+
+  const [iaLoading, setIaLoading] = useState(false);
+  const [iaErro, setIaErro] = useState<string | null>(null);
 
   // --- Controle do wizard ---
   const [stepIndex, setStepIndex] = useState(0);
@@ -87,6 +104,9 @@ export default function NovoOrcamentoPage() {
   const [valorTotal, setValorTotal] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+
+  // Premium status (front)
+  const { isPremium, resolved } = usePremium();
 
   // Busca clientes
   useEffect(() => {
@@ -117,11 +137,13 @@ export default function NovoOrcamentoPage() {
         const res = await fetch("/api/servicos", { credentials: "include" });
         if (!res.ok) throw new Error("Erro ao buscar serviços");
         const data = (await res.json()) as Partial<Servico>[];
-        const normalizados: Servico[] = (Array.isArray(data) ? data : []).map((s) => ({
-          id: String(s.id),
-          nome: String(s.nome),
-          preco: Number(s.preco ?? 0),
-        }));
+        const normalizados: Servico[] = (Array.isArray(data) ? data : []).map(
+          (s) => ({
+            id: String(s.id),
+            nome: String(s.nome),
+            preco: Number(s.preco ?? 0),
+          })
+        );
         setServicos(normalizados);
       } catch (err) {
         console.error(err);
@@ -154,7 +176,9 @@ export default function NovoOrcamentoPage() {
 
   // Helpers serviços
   function toggleServico(id: string) {
-    setServicoIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setServicoIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
   }
   function removerServico(id: string) {
     setServicoIds((prev) => prev.filter((x) => x !== id));
@@ -170,7 +194,8 @@ export default function NovoOrcamentoPage() {
   // Guardas de avanço
   const canNext = useMemo(() => {
     if (currentStep === "cliente") return !!clienteId;
-    if (currentStep === "servicos") return servicoIds.length > 0 || subtotalServicos >= 0; // pode avançar sem, se for digitar valor depois
+    if (currentStep === "servicos")
+      return servicoIds.length > 0 || subtotalServicos >= 0; // pode avançar sem, se for digitar valor depois
     if (currentStep === "descricao") return true; // opcional
     if (currentStep === "confirmar") return true;
     return false;
@@ -243,15 +268,20 @@ export default function NovoOrcamentoPage() {
           <CardHeader>
             <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-4">
               <div>
-                <CardTitle className="text-xl sm:text-2xl">Criar orçamento em etapas</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">
+                  Criar orçamento em etapas
+                </CardTitle>
                 <CardDescription>
-                  Siga o fluxo: escolha o cliente, selecione os serviços, descreva o escopo e confirme o valor.
+                  Siga o fluxo: escolha o cliente, selecione os serviços,
+                  descreva o escopo e confirme o valor.
                 </CardDescription>
               </div>
               <div className="w-full sm:w-auto min-w-[140px] text-right">
                 <span className="text-xs text-muted-foreground">Progresso</span>
                 <Progress value={progress} className="mt-1 h-2" />
-                <div className="mt-1 text-xs text-muted-foreground">{Math.round(progress)}%</div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {Math.round(progress)}%
+                </div>
               </div>
             </div>
 
@@ -270,10 +300,18 @@ export default function NovoOrcamentoPage() {
                       onClick={() => setStepIndex(idx)}
                       className={cn(
                         "shrink-0 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs",
-                        active ? "border-primary bg-primary/10 text-primary" : done ? "border-green-600/40 bg-green-600/10 text-green-700 dark:text-green-300" : "border-muted text-muted-foreground"
+                        active
+                          ? "border-primary bg-primary/10 text-primary"
+                          : done
+                          ? "border-green-600/40 bg-green-600/10 text-green-700 dark:text-green-300"
+                          : "border-muted text-muted-foreground"
                       )}
                     >
-                      {done ? <CheckCircle2 className="size-4" /> : <Icon className="size-4" />}
+                      {done ? (
+                        <CheckCircle2 className="size-4" />
+                      ) : (
+                        <Icon className="size-4" />
+                      )}
                       <span className="whitespace-nowrap">{s.label}</span>
                     </button>
                   );
@@ -292,20 +330,41 @@ export default function NovoOrcamentoPage() {
                     key={s.key}
                     className={cn(
                       "rounded-xl border p-3 flex items-center gap-3",
-                      active ? "border-primary bg-primary/5" : done ? "border-green-600/40 bg-green-600/5" : "border-muted"
+                      active
+                        ? "border-primary bg-primary/5"
+                        : done
+                        ? "border-green-600/40 bg-green-600/5"
+                        : "border-muted"
                     )}
                   >
                     <div
                       className={cn(
                         "size-8 rounded-full grid place-items-center",
-                        active ? "bg-primary text-primary-foreground" : done ? "bg-green-600 text-white" : "bg-muted text-muted-foreground"
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : done
+                          ? "bg-green-600 text-white"
+                          : "bg-muted text-muted-foreground"
                       )}
                     >
-                      {done ? <CheckCircle2 className="size-5" /> : <Icon className="size-5" />}
+                      {done ? (
+                        <CheckCircle2 className="size-5" />
+                      ) : (
+                        <Icon className="size-5" />
+                      )}
                     </div>
                     <div className="flex flex-col leading-tight">
-                      <span className="text-xs text-muted-foreground">Etapa {idx + 1}</span>
-                      <span className={cn("text-sm font-medium", active && "text-primary")}>{s.label}</span>
+                      <span className="text-xs text-muted-foreground">
+                        Etapa {idx + 1}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-sm font-medium",
+                          active && "text-primary"
+                        )}
+                      >
+                        {s.label}
+                      </span>
                     </div>
                   </li>
                 );
@@ -353,7 +412,9 @@ export default function NovoOrcamentoPage() {
                           ))
                         )}
                       </select>
-                      <p className="text-xs text-muted-foreground">Selecione o cliente destinatário deste orçamento.</p>
+                      <p className="text-xs text-muted-foreground">
+                        Selecione o cliente destinatário deste orçamento.
+                      </p>
                     </div>
                   </section>
                 )}
@@ -369,7 +430,11 @@ export default function NovoOrcamentoPage() {
                             const s = servicos.find((x) => x.id === id);
                             if (!s) return null;
                             return (
-                              <Badge key={id} variant="secondary" className="flex items-center gap-1">
+                              <Badge
+                                key={id}
+                                variant="secondary"
+                                className="flex items-center gap-1"
+                              >
                                 {s.nome} · {brl.format(s.preco || 0)}
                                 <button
                                   type="button"
@@ -385,18 +450,33 @@ export default function NovoOrcamentoPage() {
                           })}
                         </div>
                       ) : (
-                        <p className="text-sm text-muted-foreground">Nenhum serviço selecionado.</p>
+                        <p className="text-sm text-muted-foreground">
+                          Nenhum serviço selecionado.
+                        </p>
                       )}
 
                       <div className="text-xs text-muted-foreground">
-                        Subtotal: <span className="font-medium">{brl.format(subtotalServicos)}</span>
+                        Subtotal:{" "}
+                        <span className="font-medium">
+                          {brl.format(subtotalServicos)}
+                        </span>
                       </div>
                     </div>
 
-                    <Dialog open={servicosDialogOpen} onOpenChange={setServicosDialogOpen}>
+                    <Dialog
+                      open={servicosDialogOpen}
+                      onOpenChange={setServicosDialogOpen}
+                    >
                       <DialogTrigger asChild>
-                        <Button type="button" variant="outline" disabled={servicosLoading || enviando} className="w-full">
-                          {servicosLoading ? "Carregando serviços..." : "Selecionar serviços"}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={servicosLoading || enviando}
+                          className="w-full"
+                        >
+                          {servicosLoading
+                            ? "Carregando serviços..."
+                            : "Selecionar serviços"}
                         </Button>
                       </DialogTrigger>
 
@@ -417,10 +497,20 @@ export default function NovoOrcamentoPage() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <Button type="button" variant="ghost" onClick={selecionarTodosVisiveis} disabled={servicosFiltrados.length === 0}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={selecionarTodosVisiveis}
+                            disabled={servicosFiltrados.length === 0}
+                          >
                             Selecionar todos visíveis
                           </Button>
-                          <Button type="button" variant="ghost" onClick={limparSelecao} disabled={servicoIds.length === 0}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={limparSelecao}
+                            disabled={servicoIds.length === 0}
+                          >
                             Limpar seleção
                           </Button>
                         </div>
@@ -435,16 +525,28 @@ export default function NovoOrcamentoPage() {
                               </div>
                             ) : servicosFiltrados.length === 0 ? (
                               <p className="text-sm text-muted-foreground px-1">
-                                {buscaServicos ? "Nenhum serviço corresponde ao filtro." : "Nenhum serviço cadastrado."}
+                                {buscaServicos
+                                  ? "Nenhum serviço corresponde ao filtro."
+                                  : "Nenhum serviço cadastrado."}
                               </p>
                             ) : (
                               servicosFiltrados.map((s) => (
-                                <label key={s.id} className="flex items-center justify-between gap-3 rounded-md px-2 py-2 hover:bg-muted cursor-pointer">
+                                <label
+                                  key={s.id}
+                                  className="flex items-center justify-between gap-3 rounded-md px-2 py-2 hover:bg-muted cursor-pointer"
+                                >
                                   <div className="flex items-center gap-3">
-                                    <Checkbox checked={servicoIds.includes(s.id)} onCheckedChange={() => toggleServico(s.id)} />
+                                    <Checkbox
+                                      checked={servicoIds.includes(s.id)}
+                                      onCheckedChange={() =>
+                                        toggleServico(s.id)
+                                      }
+                                    />
                                     <span className="text-sm">{s.nome}</span>
                                   </div>
-                                  <span className="text-xs text-muted-foreground">{brl.format(s.preco || 0)}</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {brl.format(s.preco || 0)}
+                                  </span>
                                 </label>
                               ))
                             )}
@@ -452,11 +554,19 @@ export default function NovoOrcamentoPage() {
                         </ScrollArea>
 
                         <DialogFooter className="mt-2">
-                          <Button type="button" variant="ghost" onClick={() => setServicosDialogOpen(false)}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setServicosDialogOpen(false)}
+                          >
                             Fechar
                           </Button>
-                          <Button type="button" onClick={() => setServicosDialogOpen(false)}>
-                            Anexar {servicoIds.length} serviço{servicoIds.length === 1 ? "" : "s"}
+                          <Button
+                            type="button"
+                            onClick={() => setServicosDialogOpen(false)}
+                          >
+                            Anexar {servicoIds.length} serviço
+                            {servicoIds.length === 1 ? "" : "s"}
                           </Button>
                         </DialogFooter>
                       </DialogContent>
@@ -467,18 +577,127 @@ export default function NovoOrcamentoPage() {
                 {/* === STEP 3: DESCRIÇÃO === */}
                 {currentStep === "descricao" && (
                   <section className="grid gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="descricao">Descrição do escopo</Label>
-                      <Textarea
-                        id="descricao"
-                        value={descricao}
-                        onChange={(e) => setDescricao(e.target.value)}
-                        placeholder="Ex: Instalação elétrica, troca de tomada..."
-                        rows={6}
-                        disabled={enviando}
-                      />
-                      <p className="text-xs text-muted-foreground">Detalhe o que está incluso. Você poderá revisar na próxima etapa.</p>
+                    <div className="flex items-center justify-between">
+                      <div className="grid gap-1">
+                        <Label htmlFor="descricao">Descrição do escopo</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Gere automaticamente com IA com base nos serviços
+                          selecionados ou edite manualmente.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {/* Botão IA só habilita se Premium */}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={
+                            iaLoading || enviando || !resolved || !isPremium
+                          }
+                          onClick={async () => {
+                            if (!resolved || !isPremium) return;
+                            if (iaLoading) return;
+                            setIaErro(null);
+                            setIaLoading(true);
+                            try {
+                              const payload = {
+                                clienteNome: clientes.find(
+                                  (c) => c.id === clienteId
+                                )?.nome,
+                                servicos: servicoIds
+                                  .map((id) =>
+                                    servicos.find((s) => s.id === id)
+                                  )
+                                  .filter(Boolean)
+                                  .map((s) => ({
+                                    id: s!.id,
+                                    nome: s!.nome,
+                                    preco: s!.preco,
+                                  })),
+                                valorTotal:
+                                  parseMoeda(valorTotal) ?? subtotalServicos,
+                              };
+                              const res = await fetch("/api/ia/descricao", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify(payload),
+                                credentials: "include",
+                              });
+                              const data = await res.json().catch(() => ({}));
+                              if (!res.ok || !data?.descricao) {
+                                throw new Error(
+                                  data?.error || "Falha ao gerar descrição."
+                                );
+                              }
+                              setDescricao(data.descricao);
+                            } catch (e: any) {
+                              setIaErro(
+                                e?.message || "Erro ao gerar descrição."
+                              );
+                            } finally {
+                              setIaLoading(false);
+                            }
+                          }}
+                          title={
+                            !resolved
+                              ? "Verificando seu status..."
+                              : !isPremium
+                              ? "Recurso exclusivo do Premium"
+                              : "Gerar descrição com IA"
+                          }
+                        >
+                          {iaLoading ? (
+                            "Gerando..."
+                          ) : (
+                            <span className="flex justify-center items-center gap-1">
+                              <Sparkles className="inline text-primary mr-1 h-4 w-4" />
+                              Gerar com IA
+                            </span>
+                          )}
+                        </Button>
+
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          disabled={iaLoading || enviando || !descricao}
+                          onClick={() => setDescricao("")}
+                        >
+                          Limpar
+                        </Button>
+                      </div>
                     </div>
+
+                    {/* CTA para não-assinantes */}
+                    {resolved && !isPremium && (
+                      <div className="text-xs border rounded-md p-3">
+                        <span className="text-muted-foreground">
+                          Este recurso é exclusivo para assinantes{" "}
+                          <strong>OneOrça</strong>.
+                        </span>{" "}
+                        <a href="/upgrade" className="underline">
+                          Fazer parte
+                        </a>
+                      </div>
+                    )}
+
+                    {iaErro && (
+                      <div className="text-xs text-red-600 border border-red-300 bg-red-50 rounded px-3 py-2">
+                        {iaErro}
+                      </div>
+                    )}
+
+                    <Textarea
+                      id="descricao"
+                      value={descricao}
+                      onChange={(e) => setDescricao(e.target.value)}
+                      placeholder="Ex: Instalação elétrica, troca de tomada..."
+                      rows={8}
+                      disabled={enviando || iaLoading}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Dica: revise o texto antes de confirmar. Se não gostar,
+                      clique em <strong>Limpar</strong> e gere novamente.
+                    </p>
                   </section>
                 )}
 
@@ -492,12 +711,19 @@ export default function NovoOrcamentoPage() {
                         inputMode="decimal"
                         value={valorTotal}
                         onChange={(e) => setValorTotal(e.target.value)}
-                        placeholder={brl.format(subtotalServicos).replace("\u00A0", " ")}
+                        placeholder={brl
+                          .format(subtotalServicos)
+                          .replace("\u00A0", " ")}
                         disabled={enviando}
                       />
                       <p className="text-xs text-muted-foreground">
-                        Sugestão: <span className="font-medium">{brl.format(sugestaoTotal || 0)}</span>
-                        {valorTotal.trim() ? " (usando o valor digitado)" : " (usando o subtotal dos serviços)"}
+                        Sugestão:{" "}
+                        <span className="font-medium">
+                          {brl.format(sugestaoTotal || 0)}
+                        </span>
+                        {valorTotal.trim()
+                          ? " (usando o valor digitado)"
+                          : " (usando o subtotal dos serviços)"}
                       </p>
                     </div>
 
@@ -506,7 +732,9 @@ export default function NovoOrcamentoPage() {
                     <div className="grid gap-3 text-sm">
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Cliente</span>
-                        <strong>{clientes.find((c) => c.id === clienteId)?.nome ?? "—"}</strong>
+                        <strong>
+                          {clientes.find((c) => c.id === clienteId)?.nome ?? "—"}
+                        </strong>
                       </div>
                       <div className="flex items-start justify-between gap-4">
                         <span className="text-muted-foreground">Serviços</span>
@@ -519,9 +747,14 @@ export default function NovoOrcamentoPage() {
                                 const s = servicos.find((x) => x.id === id);
                                 if (!s) return null;
                                 return (
-                                  <li key={id} className="flex items-center justify-between gap-4">
+                                  <li
+                                    key={id}
+                                    className="flex items-center justify-between gap-4"
+                                  >
                                     <span>{s.nome}</span>
-                                    <span className="text-muted-foreground">{brl.format(s.preco || 0)}</span>
+                                    <span className="text-muted-foreground">
+                                      {brl.format(s.preco || 0)}
+                                    </span>
                                   </li>
                                 );
                               })}
@@ -531,16 +764,22 @@ export default function NovoOrcamentoPage() {
                       </div>
                       <div>
                         <span className="text-muted-foreground">Descrição</span>
-                        <p className="mt-1 whitespace-pre-wrap">{descricao || "—"}</p>
+                        <p className="mt-1 whitespace-pre-wrap">
+                          {descricao || "—"}
+                        </p>
                       </div>
                       <Separator />
                       <div className="flex items-center justify-between text-base">
-                        <span className="text-muted-foreground">Subtotal serviços</span>
+                        <span className="text-muted-foreground">
+                          Subtotal serviços
+                        </span>
                         <span>{brl.format(subtotalServicos)}</span>
                       </div>
                       <div className="flex items-center justify-between text-base">
                         <span className="font-medium">Total</span>
-                        <span className="font-semibold">{brl.format(sugestaoTotal || 0)}</span>
+                        <span className="font-semibold">
+                          {brl.format(sugestaoTotal || 0)}
+                        </span>
                       </div>
                     </div>
                   </section>
@@ -550,16 +789,32 @@ export default function NovoOrcamentoPage() {
                 <div className="md:mt-2 flex items-center justify-between">
                   <div className="sticky bottom-2 left-0 right-0">
                     <div className="md:p-0 p-2 mx-[-0.5rem] sm:mx-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-0 border md:border-0 rounded-xl md:rounded-none shadow md:shadow-none flex items-center justify-between gap-2">
-                      <Button type="button" variant="ghost" onClick={back} disabled={stepIndex === 0 || enviando} className="w-auto">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={back}
+                        disabled={stepIndex === 0 || enviando}
+                        className="w-auto"
+                      >
                         <ChevronLeft className="mr-1 size-4" /> Voltar
                       </Button>
 
                       {stepIndex < steps.length - 1 ? (
-                        <Button type="button" onClick={next} disabled={!canNext || enviando} className="w-auto">
+                        <Button
+                          type="button"
+                          onClick={next}
+                          disabled={!canNext || enviando}
+                          className="w-auto"
+                        >
                           Avançar <ChevronRight className="ml-1 size-4" />
                         </Button>
                       ) : (
-                        <Button type="button" onClick={handleSubmit} disabled={enviando} className="w-auto">
+                        <Button
+                          type="button"
+                          onClick={handleSubmit}
+                          disabled={enviando}
+                          className="w-auto"
+                        >
                           {enviando ? "Gerando..." : "Gerar Orçamento"}
                         </Button>
                       )}

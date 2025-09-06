@@ -21,21 +21,6 @@ export function PremiumProvider({
   const [isPremium, setIsPremium] = useState<boolean>(initialIsPremium);
   const [resolved, setResolved] = useState<boolean>(true);
 
-  // (Opcional) Revalida em background; não precisa alterar UI se nada mudar
-  useEffect(() => {
-    (async () => {
-      try {
-        const r = await fetch("/api/me", { credentials: "include" });
-        if (r.ok) {
-          const { isPremium: fresh } = await r.json();
-          setIsPremium(Boolean(fresh));
-        }
-      } finally {
-        setResolved(true);
-      }
-    })();
-  }, []);
-
   const value = useMemo(() => ({ isPremium, resolved, setIsPremium }), [isPremium, resolved]);
   return <PremiumCtx.Provider value={value}>{children}</PremiumCtx.Provider>;
 }
