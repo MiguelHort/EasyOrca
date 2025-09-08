@@ -290,65 +290,104 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Upsell vs PRO */}
+            {/* Card de Upgrade para PRO - Minimalista Sofisticado */}
             {!isBootLoading && !isPremium ? (
-              <Card className="flex-1 rounded-xl border border-blue-600 bg-blue-50/50 dark:bg-blue-950 p-6 shadow-sm">
-                <CardHeader className="p-0 mb-4">
-                  <CardTitle className="flex items-center gap-2 text-blue-600 text-xl font-semibold">
-                    <Crown className="h-5 w-5 text-blue-600" />
-                    Upgrade para PRO
-                  </CardTitle>
-                  <CardDescription className="text-sm text-gray-500">
+              <Card className="group relative flex-1 rounded-2xl border-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50 dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-purple-950/30 p-7 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
+                {/* Efeito sutil de brilho */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+
+                <CardHeader className="p-0 mb-6 relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <CardTitle className="flex items-center gap-3 text-gray-900 dark:text-white text-xl font-semibold">
+                      <Crown className="h-5 w-5 text-blue-600" />
+                      Upgrade para PRO
+                    </CardTitle>
+                    <div className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-md">
+                      Popular
+                    </div>
+                  </div>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">
                     Desbloqueie recursos avançados para seu negócio
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-0">
-                  <ul className="space-y-2 text-gray-500 text-sm mb-6">
+
+                <CardContent className="p-0 relative z-10">
+                  <div className="space-y-3 mb-7">
                     {[
-                      "Orçamentos ilimitados",
-                      "Templates premium",
-                      "Integração com Pix",
-                      "Relatórios avançados",
+                      { text: "Orçamentos ilimitados" },
+                      { text: "Templates premium exclusivos" },
+                      { text: "Integração instantânea com Pix" },
+                      { text: "Relatórios e analytics avançados" },
                     ].map((item, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-blue-600" />
-                        {item}
-                      </li>
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/40 dark:hover:bg-gray-800/40 transition-colors duration-200"
+                      >
+                        <div className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0"></div>
+                        <span className="text-gray-700 dark:text-gray-300 text-sm">
+                          {item.text}
+                        </span>
+                      </div>
                     ))}
-                  </ul>
-                  <Link href="/upgrade">
-                    <Button className="w-full bg-primary text-white text-sm shadow-md">
-                      Fazer parte
+                  </div>
+
+                  <Link href="/upgrade" className="block">
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.01]">
+                      Começar agora
                     </Button>
                   </Link>
+
+                  <p className="text-center text-xs text-gray-500 mt-4">
+                    Teste grátis por 7 dias
+                  </p>
                 </CardContent>
               </Card>
             ) : null}
 
+            {/* Card PRO Ativo - Minimalista Sofisticado */}
             {!isBootLoading && isPremium ? (
-              <Card className="flex-1 rounded-xl border border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950 p-6 shadow-sm">
-                <CardHeader className="p-0 mb-4">
-                  <CardTitle className="flex items-center gap-2 text-emerald-700 text-xl font-semibold">
-                    <Crown className="h-5 w-5" />
-                    Você é The One!
-                  </CardTitle>
-                  <CardDescription className="text-sm text-emerald-700/80">
-                    Obrigado por apoiar o EasyOrça! Aproveite todos os recursos.
+              <Card className="relative flex-1 rounded-2xl border-0 bg-gradient-to-br from-emerald-50/50 via-green-50/30 to-teal-50/50 dark:from-emerald-950/30 dark:via-green-950/20 dark:to-teal-950/30 p-7 shadow-sm overflow-hidden">
+                {/* Efeito sutil de brilho */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-100/20 to-transparent opacity-50"></div>
+
+                <CardHeader className="p-0 mb-6 relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <CardTitle className="flex items-center gap-3 text-gray-900 dark:text-white text-xl font-semibold">
+                      <Crown className="h-5 w-5 text-emerald-600" />
+                      Você é The One!
+                    </CardTitle>
+                    <div className="px-2 py-1 bg-emerald-600 text-white text-xs font-medium rounded-md">
+                      Ativo
+                    </div>
+                  </div>
+                  <CardDescription className="text-emerald-700 dark:text-emerald-300">
+                    Obrigado por apoiar o EasyOrça! Aproveite todos os recursos
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-0">
-                  <ul className="space-y-2 text-emerald-700/90 text-sm">
+
+                <CardContent className="p-0 relative z-10">
+                  <div className="space-y-3 mb-6">
                     {[
-                      "Acesso a templates premium",
-                      "Relatórios e métricas avançadas",
-                      "Prioridade em futuras integrações",
+                      { text: "Acesso a templates premium" },
+                      { text: "Relatórios e métricas avançadas" },
+                      { text: "Prioridade em futuras integrações" },
+                      { text: "Suporte prioritário VIP" },
                     ].map((item, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4" />
-                        {item}
-                      </li>
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-emerald-100/30 dark:hover:bg-emerald-800/20 transition-colors duration-200"
+                      >
+                        <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full flex-shrink-0"></div>
+                        <span className="text-emerald-800 dark:text-emerald-200 text-sm">
+                          {item.text}
+                        </span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-4 rounded-xl text-center">
+                    <p className="font-medium">Status: Premium Ativo</p>
+                  </div>
                 </CardContent>
               </Card>
             ) : null}

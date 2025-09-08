@@ -170,7 +170,7 @@ export default function AuthPage() {
 
           {/* Interface moderna de orçamento sendo construída */}
           <div className="relative">
-            <div className="bg-white/90 backdrop-blur-xl rounded-2xl p-8 w-[400px] mx-auto shadow-2xl border border-white/50">
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl p-8 w-[360px] md:w-[400px] mx-auto shadow-2xl border border-white/50">
               <div className="space-y-6">
                 {/* Header com info do cliente */}
                 <div className="space-y-3">
