@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import HeaderLandingPage from "./HeaderLandingPage";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 
 export default function ModernEasyOrcaLanding() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -104,14 +105,20 @@ export default function ModernEasyOrcaLanding() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="group bg-primary text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl transform hover:scale-105 transition-all flex items-center justify-center">
+                <Link
+                  href="/auth/login"
+                  className="group bg-primary text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl transform hover:scale-105 transition-all flex items-center justify-center"
+                >
                   Começar Grátis Agora
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <button className="flex items-center justify-center px-8 py-4 border border-gray-300 rounded-full text-lg font-semibold hover:bg-gray-50 transition-all">
+                </Link>
+                <Link
+                  href="https://www.instagram.com/easyorca"
+                  className="flex items-center justify-center px-8 py-4 border border-gray-300 rounded-full text-lg font-semibold hover:bg-gray-50 transition-all"
+                >
                   <Play className="w-5 h-5 mr-2" />
                   Ver Demonstração
-                </button>
+                </Link>
               </div>
 
               <div className="flex items-center space-x-8 text-sm text-gray-500">
@@ -350,10 +357,11 @@ export default function ModernEasyOrcaLanding() {
                   </div>
                 ))}
               </div>
-
-              <button className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition-colors">
-                Começar Grátis
-              </button>
+              <Link href="/auth/login">
+                <button className="w-full bg-black text-white py-4 rounded-full font-semibold hover:shadow-lg transform transition-all">
+                  Começar Agora
+                </button>
+              </Link>
             </div>
 
             {/* Pro Plan */}
@@ -392,6 +400,7 @@ export default function ModernEasyOrcaLanding() {
                   "Relatórios detalhados",
                   "Suporte prioritário",
                   "Backup automático na nuvem",
+                  "IA integrada",
                 ].map((feature, index) => (
                   <div key={index} className="flex items-center">
                     <CheckCircle className="w-5 h-5 text-blue-500 mr-3 flex-shrink-0" />
@@ -399,13 +408,11 @@ export default function ModernEasyOrcaLanding() {
                   </div>
                 ))}
               </div>
-
-              <button className="w-full bg-primary text-white py-4 rounded-full font-semibold hover:shadow-lg transform hover:scale-105 transition-all">
-                Começar Teste Grátis
-              </button>
-              <p className="text-center text-sm text-gray-500 mt-2">
-                7 dias grátis, cancele quando quiser
-              </p>
+              <Link href="/auth/login">
+                <button className="button-pulse w-full bg-primary text-white py-4 rounded-full font-semibold hover:shadow-lg transform transition-all">
+                  Começar Teste Grátis
+                </button>
+              </Link>
             </div>
           </div>
 
@@ -513,10 +520,13 @@ export default function ModernEasyOrcaLanding() {
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <button className="button-pulse group bg-white text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl flex items-center justify-center">
+            <Link
+              href="/auth/login"
+              className="button-pulse group bg-white text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl flex items-center justify-center"
+            >
               Começar Grátis Agora
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-white/80">
