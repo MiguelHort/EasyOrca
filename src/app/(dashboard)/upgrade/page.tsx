@@ -148,7 +148,7 @@ export default function AssinarPlanoPage() {
                 </div>
                 
                 <div className="flex items-end gap-2">
-                  <span className="text-5xl font-bold">R$ 49</span>
+                  <span className="text-5xl font-bold">R$ 39</span>
                   <span className="text-xl opacity-90 mb-2">90</span>
                   <span className="text-blue-100 mb-3">/mês</span>
                 </div>
@@ -174,7 +174,7 @@ export default function AssinarPlanoPage() {
                     },
                     {
                       icon: <MessageCircle className="h-6 w-6" />,
-                      title: "WhatsApp Pro",
+                      title: "WhatsApp Envio",
                       description: "Automação inteligente"
                     },
                     {
@@ -278,16 +278,6 @@ export default function AssinarPlanoPage() {
                 <p className="text-gray-600 text-sm">Teste sem compromisso</p>
               </div>
               
-              <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center shadow-sm">
-                <Users className="h-12 w-12 text-primary mx-auto mb-3" />
-                <h4 className="font-semibold text-gray-900 mb-1">+10k usuários</h4>
-                <div className="flex items-center justify-center gap-1 mt-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                  ))}
-                  <span className="text-sm text-gray-600 ml-2">4.9/5</span>
-                </div>
-              </div>
 
               <div className="bg-primary/5 rounded-2xl border border-primary/20 p-6 text-center">
                 <MessageCircle className="h-12 w-12 text-primary mx-auto mb-3" />
