@@ -37,8 +37,8 @@ export async function POST(req: Request) {
       customer: stripeCustomerId,
       line_items: [{ price: process.env.PRICE_ID_49!, quantity: 1 }],
       allow_promotion_codes: true, // cliente digita ONEORCA29 no Checkout
-      success_url: `https://easyorca.com/home`,
-      cancel_url: `https://easyorca.com/upgrade`,
+      success_url: `https://easyorca.com/`,
+      cancel_url: `https://easyorca.com/`,
       automatic_tax: { enabled: false },
     });
 
