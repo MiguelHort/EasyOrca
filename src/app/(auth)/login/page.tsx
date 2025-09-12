@@ -105,6 +105,34 @@ export default function AuthPage() {
     mode: "onSubmit",
   });
 
+  // Helpers
+  function allFilled<T extends Record<string, any>>(obj: T, keys: (keyof T)[]) {
+    return keys.every((k) => {
+      const v = obj[k];
+      return typeof v === "string" ? v.trim().length > 0 : Boolean(v);
+    });
+  }
+
+  // Watches (react-hook-form)
+  const loginValues = loginForm.watch();
+  const registerValues = registerForm.watch();
+
+  // Todos completos?
+  const isLoginComplete = allFilled(loginValues, [
+    "email",
+    "passwordHash",
+  ] as const);
+
+  // Se quiser exigir TODOS no cadastro:
+  const isRegisterComplete = allFilled(registerValues, [
+    "name",
+    "email",
+    "password",
+    "companyName",
+    "phone",
+    "userName",
+  ] as const);
+
   // Login handler
   async function handleLogin(data: LoginInputs) {
     try {
@@ -522,6 +550,7 @@ export default function AuthPage() {
                   >
                     Entrar
                   </button>
+
                   <button
                     type="button"
                     onClick={() => setIsLogin(false)}
@@ -634,7 +663,10 @@ export default function AuthPage() {
 
                           <Button
                             type="submit"
-                            disabled={loginForm.formState.isSubmitting}
+                            disabled={
+                              loginForm.formState.isSubmitting ||
+                              !isLoginComplete
+                            }
                             className="w-full h-12 text-base rounded-xl"
                           >
                             {loginForm.formState.isSubmitting ? (
@@ -646,6 +678,15 @@ export default function AuthPage() {
                               "Entrar"
                             )}
                           </Button>
+
+                          {!isLoginComplete && (
+                            <p className="mt-2 text-xs text-red-500">
+                              Preencha{" "}
+                              <span className="font-medium">e-mail</span> e{" "}
+                              <span className="font-medium">senha</span> para
+                              continuar.
+                            </p>
+                          )}
                         </form>
                       </div>
                     </motion.div>
@@ -751,7 +792,7 @@ export default function AuthPage() {
                               </div>
                               <Input
                                 type="text"
-                                placeholder="Empresa (opcional)"
+                                placeholder="Empresa"
                                 className="h-11 w-full pl-10 pr-3 rounded-xl text-sm"
                                 {...registerForm.register("companyName")}
                               />
@@ -771,7 +812,7 @@ export default function AuthPage() {
                               </div>
                               <Input
                                 type="tel"
-                                placeholder="Telefone (opcional)"
+                                placeholder="Telefone"
                                 className="h-11 w-full pl-10 pr-3 rounded-xl text-sm"
                                 {...registerForm.register("phone")}
                               />
@@ -802,7 +843,10 @@ export default function AuthPage() {
 
                           <Button
                             type="submit"
-                            disabled={registerForm.formState.isSubmitting}
+                            disabled={
+                              registerForm.formState.isSubmitting ||
+                              !isRegisterComplete
+                            }
                             className="w-full h-12 text-base rounded-xl"
                           >
                             {registerForm.formState.isSubmitting ? (
@@ -814,6 +858,12 @@ export default function AuthPage() {
                               "Cadastrar"
                             )}
                           </Button>
+
+                          {!isRegisterComplete && (
+                            <p className="mt-2 text-xs text-red-500">
+                              Preencha todos os campos para criar sua conta.
+                            </p>
+                          )}
                         </form>
                       </div>
                     </motion.div>
