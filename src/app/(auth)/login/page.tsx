@@ -106,7 +106,10 @@ export default function AuthPage() {
   });
 
   // Helpers
-  function allFilled<T extends Record<string, any>>(obj: T, keys: (keyof T)[]) {
+  function allFilled<T extends Record<string, any>>(
+    obj: T,
+    keys: ReadonlyArray<keyof T>
+  ) {
     return keys.every((k) => {
       const v = obj[k];
       return typeof v === "string" ? v.trim().length > 0 : Boolean(v);
@@ -830,7 +833,7 @@ export default function AuthPage() {
                             </div>
                             <Input
                               type="text"
-                              placeholder="Nome de usuário (opcional)"
+                              placeholder="Nome de usuário"
                               className="h-12 w-full pl-11 pr-3 rounded-xl"
                               {...registerForm.register("userName")}
                             />
