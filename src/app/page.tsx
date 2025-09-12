@@ -392,7 +392,7 @@ export default function ModernEasyOrcaLanding() {
 
               <div className="space-y-4 mb-8">
                 {[
-                  "Orçamentos ilimitados",
+                  "Muito mais Orçamentos",
                   "Modelos personalizáveis",
                   "WhatsApp + Email automático",
                   "Dashboard completo com métricas",

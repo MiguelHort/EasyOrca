@@ -159,7 +159,7 @@ export default function AssinarPlanoPage() {
                   {[
                     {
                       icon: <Zap className="h-6 w-6" />,
-                      title: "Orçamentos Ilimitados",
+                      title: "Muito mais Orçamentos",
                       description: "Sem limites para crescer"
                     },
                     {

@@ -314,7 +314,7 @@ export default function DashboardPage() {
                 <CardContent className="p-0 relative z-10">
                   <div className="space-y-3 mb-7">
                     {[
-                      { text: "Orçamentos ilimitados" },
+                      { text: "Muito mais Orçamentos" },
                       { text: "Templates premium exclusivos" },
                       { text: "Integração instantânea com Pix" },
                       { text: "Relatórios e analytics avançados" },
